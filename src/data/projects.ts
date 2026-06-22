@@ -37,17 +37,17 @@ export const projects: Project[] = [
     tag: "commerce · togo",
     name: "MamaShop",
     description:
-      "Système de gestion à distance pour un commerce de gros de fruits et légumes à Lomé. Application terrain mobile-first pour les employés, dashboard temps réel pour la direction, et automatisation des communications clients via WhatsApp.",
+      "Application mobile (React Native / Expo) de gestion pour un grossiste de fruits & légumes à Lomé. Trois espaces selon le rôle (Gérant, Agent de terrain, Diaspora), suivi du stock, des ventes et des crédits — conçue offline-first pour rester utilisable même sans réseau.",
     links: [
       { label: "↗ Étude de cas", href: "/projets/mamashop" },
       { label: "↗ Code (GitHub)", href: "#" }, // TODO: repo public
     ],
     meta: [
-      { label: "rôle", value: "Dev full-stack" },
+      { label: "rôle", value: "Dev full-stack (mobile)" },
       { label: "backend", value: "Supabase / PostgreSQL" },
-      { label: "canal client", value: "WhatsApp API" },
+      { label: "mode", value: "Offline-first + sync" },
     ],
-    stack: ["Supabase", "n8n", "WhatsApp API", "React"],
+    stack: ["React Native", "Expo", "TypeScript", "Supabase", "PostgreSQL"],
   },
   {
     slug: "abo",
@@ -97,10 +97,10 @@ export const projects: Project[] = [
       { label: "↗ novarift.io", href: "https://novarift.io" },
     ],
     meta: [
-      { label: "rôle", value: "Cofondateur · Dev full-stack" },
-      { label: "projets livrés", value: "Plusieurs en prod" },
-      { label: "périmètre", value: "Front · Back · Déploiement" },
+      { label: "rôle", value: "Cofondateur · Dev" },
+      { label: "approche", value: "Vanilla · 0 framework" },
+      { label: "perf", value: "Lighthouse > 90" },
     ],
-    stack: ["Next.js", "Supabase", "Stripe", "Vercel", "n8n"],
+    stack: ["HTML", "CSS", "JavaScript", "Vercel"],
   },
 ];
