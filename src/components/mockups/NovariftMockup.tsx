@@ -1,57 +1,61 @@
 import { BrowserFrame } from "./BrowserFrame";
 
-/** Mockup Novarift : hero du site d'agence (palette dark / gold). */
+/**
+ * Mockup Novarift — fidèle au vrai index.html (site vitrine vanilla).
+ * Palette réelle (CLAUDE.md) : fond #080A0F, or #C8A96E, blanc #F0EDE8.
+ * Titres serif (Cormorant Garamond → fallback Georgia).
+ */
 export function NovariftMockup() {
   const bg = "#080A0F";
   const gold = "#C8A96E";
   const goldLight = "#E2C99A";
   const white = "#F0EDE8";
-  const serif = "Georgia, 'Times New Roman', serif";
+  const serif = "'Cormorant Garamond', Georgia, 'Times New Roman', serif";
 
   return (
     <BrowserFrame url="novarift.io">
       <div style={{ background: bg, color: white }} className="text-[12px]">
         {/* nav */}
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <span
-            className="tracking-[0.2em] text-[11px] font-semibold"
-            style={{ color: white }}
-          >
+          <span className="text-[11px] font-semibold tracking-[0.22em]">
             NOVARIFT
           </span>
-          <div className="flex items-center gap-3 text-[9px] text-white/60">
-            <span>Services</span>
+          <div className="flex items-center gap-3 text-[9px] text-white/55">
+            <span>What we do</span>
             <span>Work</span>
             <span>Pricing</span>
             <span
-              style={{ borderColor: gold, color: gold }}
-              className="rounded-full border px-2 py-[3px]"
+              style={{ background: gold, color: bg }}
+              className="rounded-full px-2.5 py-[3px] font-medium"
             >
-              Contact
+              Start a project
             </span>
           </div>
         </div>
 
         {/* hero */}
-        <div className="px-5 py-8">
-          <div
-            className="text-[9px] tracking-[0.25em]"
-            style={{ color: gold }}
-          >
+        <div className="px-5 py-7">
+          <div className="text-[9px] tracking-[0.25em]" style={{ color: gold }}>
             BASED IN CANADA · EST. 2025
           </div>
-          <h3
+          <h1
             style={{ fontFamily: serif }}
-            className="mt-3 text-[26px] leading-[1.15]"
+            className="mt-3 text-[34px] font-medium leading-[0.98]"
           >
-            We build digital
+            We <em style={{ color: gold }}>build</em>
             <br />
-            experiences that{" "}
-            <span style={{ color: gold, fontStyle: "italic" }}>convert</span>.
-          </h3>
-          <p className="mt-3 max-w-[230px] text-[10px] leading-relaxed text-white/55">
-            High-performance websites, web apps, automation & AI for founders
-            who refuse to blend in.
+            <span
+              style={{ WebkitTextStroke: `1px ${gold}`, color: "transparent" }}
+            >
+              digital
+            </span>
+            <br />
+            products.
+          </h1>
+          <p className="mt-4 max-w-[250px] text-[10px] leading-relaxed text-white/55">
+            Novarift is a boutique digital agency crafting high-performance
+            websites, web apps & automation systems for founders who refuse to
+            blend in.
           </p>
           <div className="mt-4 flex items-center gap-2">
             <span
@@ -69,12 +73,16 @@ export function NovariftMockup() {
           </div>
         </div>
 
-        {/* marquee strip */}
-        <div
-          className="border-t border-white/10 px-5 py-2 font-mono text-[8px] tracking-wider"
-          style={{ color: "rgba(200,169,110,0.55)" }}
-        >
-          WEB DESIGN · WEB APPS · AUTOMATION · AI · BRANDING · SEO ·
+        {/* services strip */}
+        <div className="border-t border-white/10 px-5 py-2.5">
+          <div className="text-[8px] tracking-[0.2em]" style={{ color: gold }}>
+            WHAT WE DO
+          </div>
+          <div className="mt-1 flex gap-3 text-[9px] text-white/70">
+            <span>◈ Web Design</span>
+            <span>⬡ Mobile Apps</span>
+            <span>⟳ Automation</span>
+          </div>
         </div>
       </div>
     </BrowserFrame>
