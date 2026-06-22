@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Project } from "@/data/projects";
 
 /** Carte projet : titlebar mono + corps 2 colonnes (présentation / méta). */
@@ -28,9 +29,17 @@ export function ProjectCard({ project }: { project: Project }) {
           >
             {project.tag}
           </span>
-          <h3 className="mb-3.5 font-display text-[30px] font-semibold tracking-[-0.01em]">
-            {project.name}
-          </h3>
+          <Link
+            href={`/projets/${project.slug}`}
+            className="group/title mb-3.5 inline-flex items-center gap-2 transition-colors hover:text-lime"
+          >
+            <h3 className="font-display text-[30px] font-semibold tracking-[-0.01em]">
+              {project.name}
+            </h3>
+            <span className="text-[18px] opacity-0 transition-opacity group-hover/title:opacity-100">
+              →
+            </span>
+          </Link>
           <p className="mb-6 text-[15px] leading-[1.8] text-muted">
             {project.description}
           </p>

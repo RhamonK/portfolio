@@ -27,7 +27,8 @@ export function ContactForm() {
     const message = String(data.get("message") ?? "");
 
     // Repli mailto tant que la clé n'est pas configurée.
-    if (!site.contactFormKey || site.contactFormKey === "TODO") {
+    const formKey = site.contactFormKey as string;
+    if (!formKey || formKey === "TODO") {
       const subject = encodeURIComponent(`Contact portfolio — ${name}`);
       const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
       window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;

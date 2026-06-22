@@ -14,7 +14,7 @@ export const site = {
 
   // 📨 Formulaire de contact : crée une clé GRATUITE sur https://web3forms.com
   //    et colle-la ici. Tant que c'est "TODO", le formulaire bascule en mailto.
-  contactFormKey: "TODO",
+  contactFormKey: "fb1d6410-84e6-469b-89a1-95297326e411",
 
   // Cadrage HYBRIDE : message principal = ingénieur employable,
   // signal freelance discret et secondaire.
@@ -38,9 +38,9 @@ export const site = {
 } as const;
 
 export const navLinks = [
-  { label: "Projets", href: "#projets" },
-  { label: "Stack", href: "#skills" },
-  { label: "À propos", href: "#about" },
+  { label: "Projets", href: "/#projets" },
+  { label: "Stack", href: "/#skills" },
+  { label: "À propos", href: "/#about" },
 ] as const;
 
 // Bande marquee technique (répétée 2x dans le composant pour la boucle).
