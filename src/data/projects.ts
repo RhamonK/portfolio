@@ -40,7 +40,7 @@ export const projects: Project[] = [
       "Application mobile (React Native / Expo) de gestion pour un grossiste de fruits & légumes à Lomé. Trois espaces selon le rôle (Gérant, Agent de terrain, Diaspora), suivi du stock, des ventes et des crédits — conçue offline-first pour rester utilisable même sans réseau.",
     links: [
       { label: "↗ Étude de cas", href: "/projets/mamashop" },
-      { label: "↗ Code (GitHub)", href: "#" }, // TODO: repo public
+      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/bizup-africa" },
     ],
     meta: [
       { label: "rôle", value: "Dev full-stack (mobile)" },
@@ -59,7 +59,7 @@ export const projects: Project[] = [
       "Plateforme mobile-first qui donne une présence numérique crédible aux artisans et techniciens à Lomé. Badge « Vérifié ABO » après vérification d'identité, recherche par métier et quartier, devis directs via WhatsApp.",
     links: [
       { label: "↗ Étude de cas", href: "/projets/abo" },
-      { label: "↗ Code (GitHub)", href: "#" }, // TODO: repo public
+      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/abo" },
     ],
     meta: [
       { label: "rôle", value: "Dev full-stack" },
@@ -95,6 +95,7 @@ export const projects: Project[] = [
     links: [
       { label: "↗ Étude de cas", href: "/projets/novarift" },
       { label: "↗ novarift.io", href: "https://novarift.io" },
+      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/Novarift" },
     ],
     meta: [
       { label: "rôle", value: "Cofondateur · Dev" },
