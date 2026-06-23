@@ -47,7 +47,10 @@ export function Contact() {
               LinkedIn
             </a>
             <a href={site.cvPath} download className={linkCls}>
-              Télécharger le CV
+              CV (FR)
+            </a>
+            <a href={site.cvPathEn} download className={linkCls}>
+              CV (EN)
             </a>
           </div>
         </Reveal>

@@ -33,8 +33,9 @@ export const site = {
     instagram: "https://instagram.com/TODO", // TODO
   },
 
-  // 📄 Mets ton CV dans /public/cv.pdf (le bouton pointe ici).
+  // 📄 CV — versions FR et EN dans /public/.
   cvPath: "/cv.pdf",
+  cvPathEn: "/cv-en.pdf",
 } as const;
 
 export const navLinks = [
