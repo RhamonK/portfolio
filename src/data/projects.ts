@@ -143,7 +143,7 @@ export const projects: Project[] = [
     links: [
       { label: "↗ Étude de cas", href: "/projets/kelthen" },
       { label: "↗ kelthen.com", href: "https://kelthen.com" },
-      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/Novarift" },
+      { label: "↗ Code (GitHub)", href: "https://github.com/kelthen/kelthen" },
     ],
     meta: [
       { label: "rôle", value: "Cofondateur · Dev" },
