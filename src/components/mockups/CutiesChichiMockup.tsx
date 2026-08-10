@@ -1,7 +1,7 @@
 import { PhoneFrame } from "./PhoneFrame";
 
-/** Mockup ChiChicuties : conversation WhatsApp de prise de RDV + rappel. */
-export function ChichicutiesMockup() {
+/** Mockup CutiesChichi : conversation WhatsApp de prise de RDV + rappel. */
+export function CutiesChichiMockup() {
   const waHeader = "#008069"; // vert WhatsApp (barre du haut)
   const waBg = "#ECE5DD"; // fond de chat WhatsApp (beige)
   const incoming = "#ffffff";
@@ -32,7 +32,7 @@ export function ChichicutiesMockup() {
             ✂️
           </div>
           <div className="leading-tight">
-            <div className="text-[11px] font-semibold">ChiChicuties</div>
+            <div className="text-[11px] font-semibold">CutiesChichi</div>
             <div className="text-[8px] text-white/70">en ligne</div>
           </div>
         </div>
@@ -47,7 +47,7 @@ export function ChichicutiesMockup() {
             style={{ background: incoming }}
             className="max-w-[85%] self-start rounded-lg rounded-tl-sm px-2.5 py-1.5 shadow-sm"
           >
-            Bienvenue chez ChiChicuties ✂️<br />
+            Bienvenue chez CutiesChichi ✂️<br />
             Quelle prestation souhaitez-vous ?
           </div>
           <div className="flex max-w-[85%] flex-wrap gap-1 self-start">
@@ -103,7 +103,7 @@ export function ChichicutiesMockup() {
             className="max-w-[85%] self-start rounded-lg rounded-tl-sm px-2.5 py-1.5 shadow-sm"
           >
             ⏰ <b>Rappel</b> : ton RDV Tresses, c&apos;est demain à 14:00 chez
-            ChiChicuties. À très vite !
+            CutiesChichi. À très vite !
           </div>
         </div>
 

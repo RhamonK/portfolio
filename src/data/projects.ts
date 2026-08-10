@@ -31,6 +31,38 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "aura",
+    file: "aura — réceptionniste IA",
+    accent: "lime",
+    tag: "IA · multi-canal",
+    name: "AURA",
+    description:
+      "Réceptionniste virtuelle propulsée par IA qui répond aux clients d'un commerce sur tous ses canaux — WhatsApp, Messenger, Instagram, Telegram et chat web — depuis un seul cerveau. Elle comprend le texte comme les notes vocales (transcription automatique), consulte services et disponibilités, puis prend, retrouve, modifie ou annule un rendez-vous dans Google Calendar, avant de répondre sur le canal d'origine.",
+    links: [{ label: "↗ Étude de cas", href: "/projets/aura" }],
+    meta: [
+      { label: "rôle", value: "Architecte & builder IA" },
+      { label: "canaux", value: "5 · web · WA · Messenger · IG · TG" },
+      { label: "cerveau", value: "Agent Gemini + outils" },
+    ],
+    stack: ["n8n", "Google Gemini", "Groq / Whisper", "Google Calendar", "Meta API", "Supabase"],
+  },
+  {
+    slug: "agent-financier",
+    file: "agent-financier — IA marché",
+    accent: "lime",
+    tag: "IA · finance",
+    name: "Agent Financier IA",
+    description:
+      "Analyste financier autonome qui surveille un portefeuille. Chaque matin, un agent IA (Gemini) consolide cours et actualités, rédige un rapport clair, l'archive dans Google Sheets et l'envoie sur Telegram. En journée, une veille intraday ne déclenche une alerte que lorsqu'un signal réellement significatif est détecté.",
+    links: [{ label: "↗ Étude de cas", href: "/projets/agent-financier" }],
+    meta: [
+      { label: "rôle", value: "Conception & automatisation IA" },
+      { label: "rythme", value: "Rapport 8h + veille intraday" },
+      { label: "sortie", value: "Telegram + Google Sheets" },
+    ],
+    stack: ["n8n", "Google Gemini", "APIs marché", "RSS News", "Google Sheets"],
+  },
+  {
     slug: "mamashop",
     file: "mamashop — gestion commerce",
     accent: "coral",
@@ -69,20 +101,36 @@ export const projects: Project[] = [
     stack: ["Next.js 14", "TypeScript", "Prisma", "Cloudflare R2"],
   },
   {
-    slug: "chichicuties",
-    file: "chichicuties-bot — automation",
+    slug: "cutieschichi",
+    file: "cutieschichi-bot — automation",
     accent: "lime",
     tag: "automation · whatsapp",
-    name: "ChiChicuties",
+    name: "CutiesChichi",
     description:
-      "Bot WhatsApp qui automatise la prise de rendez-vous d'un salon de coiffure : le client choisit une prestation et un créneau directement dans la conversation, reçoit une confirmation instantanée, puis un rappel automatique avant son RDV — zéro appel, zéro oubli.",
-    links: [{ label: "↗ Étude de cas", href: "/projets/chichicuties" }],
+      "Système de réservation par WhatsApp pour un salon de coiffure. La cliente choisit une prestation et un créneau dans la conversation ; le salon est prévenu en direct (WhatsApp + Telegram), le rendez-vous est ajouté à Google Calendar, et la cliente reçoit confirmation et rappel par WhatsApp, SMS ou email — zéro appel, zéro oubli.",
+    links: [{ label: "↗ Étude de cas", href: "/projets/cutieschichi" }],
     meta: [
       { label: "rôle", value: "Conception & automatisation" },
       { label: "canal", value: "WhatsApp Business API" },
       { label: "valeur", value: "RDV 24/7 · rappels auto" },
     ],
-    stack: ["WhatsApp Business API", "n8n", "Automatisation", "Scheduler"],
+    stack: ["WhatsApp Business API", "n8n", "Google Calendar", "Scheduler"],
+  },
+  {
+    slug: "kelthen-prospection",
+    file: "kelthen — prospection auto",
+    accent: "lime",
+    tag: "automation · growth",
+    name: "Kelthen · Prospection auto",
+    description:
+      "Moteur de prospection B2B pour l'agence. On envoie une recherche par Telegram ; le workflow scrape les entreprises via Google Maps (Apify), détecte celles sans vrai site, audite la performance des sites existants (Google PageSpeed), score chaque prospect, puis enregistre les leads qualifiés dans Google Sheets et renvoie une synthèse sur Telegram.",
+    links: [{ label: "↗ Étude de cas", href: "/projets/kelthen-prospection" }],
+    meta: [
+      { label: "rôle", value: "Conception & automatisation" },
+      { label: "sources", value: "Google Maps · PageSpeed" },
+      { label: "sortie", value: "Leads scorés → Sheets" },
+    ],
+    stack: ["n8n", "Apify", "Google PageSpeed", "Google Sheets", "Telegram Bot API"],
   },
   {
     slug: "kelthen",

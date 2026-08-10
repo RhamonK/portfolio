@@ -82,8 +82,8 @@ export function Hero() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <StatBlock
               variant="lime"
-              num="3"
-              label="projets en production"
+              num="7"
+              label="projets livrés"
               className="stat-lime-anim"
             />
             <StatBlock

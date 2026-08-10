@@ -9,7 +9,7 @@ export function StatusBar() {
           <span className="dot-live h-2 w-2 rounded-full" />
         </div>
         <div>
-          3 projets livrés · Canada → Togo
+          7 projets livrés · Canada → Togo
           <span className="cursor" />
         </div>
       </div>

@@ -1,10 +1,15 @@
 // ============================================================
 // Études de cas détaillées — une page /projets/[slug] par projet.
 // Contenu basé sur le CODE RÉEL pour mamashop / abo / kelthen,
-// et sur la DESCRIPTION pour chichicuties (pas de dossier source).
+// et sur la DESCRIPTION pour les projets d'automatisation (n8n).
 // ============================================================
 
-export type MockupKind = "phone" | "browser" | "whatsapp";
+export type MockupKind =
+  | "phone"
+  | "browser"
+  | "whatsapp"
+  | "telegram"
+  | "aura";
 
 export type Decision = {
   title: string;
@@ -133,47 +138,184 @@ export const caseStudies: Record<string, CaseStudy> = {
     mockup: "browser",
   },
 
-  chichicuties: {
-    slug: "chichicuties",
-    name: "ChiChicuties",
+  cutieschichi: {
+    slug: "cutieschichi",
+    name: "CutiesChichi",
     tag: "automation · whatsapp",
     accent: "lime",
     year: "2026",
     role: "Conception & automatisation",
     tagline:
-      "Un bot WhatsApp qui prend les rendez-vous d'un salon de coiffure et relance les clients automatiquement.",
-    deviceLabel: "ChiChicuties Bot",
+      "Un système de réservation par WhatsApp qui prend les rendez-vous d'un salon, prévient l'équipe en direct et relance les clientes automatiquement.",
+    deviceLabel: "CutiesChichi",
     context:
-      "Automatisation de la prise de rendez-vous pour un salon de coiffure, directement dans WhatsApp, avec rappels automatiques avant chaque RDV.",
+      "Automatisation complète de la prise de rendez-vous d'un salon de coiffure : réservation côté cliente dans WhatsApp, notification de l'équipe en temps réel, agenda synchronisé et rappels automatiques.",
     problem:
-      "Gérer les rendez-vous par appels et messages privés est chronophage pour le salon, et beaucoup de clients oublient leur RDV (no-shows), ce qui fait perdre des créneaux.",
+      "Gérer les rendez-vous par appels et messages privés est chronophage pour le salon, et beaucoup de clientes oublient leur RDV (no-shows), ce qui fait perdre des créneaux. L'équipe a aussi besoin d'être prévenue instantanément de chaque nouvelle demande.",
     approach: [
-      "Le client réserve en quelques boutons dans une conversation WhatsApp — prestation, jour, créneau.",
-      "Confirmation instantanée, puis rappel automatique avant le rendez-vous.",
-      "Aucune app à installer pour le client : tout se passe dans WhatsApp, qu'il a déjà.",
+      "Côté cliente : réservation en quelques boutons dans WhatsApp — prestation, jour, créneau.",
+      "Côté salon : notification en temps réel de chaque demande, et rendez-vous poussé dans l'agenda.",
+      "Confirmations et rappels multi-canaux (WhatsApp, SMS, email) pour réduire les oublis.",
     ],
     decisions: [
       {
         title: "Parcours conversationnel guidé",
-        body: "Le client choisit sa prestation puis un créneau via des boutons interactifs WhatsApp — pas de saisie libre, pas d'appel téléphonique, pas d'erreur de format.",
+        body: "La cliente choisit sa prestation puis un créneau via des boutons interactifs WhatsApp — pas de saisie libre, pas d'appel téléphonique, pas d'erreur de format.",
       },
       {
-        title: "Rappels automatiques planifiés",
-        body: "Un planificateur envoie un rappel avant le rendez-vous pour réduire fortement les oublis et les créneaux perdus.",
+        title: "L'équipe prévenue, l'agenda à jour",
+        body: "Chaque demande notifie le salon en direct (WhatsApp + Telegram) et, une fois validée, le rendez-vous est ajouté à Google Calendar. La cliente reçoit une confirmation (ou un refus) par WhatsApp, SMS ou email selon ce qu'elle a fourni.",
       },
       {
-        title: "Automatisation sans serveur lourd",
-        body: "L'orchestration (réception des messages WhatsApp, logique de créneaux, envoi des confirmations et rappels) repose sur un workflow d'automatisation n8n.",
+        title: "Backend fiable : sécurisé et sans doublon",
+        body: "La validation passe par une API protégée par secret (rejet 401 sinon) et une garde d'idempotence (« déjà traité ») qui empêche de confirmer deux fois la même demande. L'orchestration repose sur n8n.",
       },
     ],
     result: [
       "Réservation possible 24/7, sans intervention humaine.",
+      "Le salon est prévenu en temps réel et son agenda reste à jour.",
       "Moins de no-shows grâce aux rappels automatiques.",
-      "Le salon se concentre sur les clients plutôt que sur l'agenda.",
     ],
-    stack: ["WhatsApp Business API", "n8n", "Automatisation", "Scheduler"],
+    stack: ["WhatsApp Business API", "n8n", "Google Calendar", "Gmail / SMS", "API sécurisée"],
     links: [],
     mockup: "whatsapp",
+  },
+
+  aura: {
+    slug: "aura",
+    name: "AURA",
+    tag: "IA · multi-canal",
+    accent: "lime",
+    year: "2026",
+    role: "Architecte & builder IA",
+    tagline:
+      "Une réceptionniste IA unique qui répond aux clients sur WhatsApp, Messenger, Instagram, Telegram et le web — et prend les rendez-vous toute seule.",
+    deviceLabel: "AURA · Réceptionniste IA",
+    context:
+      "AURA est une réceptionniste virtuelle multi-canal pour les commerces de service (salons, cliniques, restaurants). Un seul agent IA gère toutes les conversations entrantes, quel que soit le canal, et pilote un vrai agenda.",
+    problem:
+      "Un commerce reçoit des messages sur cinq canaux différents (WhatsApp, Messenger, Instagram, Telegram, chat du site) et doit répondre vite, souvent hors des heures d'ouverture. Répondre à la main, retrouver les dispos et noter chaque RDV est chronophage et source d'erreurs — et beaucoup de clients envoient des notes vocales.",
+    approach: [
+      "Un point d'entrée par canal, tous normalisés vers un format de message unique — l'IA n'a qu'un seul cerveau à alimenter.",
+      "Support natif du texte ET de la voix : les notes vocales sont transcrites automatiquement avant d'atteindre l'agent.",
+      "Un agent IA outillé qui ne se contente pas de discuter : il agit sur l'agenda (consulter, réserver, modifier, annuler).",
+    ],
+    decisions: [
+      {
+        title: "Une seule IA, cinq canaux",
+        body: "Chaque canal (WhatsApp, Messenger, Instagram, Telegram, web) a son adaptateur d'entrée et de sortie, mais converge vers un unique agent Gemini. Un routeur renvoie la réponse sur le canal d'origine du client.",
+      },
+      {
+        title: "Voix comprise, pas seulement le texte",
+        body: "Les messages audio sont téléchargés, transcrits (Groq / Whisper) puis passés à l'agent comme du texte. Le client peut parler ; AURA comprend.",
+      },
+      {
+        title: "Un agent qui agit sur l'agenda",
+        body: "L'agent dispose d'outils concrets : consulter services & prix, vérifier les disponibilités, prendre / retrouver / modifier / annuler un rendez-vous dans Google Calendar, avec Google Sheets comme source des services et des réservations.",
+      },
+    ],
+    result: [
+      "Un seul cerveau IA répond sur cinq canaux, en texte comme en vocal.",
+      "Les rendez-vous sont créés et gérés directement dans Google Calendar.",
+      "Architecture modulaire : ajouter un canal = brancher un adaptateur, sans toucher au cœur.",
+    ],
+    stack: [
+      "n8n",
+      "Google Gemini",
+      "Groq / Whisper",
+      "Google Calendar",
+      "Google Sheets",
+      "Meta API",
+      "Supabase",
+    ],
+    links: [],
+    mockup: "aura",
+  },
+
+  "agent-financier": {
+    slug: "agent-financier",
+    name: "Agent Financier IA",
+    tag: "IA · finance",
+    accent: "lime",
+    year: "2026",
+    role: "Conception & automatisation IA",
+    tagline:
+      "Un analyste financier autonome qui livre un rapport de marché chaque matin et n'alerte en journée que sur les vrais signaux.",
+    deviceLabel: "Agent Financier · Telegram",
+    context:
+      "Un agent IA qui surveille un portefeuille : rapport de marché quotidien rédigé par une IA, et veille intraday intelligente, le tout livré sur Telegram et archivé.",
+    problem:
+      "Suivre un portefeuille demande de lire chaque jour cours et actualités, d'en tirer une synthèse utile, et de réagir en journée sans passer ses heures devant les graphiques — ni se noyer sous les fausses alertes.",
+    approach: [
+      "Deux rythmes complémentaires : un rapport structuré chaque matin, et une veille légère en continu.",
+      "Consolidation des données de marché et des actualités avant toute analyse — l'IA raisonne sur des faits à jour.",
+      "Filtrage des alertes : seuls les signaux jugés significatifs déclenchent une notification.",
+    ],
+    decisions: [
+      {
+        title: "Un analyste IA avec une voix",
+        body: "Le rapport matinal (8h, du lundi au vendredi) est rédigé par un agent Gemini incarnant un analyste — cours et news consolidés, puis une synthèse claire, archivée dans Google Sheets et envoyée sur Telegram.",
+      },
+      {
+        title: "Veille intraday, zéro bruit",
+        body: "Un second agent surveille le marché en journée. Un test « signal détecté ? » ne laisse passer que les mouvements réellement notables, formatés en alerte Telegram — le reste est ignoré.",
+      },
+      {
+        title: "Orchestration sans serveur lourd",
+        body: "Déclencheurs planifiés, récupération de données (APIs de marché + flux RSS), agents IA et sorties (Telegram, Sheets) sont orchestrés dans n8n — modulaire et facile à faire évoluer.",
+      },
+    ],
+    result: [
+      "Un briefing marché clair chaque matin, sans effort.",
+      "Des alertes intraday rares mais pertinentes, plutôt qu'un flot de notifications.",
+      "Un historique des rapports conservé dans Google Sheets.",
+    ],
+    stack: ["n8n", "Google Gemini", "APIs marché", "RSS News", "Google Sheets", "Telegram Bot API"],
+    links: [],
+    mockup: "telegram",
+  },
+
+  "kelthen-prospection": {
+    slug: "kelthen-prospection",
+    name: "Kelthen · Prospection auto",
+    tag: "automation · growth",
+    accent: "lime",
+    year: "2026",
+    role: "Conception & automatisation",
+    tagline:
+      "Un moteur de prospection B2B qui trouve, audite et score des prospects tout seul — piloté depuis Telegram.",
+    deviceLabel: "Kelthen · Prospection",
+    context:
+      "Un pipeline de génération de leads pour l'agence Kelthen : de la recherche d'entreprises à la liste de prospects qualifiés et scorés, sans travail manuel.",
+    problem:
+      "Trouver des clients pour une agence web demande d'identifier des entreprises, de vérifier si leur site est faible ou inexistant, puis de prioriser — un travail long et répétitif fait à la main.",
+    approach: [
+      "On lance une recherche par Telegram (métier + ville) ; le pipeline fait le reste.",
+      "Détection des cibles à fort potentiel : pas de site, ou site lent / mal noté.",
+      "Sortie exploitable : des leads scorés, enregistrés et résumés automatiquement.",
+    ],
+    decisions: [
+      {
+        title: "Scraping ciblé via Google Maps",
+        body: "Une recherche envoyée sur Telegram déclenche un scraping d'entreprises via Apify (Google Maps), puis une normalisation des données pour la suite du pipeline.",
+      },
+      {
+        title: "Audit automatique de la cible",
+        body: "Pour chaque entreprise ayant un site, un audit Google PageSpeed mesure la performance. Un site lent ou absent = un prospect à fort potentiel pour l'agence.",
+      },
+      {
+        title: "Scoring et enregistrement",
+        body: "Chaque prospect est scoré selon des règles, filtré pour ne garder que les plus utiles, enregistré dans Google Sheets, puis résumé dans un message Telegram.",
+      },
+    ],
+    result: [
+      "Une recherche = une liste de prospects qualifiés, sans travail manuel.",
+      "Les cibles à fort potentiel (sites faibles ou absents) remontent en priorité.",
+      "Leads centralisés dans Google Sheets, prêts à contacter.",
+    ],
+    stack: ["n8n", "Apify", "Google PageSpeed", "Google Sheets", "Telegram Bot API"],
+    links: [],
+    mockup: "telegram",
   },
 
   kelthen: {
