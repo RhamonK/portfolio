@@ -1,14 +1,14 @@
 import { PhoneFrame } from "./PhoneFrame";
 
-/** Mockup ChiChicuties : conversation Telegram de prise de RDV + rappel. */
+/** Mockup ChiChicuties : conversation WhatsApp de prise de RDV + rappel. */
 export function ChichicutiesMockup() {
-  const tgHeader = "#527da3"; // bleu Telegram
-  const tgBg = "#d9e4dd"; // fond de chat
+  const waHeader = "#008069"; // vert WhatsApp (barre du haut)
+  const waBg = "#ECE5DD"; // fond de chat WhatsApp (beige)
   const incoming = "#ffffff";
-  const outgoing = "#e4fcc8";
-  const btnText = "#3390ec";
-  const ink = "#1f2c33";
-  const muted = "#7d8a91";
+  const outgoing = "#D9FDD3"; // bulle sortante verte WhatsApp
+  const btnText = "#00A884"; // vert teal des boutons interactifs
+  const ink = "#111b21";
+  const muted = "#667781";
 
   const Btn = ({ children }: { children: React.ReactNode }) => (
     <span
@@ -22,9 +22,9 @@ export function ChichicutiesMockup() {
   return (
     <PhoneFrame>
       <div className="text-[11px]" style={{ color: ink }}>
-        {/* telegram header */}
+        {/* whatsapp header */}
         <div
-          style={{ background: tgHeader }}
+          style={{ background: waHeader }}
           className="flex items-center gap-2 px-3 pb-2 pt-3 text-white"
         >
           <span className="text-[13px]">‹</span>
@@ -32,14 +32,14 @@ export function ChichicutiesMockup() {
             ✂️
           </div>
           <div className="leading-tight">
-            <div className="text-[11px] font-semibold">ChiChicuties Bot</div>
-            <div className="text-[8px] text-white/70">bot · en ligne</div>
+            <div className="text-[11px] font-semibold">ChiChicuties</div>
+            <div className="text-[8px] text-white/70">en ligne</div>
           </div>
         </div>
 
         {/* chat */}
         <div
-          style={{ background: tgBg }}
+          style={{ background: waBg }}
           className="flex flex-col gap-1.5 px-2.5 py-3"
         >
           {/* bot welcome + buttons */}
@@ -115,7 +115,7 @@ export function ChichicutiesMockup() {
           >
             Message…
           </div>
-          <span style={{ color: tgHeader }} className="text-[14px]">
+          <span style={{ color: waHeader }} className="text-[14px]">
             ➤
           </span>
         </div>

@@ -22,14 +22,14 @@ export const site = {
 
   // Email perso en priorité (recruteur), email agence en secondaire.
   email: "rhamonkota@gmail.com",
-  novariftEmail: "hello@novarift.io",
+  kelthenEmail: "hello@kelthen.com",
 
   // 🔗 Liens réels à remplir — un recruteur clique TOUJOURS dessus.
   links: {
     github: "https://github.com/RhamonK",
     linkedin: "https://www.linkedin.com/in/rhamone-nyavedji-nova6679",
     x: "https://x.com/TODO", // TODO (ou supprime si tu n'en as pas)
-    novarift: "https://novarift.io",
+    kelthen: "https://kelthen.com",
     instagram: "https://instagram.com/TODO", // TODO
   },
 

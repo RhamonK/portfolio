@@ -1,11 +1,12 @@
 import { BrowserFrame } from "./BrowserFrame";
 
 /**
- * Mockup Novarift — fidèle au vrai index.html (site vitrine vanilla).
- * Palette réelle (CLAUDE.md) : fond #080A0F, or #C8A96E, blanc #F0EDE8.
+ * Mockup Kelthen — site vitrine de l'agence (vanilla, premium).
+ * Palette : fond #080A0F, or #C8A96E, blanc #F0EDE8.
  * Titres serif (Cormorant Garamond → fallback Georgia).
+ * NB : à ajuster si l'identité visuelle réelle de kelthen.com diffère.
  */
-export function NovariftMockup() {
+export function KelthenMockup() {
   const bg = "#080A0F";
   const gold = "#C8A96E";
   const goldLight = "#E2C99A";
@@ -13,12 +14,12 @@ export function NovariftMockup() {
   const serif = "'Cormorant Garamond', Georgia, 'Times New Roman', serif";
 
   return (
-    <BrowserFrame url="novarift.io">
+    <BrowserFrame url="kelthen.com">
       <div style={{ background: bg, color: white }} className="text-[12px]">
         {/* nav */}
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <span className="text-[11px] font-semibold tracking-[0.22em]">
-            NOVARIFT
+            KELTHEN
           </span>
           <div className="flex items-center gap-3 text-[9px] text-white/55">
             <span>What we do</span>
@@ -53,7 +54,7 @@ export function NovariftMockup() {
             products.
           </h1>
           <p className="mt-4 max-w-[250px] text-[10px] leading-relaxed text-white/55">
-            Novarift is a boutique digital agency crafting high-performance
+            Kelthen is a boutique digital agency crafting high-performance
             websites, web apps & automation systems for founders who refuse to
             blend in.
           </p>

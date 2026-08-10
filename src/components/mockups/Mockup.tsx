@@ -1,7 +1,7 @@
 import { MamaShopMockup } from "./MamaShopMockup";
 import { AboMockup } from "./AboMockup";
 import { ChichicutiesMockup } from "./ChichicutiesMockup";
-import { NovariftMockup } from "./NovariftMockup";
+import { KelthenMockup } from "./KelthenMockup";
 
 /** Sélectionne le bon mockup selon le slug du projet. */
 export function Mockup({ slug }: { slug: string }) {
@@ -12,8 +12,8 @@ export function Mockup({ slug }: { slug: string }) {
       return <AboMockup />;
     case "chichicuties":
       return <ChichicutiesMockup />;
-    case "novarift":
-      return <NovariftMockup />;
+    case "kelthen":
+      return <KelthenMockup />;
     default:
       return null;
   }

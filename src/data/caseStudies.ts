@@ -1,10 +1,10 @@
 // ============================================================
 // Études de cas détaillées — une page /projets/[slug] par projet.
-// Contenu basé sur le CODE RÉEL pour mamashop / abo / novarift,
+// Contenu basé sur le CODE RÉEL pour mamashop / abo / kelthen,
 // et sur la DESCRIPTION pour chichicuties (pas de dossier source).
 // ============================================================
 
-export type MockupKind = "phone" | "browser" | "telegram";
+export type MockupKind = "phone" | "browser" | "whatsapp";
 
 export type Decision = {
   title: string;
@@ -136,26 +136,26 @@ export const caseStudies: Record<string, CaseStudy> = {
   chichicuties: {
     slug: "chichicuties",
     name: "ChiChicuties",
-    tag: "automation · telegram",
+    tag: "automation · whatsapp",
     accent: "lime",
     year: "2026",
     role: "Conception & automatisation",
     tagline:
-      "Un bot Telegram qui prend les rendez-vous d'un salon de coiffure et relance les clients automatiquement.",
+      "Un bot WhatsApp qui prend les rendez-vous d'un salon de coiffure et relance les clients automatiquement.",
     deviceLabel: "ChiChicuties Bot",
     context:
-      "Automatisation de la prise de rendez-vous pour un salon de coiffure, directement dans Telegram, avec rappels automatiques avant chaque RDV.",
+      "Automatisation de la prise de rendez-vous pour un salon de coiffure, directement dans WhatsApp, avec rappels automatiques avant chaque RDV.",
     problem:
       "Gérer les rendez-vous par appels et messages privés est chronophage pour le salon, et beaucoup de clients oublient leur RDV (no-shows), ce qui fait perdre des créneaux.",
     approach: [
-      "Le client réserve en quelques boutons dans une conversation Telegram — prestation, jour, créneau.",
+      "Le client réserve en quelques boutons dans une conversation WhatsApp — prestation, jour, créneau.",
       "Confirmation instantanée, puis rappel automatique avant le rendez-vous.",
-      "Aucune app à installer pour le client : tout se passe dans Telegram.",
+      "Aucune app à installer pour le client : tout se passe dans WhatsApp, qu'il a déjà.",
     ],
     decisions: [
       {
         title: "Parcours conversationnel guidé",
-        body: "Le client choisit sa prestation puis un créneau via des boutons (clavier inline Telegram) — pas de saisie libre, pas d'appel téléphonique, pas d'erreur de format.",
+        body: "Le client choisit sa prestation puis un créneau via des boutons interactifs WhatsApp — pas de saisie libre, pas d'appel téléphonique, pas d'erreur de format.",
       },
       {
         title: "Rappels automatiques planifiés",
@@ -163,7 +163,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         title: "Automatisation sans serveur lourd",
-        body: "L'orchestration (réception des messages Telegram, logique de créneaux, envoi des confirmations et rappels) repose sur un workflow d'automatisation n8n.",
+        body: "L'orchestration (réception des messages WhatsApp, logique de créneaux, envoi des confirmations et rappels) repose sur un workflow d'automatisation n8n.",
       },
     ],
     result: [
@@ -171,23 +171,23 @@ export const caseStudies: Record<string, CaseStudy> = {
       "Moins de no-shows grâce aux rappels automatiques.",
       "Le salon se concentre sur les clients plutôt que sur l'agenda.",
     ],
-    stack: ["Telegram Bot API", "n8n", "Automatisation", "Scheduler"],
+    stack: ["WhatsApp Business API", "n8n", "Automatisation", "Scheduler"],
     links: [],
-    mockup: "telegram",
+    mockup: "whatsapp",
   },
 
-  novarift: {
-    slug: "novarift",
-    name: "Novarift",
+  kelthen: {
+    slug: "kelthen",
+    name: "Kelthen",
     tag: "agence · 2025",
     accent: "lime",
     year: "2025",
     role: "Cofondateur · Développeur",
     tagline:
-      "Le site vitrine de l'agence digitale Novarift — ultra-rapide, sans framework, esthétique premium.",
-    deviceLabel: "novarift.io",
+      "Le site vitrine de l'agence digitale Kelthen — ultra-rapide, sans framework, esthétique premium.",
+    deviceLabel: "kelthen.com",
     context:
-      "Site vitrine de l'agence digitale Novarift (Canada), conçu pour inspirer confiance dès la première seconde et charger instantanément.",
+      "Site vitrine de l'agence digitale Kelthen (Canada), conçu pour inspirer confiance dès la première seconde et charger instantanément.",
     problem:
       "Le site d'une agence est sa première démonstration de compétence : il doit être impeccable, rapide et mémorable — un site lent ou générique décrédibilise immédiatement l'offre.",
     approach: [
@@ -210,11 +210,11 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
     ],
     result: [
-      "Site en production sur novarift.io, hébergé sur Vercel.",
+      "Site en production sur kelthen.com, hébergé sur Vercel.",
       "Chargement rapide, responsive, et une image de marque haut de gamme.",
     ],
     stack: ["HTML", "CSS", "JavaScript", "Vercel"],
-    links: [{ label: "↗ novarift.io", href: "https://novarift.io" }],
+    links: [{ label: "↗ kelthen.com", href: "https://kelthen.com" }],
     mockup: "browser",
   },
 };

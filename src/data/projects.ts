@@ -19,7 +19,7 @@ export type Project = {
   slug: string;
   /** nom de fichier affiché dans la titlebar mono */
   file: string;
-  /** tag pill : "lime" (Novarift) ou "coral" (projets Togo) */
+  /** tag pill : "lime" (Kelthen) ou "coral" (projets Togo) */
   accent: "lime" | "coral";
   tag: string;
   name: string;
@@ -72,29 +72,29 @@ export const projects: Project[] = [
     slug: "chichicuties",
     file: "chichicuties-bot — automation",
     accent: "lime",
-    tag: "automation · telegram",
+    tag: "automation · whatsapp",
     name: "ChiChicuties",
     description:
-      "Bot Telegram qui automatise la prise de rendez-vous d'un salon de coiffure : le client choisit une prestation et un créneau directement dans la conversation, reçoit une confirmation instantanée, puis un rappel automatique avant son RDV — zéro appel, zéro oubli.",
+      "Bot WhatsApp qui automatise la prise de rendez-vous d'un salon de coiffure : le client choisit une prestation et un créneau directement dans la conversation, reçoit une confirmation instantanée, puis un rappel automatique avant son RDV — zéro appel, zéro oubli.",
     links: [{ label: "↗ Étude de cas", href: "/projets/chichicuties" }],
     meta: [
       { label: "rôle", value: "Conception & automatisation" },
-      { label: "canal", value: "Telegram Bot API" },
+      { label: "canal", value: "WhatsApp Business API" },
       { label: "valeur", value: "RDV 24/7 · rappels auto" },
     ],
-    stack: ["Telegram Bot API", "n8n", "Automatisation", "Scheduler"],
+    stack: ["WhatsApp Business API", "n8n", "Automatisation", "Scheduler"],
   },
   {
-    slug: "novarift",
-    file: "novarift.io — agence",
+    slug: "kelthen",
+    file: "kelthen.com — agence",
     accent: "lime",
     tag: "agence · 2025",
-    name: "Novarift",
+    name: "Kelthen",
     description:
       "Agence digitale que j'ai cofondée au Canada. Sites web haute performance, applications web, automatisation et intégration d'IA. Une expérience entrepreneuriale qui m'a appris à livrer de A à Z : cadrage client, architecture, code et déploiement.",
     links: [
-      { label: "↗ Étude de cas", href: "/projets/novarift" },
-      { label: "↗ novarift.io", href: "https://novarift.io" },
+      { label: "↗ Étude de cas", href: "/projets/kelthen" },
+      { label: "↗ kelthen.com", href: "https://kelthen.com" },
       { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/Novarift" },
     ],
     meta: [
