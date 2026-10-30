@@ -3,7 +3,8 @@
 Tout ce qui s'affiche encore comme emplacement neutre sur le site.
 
 ## Captures des projets
-Une capture (ou une courte vidéo d'écran) par écran important, dans `public/projets/<slug>/` :
+Les écrans affichent pour l'instant un dessin de chaque projet (`src/components/ProjectArt.tsx`).
+Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par projet, dans `public/projets/<slug>/` :
 
 - [ ] MamaShop — `public/projets/mamashop/`
 - [ ] ABO — `public/projets/abo/`
