@@ -1,18 +1,30 @@
 import type { Project } from "@/data/projects";
+import { ProjectArt } from "@/components/ProjectArt";
 
-// Écran de verre d'un projet. Tant que la vraie capture n'est pas
-// fournie (/public/projets/<slug>/), on affiche un emplacement neutre.
+// Contenu d'un écran de projet : le dessin du projet, en attendant
+// la vraie capture (/public/projets/<slug>/).
+export function ScreenContent({ project }: { project: Project }) {
+  return (
+    <div className="relative h-full w-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,255,58,0.10),transparent_60%),rgba(16,18,14,0.92)]">
+      <div className="absolute inset-0 p-[4%]">
+        <ProjectArt slug={project.slug} />
+      </div>
+      <span className="absolute left-[4%] top-[3%] font-mono text-[11px] tracking-wide text-lime/80">
+        {project.name.toLowerCase()}
+      </span>
+    </div>
+  );
+}
+
+// Écran plat (mobile, mouvement réduit, Mode rapide).
 export function ProjectScreen({ project }: { project: Project }) {
   return (
     <div
-      className="glass relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-2xl"
+      className="glass relative aspect-[16/10.5] overflow-hidden rounded-2xl"
       role="img"
-      aria-label={`Capture de ${project.name} à venir`}
+      aria-label={`Illustration de ${project.name}`}
     >
-      <div className="text-center">
-        <div className="display text-[clamp(28px,4vw,44px)] text-ink/90">{project.name}</div>
-        <div className="eyebrow mt-2">capture à venir</div>
-      </div>
+      <ScreenContent project={project} />
     </div>
   );
 }

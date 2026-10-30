@@ -118,39 +118,41 @@
 }
 
 /* ===== SCÈNE B — salle d'écrans =====
-   Mobile ou mouvement réduit : carrousel horizontal, sans 3D. */
-.room-inline-caption {
-  display: none;
+   Desktop : cylindre courbé. Mobile ou mouvement réduit : carrousel plat.
+   Sur desktop, la liste plate reste lisible par les lecteurs d'écran. */
+.room-flat {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .room {
     height: auto;
     padding-bottom: 64px;
   }
-  .room-stage {
+  .room-3d {
+    display: none !important;
+  }
+  .room-flat {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    white-space: normal;
     display: flex;
     gap: 16px;
     margin-top: 32px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     padding: 0 24px 12px;
-    perspective: none;
     scrollbar-width: none;
   }
-  .room-screen {
-    position: relative;
-    left: auto;
-    top: auto;
-    translate: none;
+  .room-flat > li {
     flex: 0 0 min(85%, 560px);
     scroll-snap-align: center;
-  }
-  .room-floor,
-  .room-front-caption {
-    display: none !important;
-  }
-  .room-inline-caption {
-    display: block;
   }
 }
 
