@@ -148,14 +148,12 @@ export function ProjectRoom() {
         </div>
       </div>
 
-      <div className="wrap relative z-10 flex items-end justify-between gap-6">
-        <div>
-          <p className="eyebrow">// projets</p>
-          <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
-            Ce que j&apos;ai <span className="text-lime">fait</span>.
-          </h2>
-        </div>
-        <p className="eyebrow room-3d hidden text-right lg:block">molette ou ← → pour tourner</p>
+      <div className="wrap relative z-10 md:text-center">
+        <p className="eyebrow">// projets</p>
+        <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
+          Ce que j&apos;ai <span className="text-lime">fait</span>.
+        </h2>
+        <p className="eyebrow room-3d absolute bottom-2 right-6 hidden lg:block">molette ou ← → pour tourner</p>
       </div>
 
       {/* ===== cylindre (desktop) ===== */}
