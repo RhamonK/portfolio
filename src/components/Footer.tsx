@@ -1,20 +1,13 @@
-import { navLinks, site } from "@/data/site";
+import { site } from "@/data/site";
 
 export function Footer() {
   return (
-    <footer className="border-t border-line py-8">
-      <div className="wrap flex flex-wrap items-center justify-between gap-3 font-mono text-[12px] text-dim">
-        <div>© 2026 {site.name} — Gatineau, Canada</div>
-        <div className="flex gap-6">
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="hover:text-lime">
-              {link.label}
-            </a>
-          ))}
-          <a href="#contact" className="hover:text-lime">
-            Contact
-          </a>
-        </div>
+    <footer className="border-t border-glass-line py-8">
+      <div className="wrap flex flex-wrap items-center justify-between gap-3 text-[14px] text-muted">
+        <span>© {site.name}</span>
+        <a href={site.url} className="font-mono hover:text-ink">
+          {site.domain}
+        </a>
       </div>
     </footer>
   );
