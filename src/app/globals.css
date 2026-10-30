@@ -117,6 +117,74 @@
   }
 }
 
+/* ===== SCÈNE B — salle d'écrans =====
+   Mobile ou mouvement réduit : carrousel horizontal, sans 3D. */
+.room-inline-caption {
+  display: none;
+}
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .room {
+    height: auto;
+    padding-bottom: 64px;
+  }
+  .room-stage {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 24px 12px;
+    perspective: none;
+    scrollbar-width: none;
+  }
+  .room-screen {
+    position: relative;
+    left: auto;
+    top: auto;
+    translate: none;
+    flex: 0 0 min(85%, 560px);
+    scroll-snap-align: center;
+  }
+  .room-floor,
+  .room-front-caption {
+    display: none !important;
+  }
+  .room-inline-caption {
+    display: block;
+  }
+}
+
+/* ===== SCÈNE D — cadres de musée ===== */
+.museum-frame {
+  position: relative;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+.museum-frame::before {
+  content: "";
+  position: absolute;
+  inset: -60px 15% auto;
+  height: 120px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212, 255, 58, 0.22), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.museum-frame.is-lit {
+  border-color: rgba(212, 255, 58, 0.55);
+  box-shadow: 0 0 70px -18px rgba(212, 255, 58, 0.45);
+}
+.museum-frame.is-lit::before {
+  opacity: 1;
+}
+
+@keyframes hint-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+.hint-bob {
+  animation: hint-bob 2s ease-in-out infinite;
+}
+
 /* Mouvement réduit : on coupe les animations, le contenu reste complet. */
 @media (prefers-reduced-motion: reduce) {
   *,
