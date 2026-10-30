@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/data/projects";
 import { ProjectScreen, ScreenContent } from "@/components/ProjectScreen";
-import { scrollToY } from "@/lib/scroll";
+import { presentations } from "@/data/presentations";
+import { Presentation } from "@/components/presentation/Presentation";
+import { lockScroll, scrollToY } from "@/lib/scroll";
 
 // Scène B — salle d'écrans. Le visiteur est au centre d'un cylindre :
 // chaque écran est courbé (découpé en fines bandes posées sur l'anneau)
@@ -30,7 +33,10 @@ export function ProjectRoom() {
   const cylinder = useRef<HTMLDivElement>(null);
   const flat = useRef<(HTMLLIElement | null)[]>([]);
   const trigger = useRef<ScrollTrigger | null>(null);
+  const stage3d = useRef<HTMLDivElement>(null);
+  const lastFocus = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
   const [radius, setRadius] = useState(1000);
   const radiusRef = useRef(1000);
   const n = projects.length;
@@ -104,8 +110,41 @@ export function ProjectRoom() {
     }
   };
 
+  // Lancer : l'écran est « aspiré », la caméra plonge dedans (0,8 s).
+  const launch = (i: number) => {
+    const p = projects[i];
+    if (!presentations[p.slug] || open) return;
+    lastFocus.current = document.activeElement as HTMLElement;
+    lockScroll(true);
+    if (trigger.current) {
+      gsap
+        .timeline({ onComplete: () => setOpen(p.slug) })
+        .to(cylinder.current, { z: radiusRef.current * 1.85, duration: 0.8, ease: "power3.in" }, 0)
+        .to(stage3d.current, { filter: "blur(6px)", duration: 0.8, ease: "power2.in" }, 0);
+    } else setOpen(p.slug);
+  };
+
+  const closePresentation = () => {
+    setOpen(null);
+    lockScroll(false);
+    if (trigger.current) {
+      gsap.to(cylinder.current, { z: radiusRef.current, duration: 0.6, ease: "power3.out" });
+      gsap.to(stage3d.current, { filter: "blur(0px)", duration: 0.6, clearProps: "filter" });
+    }
+    lastFocus.current?.focus();
+  };
+
+  const nextProject = () => {
+    closePresentation();
+    setTimeout(() => goTo(active + 1), 650);
+  };
+
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      launch(active);
+    } else if (e.key === "ArrowRight") {
       e.preventDefault();
       goTo(active + 1);
     } else if (e.key === "ArrowLeft") {
@@ -157,13 +196,13 @@ export function ProjectRoom() {
       </div>
 
       {/* ===== cylindre (desktop) ===== */}
-      <div aria-hidden className="room-3d relative flex-1" style={{ perspective: `${radius}px` }}>
+      <div ref={stage3d} aria-hidden className="room-3d relative flex-1" style={{ perspective: `${radius}px` }}>
         <div
           ref={cylinder}
           className="absolute left-1/2 top-1/2 h-0 w-0 [transform-style:preserve-3d]"
         >
           {projects.map((p, i) => (
-            <div key={p.slug} className="cyl-screen [transform-style:preserve-3d]" onClick={() => goTo(i)}>
+            <div key={p.slug} className="cyl-screen [transform-style:preserve-3d]" onClick={() => (i === active ? launch(i) : goTo(i))}>
               {Array.from({ length: STRIPS }).map((_, j) => {
                 const angle = -(i * STEP + (j - (STRIPS - 1) / 2) * stripDeg);
                 const first = j === 0;
@@ -205,9 +244,15 @@ export function ProjectRoom() {
           <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Projet précédent">
             ←
           </button>
-          <button type="button" className="btn btn-lime" aria-disabled="true" title="La présentation arrive à l'étape suivante">
-            ▶ Lancer la présentation · 60 s
-          </button>
+          {presentations[current.slug] ? (
+            <button type="button" className="btn btn-lime" onClick={() => launch(active)}>
+              ▶ Lancer la présentation · 60 s
+            </button>
+          ) : (
+            <button type="button" className="btn btn-glass" disabled>
+              Présentation bientôt
+            </button>
+          )}
           <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active + 1)} disabled={active === n - 1} aria-label="Projet suivant">
             →
           </button>
@@ -229,9 +274,25 @@ export function ProjectRoom() {
             </span>
             <h3 className="mt-1 text-[24px] font-bold tracking-tight">{p.name}</h3>
             <p className="mt-1 text-muted">{p.pitch}</p>
+            {presentations[p.slug] && (
+              <button type="button" className="btn btn-lime mt-4" onClick={() => launch(i)}>
+                ▶ Lancer la présentation · 60 s
+              </button>
+            )}
           </li>
         ))}
       </ol>
+
+      {open &&
+        createPortal(
+        <Presentation
+          project={projects.find((p) => p.slug === open)!}
+          presentation={presentations[open]}
+          onClose={closePresentation}
+          onNextProject={nextProject}
+        />,
+        document.body,
+      )}
     </section>
   );
 }
