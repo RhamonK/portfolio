@@ -1,107 +1,70 @@
 // ============================================================
-// Projets. Chaque projet alimente une <ProjectCard/>.
-// 👉 Remplace les liens "#" par de vraies URLs (étude de cas,
-//    démo, repo GitHub). Les liens morts tuent ta crédibilité.
+// Projets : ce que chaque projet FAIT, en langage simple.
+// Pas d'architecture ni de code. Rien d'inventé : un champ
+// à confirmer reste `null` et s'affiche comme emplacement neutre.
 // ============================================================
 
-export type ProjectLink = {
-  label: string;
-  href: string;
-};
-
-export type MetaRow = {
-  label: string;
-  value: string;
-};
-
 export type Project = {
-  /** identifiant d'URL : /projets/[slug] */
   slug: string;
-  /** nom de fichier affiché dans la titlebar mono */
-  file: string;
-  /** tag pill : "lime" (Novarift) ou "coral" (projets Togo) */
-  accent: "lime" | "coral";
-  tag: string;
   name: string;
+  /** Une phrase « ce que ça fait », affichée sous l'écran. */
+  pitch: string;
+  /** Description plus longue pour le Mode rapide et le SEO. */
   description: string;
-  links: ProjectLink[];
-  meta: MetaRow[];
-  stack: string[];
+  /** Quelques technologies citées en passant ; null = à confirmer. */
+  tech: string | null;
+  /** Lien public ; null = à fournir. */
+  href: string | null;
+  hrefLabel?: string;
 };
 
 export const projects: Project[] = [
   {
     slug: "mamashop",
-    file: "mamashop — gestion commerce",
-    accent: "coral",
-    tag: "commerce · togo",
     name: "MamaShop",
+    pitch:
+      "Le stock, les ventes et les crédits d'un grossiste, au même endroit, même sans réseau.",
     description:
-      "Application mobile (React Native / Expo) de gestion pour un grossiste de fruits & légumes à Lomé. Trois espaces selon le rôle (Gérant, Agent de terrain, Diaspora), suivi du stock, des ventes et des crédits — conçue offline-first pour rester utilisable même sans réseau.",
-    links: [
-      { label: "↗ Étude de cas", href: "/projets/mamashop" },
-      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/bizup-africa" },
-    ],
-    meta: [
-      { label: "rôle", value: "Dev full-stack (mobile)" },
-      { label: "backend", value: "Supabase / PostgreSQL" },
-      { label: "mode", value: "Offline-first + sync" },
-    ],
-    stack: ["React Native", "Expo", "TypeScript", "Supabase", "PostgreSQL"],
+      "Application mobile de gestion pour un grossiste de fruits et légumes à Lomé. Trois espaces selon le rôle : gérant, agent de terrain, diaspora. Suivi du stock, des ventes et des crédits clients au même endroit, tableau de bord en direct, utilisable même sans réseau.",
+    tech: "React Native, Supabase",
+    href: "https://github.com/RhamonK/bizup-africa",
+    hrefLabel: "Code sur GitHub",
   },
   {
     slug: "abo",
-    file: "abo.tg — artisans vérifiés",
-    accent: "coral",
-    tag: "marketplace · togo",
     name: "ABO",
+    pitch: "Trouver un artisan de confiance, vérifié, en quelques minutes.",
     description:
-      "Plateforme mobile-first qui donne une présence numérique crédible aux artisans et techniciens à Lomé. Badge « Vérifié ABO » après vérification d'identité, recherche par métier et quartier, devis directs via WhatsApp.",
-    links: [
-      { label: "↗ Étude de cas", href: "/projets/abo" },
-      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/abo" },
-    ],
-    meta: [
-      { label: "rôle", value: "Dev full-stack" },
-      { label: "cible MVP", value: "20 artisans vérifiés" },
-      { label: "temps inscription", value: "< 10 min" },
-    ],
-    stack: ["Next.js 14", "TypeScript", "Prisma", "Cloudflare R2"],
+      "Place de marché qui met en relation des clients et des artisans vérifiés. Identité vérifiée, badge de confiance, documents sécurisés, avis vérifiés.",
+    tech: null,
+    href: "https://github.com/RhamonK/abo",
+    hrefLabel: "Code sur GitHub",
   },
   {
     slug: "chichicuties",
-    file: "chichicuties-bot — automation",
-    accent: "lime",
-    tag: "automation · telegram",
     name: "ChiChicuties",
+    pitch: "Des réservations prises et rappelées automatiquement, dans Telegram.",
     description:
-      "Bot Telegram qui automatise la prise de rendez-vous d'un salon de coiffure : le client choisit une prestation et un créneau directement dans la conversation, reçoit une confirmation instantanée, puis un rappel automatique avant son RDV — zéro appel, zéro oubli.",
-    links: [{ label: "↗ Étude de cas", href: "/projets/chichicuties" }],
-    meta: [
-      { label: "rôle", value: "Conception & automatisation" },
-      { label: "canal", value: "Telegram Bot API" },
-      { label: "valeur", value: "RDV 24/7 · rappels auto" },
-    ],
-    stack: ["Telegram Bot API", "n8n", "Automatisation", "Scheduler"],
+      "Bot Telegram qui gère les réservations et envoie des rappels automatiques.",
+    tech: "Telegram, automatisation",
+    href: null,
   },
   {
-    slug: "novarift",
-    file: "novarift.io — agence",
-    accent: "lime",
-    tag: "agence · 2025",
-    name: "Novarift",
+    slug: "kelthen",
+    name: "Kelthen Inc.",
+    pitch: "Mon agence : sites web, automatisation et IA pour les entreprises.",
     description:
-      "Agence digitale que j'ai cofondée au Canada. Sites web haute performance, applications web, automatisation et intégration d'IA. Une expérience entrepreneuriale qui m'a appris à livrer de A à Z : cadrage client, architecture, code et déploiement.",
-    links: [
-      { label: "↗ Étude de cas", href: "/projets/novarift" },
-      { label: "↗ novarift.io", href: "https://novarift.io" },
-      { label: "↗ Code (GitHub)", href: "https://github.com/RhamonK/Novarift" },
-    ],
-    meta: [
-      { label: "rôle", value: "Cofondateur · Dev" },
-      { label: "approche", value: "Vanilla · 0 framework" },
-      { label: "perf", value: "Lighthouse > 90" },
-    ],
-    stack: ["HTML", "CSS", "JavaScript", "Vercel"],
+      "Mon agence : sites web, automatisation et intégration d'IA pour des entreprises.",
+    tech: null,
+    href: "https://kelthen.com",
+    hrefLabel: "kelthen.com",
+  },
+  {
+    slug: "fraul",
+    name: "Fraul",
+    pitch: "Boutique en ligne sur mesure, réalisée avec Kelthen.",
+    description: "Boutique en ligne sur mesure réalisée avec Kelthen.",
+    tech: null,
+    href: null,
   },
 ];
