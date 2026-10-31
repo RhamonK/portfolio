@@ -9,6 +9,7 @@ import { ProjectScreen, ScreenContent } from "@/components/ProjectScreen";
 import { presentations } from "@/data/presentations";
 import { Presentation } from "@/components/presentation/Presentation";
 import { lockScroll, scrollToY } from "@/lib/scroll";
+import { ui, type Lang } from "@/i18n";
 
 // Scène B — salle d'écrans. Le visiteur est au centre d'un cylindre :
 // chaque écran est courbé (découpé en fines bandes posées sur l'anneau)
@@ -31,7 +32,8 @@ function geometryFor(w: number, stageH: number) {
   return { radius, height };
 }
 
-export function ProjectRoom() {
+export function ProjectRoom({ lang }: { lang: Lang }) {
+  const t = ui[lang];
   const section = useRef<HTMLElement>(null);
   const cylinder = useRef<HTMLDivElement>(null);
   const flat = useRef<(HTMLLIElement | null)[]>([]);
@@ -231,12 +233,14 @@ export function ProjectRoom() {
       </div>
 
       <div className="wrap relative z-10 md:text-center">
-        <p className="eyebrow">// projets</p>
+        <p className="eyebrow">{t.projectsEyebrow}</p>
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
-          Some <span className="text-lime">projects</span>.
+          {t.projectsTitle[0]}
+          <span className="text-lime">{t.projectsTitle[1]}</span>
+          {t.projectsTitle[2]}
         </h2>
         <p id="aide-projets" className="sr-only">
-          Flèches gauche et droite pour changer de projet, Entrée pour lancer la présentation.
+          {t.roomHelp}
         </p>
       </div>
 
@@ -284,21 +288,21 @@ export function ProjectRoom() {
           {pad(active + 1)} / {pad(n)}
         </span>
         <h3 className="mt-1 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">{current.name}</h3>
-        <p className="mx-auto mt-1 max-w-[560px] text-muted">{current.pitch}</p>
+        <p className="mx-auto mt-1 max-w-[560px] text-muted">{current.pitch[lang]}</p>
         <div className="mt-5 flex items-center justify-center gap-3">
-          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Projet précédent">
+          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label={t.prevProject}>
             ←
           </button>
           {presentations[current.slug] ? (
             <button type="button" className="btn btn-lime" onClick={() => launch(active)}>
-              ▶ Lancer la présentation · 60 s
+              {t.launch}
             </button>
           ) : (
             <button type="button" className="btn btn-glass" disabled>
-              Présentation bientôt
+              {t.soon}
             </button>
           )}
-          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active + 1)} disabled={active === n - 1} aria-label="Projet suivant">
+          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active + 1)} disabled={active === n - 1} aria-label={t.nextProject}>
             →
           </button>
         </div>
@@ -318,10 +322,10 @@ export function ProjectRoom() {
               {pad(i + 1)} / {pad(n)}
             </span>
             <h3 className="mt-1 text-[24px] font-bold tracking-tight">{p.name}</h3>
-            <p className="mt-1 text-muted">{p.pitch}</p>
+            <p className="mt-1 text-muted">{p.pitch[lang]}</p>
             {presentations[p.slug] && (
               <button type="button" className="btn btn-lime mt-4" tabIndex={is3d ? -1 : undefined} onClick={() => launch(i)}>
-                ▶ Lancer la présentation · 60 s
+                {t.launch}
               </button>
             )}
           </li>
@@ -331,6 +335,7 @@ export function ProjectRoom() {
       {open &&
         createPortal(
         <Presentation
+          initialLang={lang}
           project={projects.find((p) => p.slug === open)!}
           presentation={presentations[open]}
           onClose={closePresentation}

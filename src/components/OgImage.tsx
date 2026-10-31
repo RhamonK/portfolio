@@ -1,12 +1,11 @@
 import { ImageResponse } from "next/og";
-import { site } from "@/data/site";
+import { site, siteCopy } from "@/data/site";
+import type { Lang } from "@/i18n";
 
-export const alt = site.title;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const ogSize = { width: 1200, height: 630 };
 
 // Image de partage (réseaux sociaux), générée au build.
-export default function OgImage() {
+export function ogImage(lang: Lang) {
   return new ImageResponse(
     (
       <div
@@ -21,13 +20,11 @@ export default function OgImage() {
           color: "#f2f3ee",
         }}
       >
-        <div style={{ fontSize: 108, fontWeight: 700, letterSpacing: -4, lineHeight: 1 }}>
-          {site.name}
-        </div>
-        <div style={{ marginTop: 28, fontSize: 36, color: "#9a9d93" }}>{site.role}</div>
+        <div style={{ fontSize: 108, fontWeight: 700, letterSpacing: -4, lineHeight: 1 }}>{site.name}</div>
+        <div style={{ marginTop: 28, fontSize: 36, color: "#9a9d93" }}>{siteCopy[lang].role}</div>
         <div style={{ marginTop: 40, fontSize: 28, color: "#d4ff3a" }}>{site.domain}</div>
       </div>
     ),
-    size,
+    ogSize,
   );
 }

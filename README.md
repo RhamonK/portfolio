@@ -21,7 +21,9 @@ npm run build    # build de production
 | `src/data/parcours.ts` | Les 3 étapes du parcours |
 
 - CV : `public/cv/Rhamone_Nyavedji.pdf` (FR) et `public/cv/Rhamone_Nyavedji_EN.pdf` (EN).
-- `/rapide` : Mode rapide, tout l'essentiel sans animation.
+- Deux langues : français à la racine (`/`, `/rapide`), anglais sous `/en` (`/en`, `/en/quick`).
+  Textes de l'interface : `src/i18n.ts` ; textes des projets et du parcours : champs `fr` / `en` dans `src/data/`.
+- `/rapide` (`/en/quick`) : Mode rapide, tout l'essentiel sans animation.
 - Captures et dessins des projets : `public/projets/<slug>/`. Les dessins (`dessin.svg`) sont générés
   depuis `src/components/ProjectArt.tsx` avec `npm run art`.
 - Présentations de 60 s (FR / EN) : `src/data/presentations.ts`.

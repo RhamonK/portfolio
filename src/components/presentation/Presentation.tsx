@@ -25,10 +25,13 @@ export function Presentation({
   presentation,
   onClose,
   onNextProject,
+  initialLang = "fr",
 }: {
   project: Project;
   presentation: Pres;
   onClose: () => void;
+  /** Langue de la page qui ouvre la présentation. */
+  initialLang?: Lang;
   /** Absent sur le dernier projet. */
   onNextProject?: () => void;
 }) {
@@ -44,7 +47,7 @@ export function Presentation({
   const signals = useRef<PresenterSignals>({ speaking: 0, pointing: false, mouse: { x: 0, y: 0 }, still: false });
 
   const [reduced] = useState(() => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const [lang, setLang] = useState<Lang>("fr");
+  const [lang, setLang] = useState<Lang>(initialLang);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(!reduced);
   const [muted, setMuted] = useState(true);
@@ -228,7 +231,7 @@ export function Presentation({
       ref={root}
       role="dialog"
       aria-modal="true"
-      aria-label={`${project.name} — présentation`}
+      aria-label={`${project.name} — ${lang === "fr" ? "présentation" : "presentation"}`}
       onKeyDown={onKeyDown}
       className="fixed inset-0 z-[200] flex flex-col overflow-hidden bg-bg"
     >
