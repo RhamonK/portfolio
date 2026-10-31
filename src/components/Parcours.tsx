@@ -4,10 +4,12 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { parcours } from "@/data/parcours";
+import { ui, type Lang } from "@/i18n";
 
 // Scène D — mur de musée. La frise lime se dessine au défilement
 // et chaque cadre s'allume à son passage.
-export function Parcours() {
+export function Parcours({ lang }: { lang: Lang }) {
+  const t = ui[lang];
   const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -47,9 +49,9 @@ export function Parcours() {
   return (
     <section ref={root} id="parcours" aria-labelledby="titre-parcours" className="py-28">
       <div className="wrap">
-        <p className="eyebrow">// parcours</p>
+        <p className="eyebrow">{t.pathEyebrow}</p>
         <h2 id="titre-parcours" className="display mt-3 text-[clamp(40px,6vw,80px)]">
-          Parcours
+          {t.pathTitle}
         </h2>
         <div className="frise-list relative mt-16 pl-8 md:pl-14">
           <div aria-hidden className="absolute bottom-0 left-0 top-0 w-px bg-white/10" />
@@ -59,7 +61,7 @@ export function Parcours() {
           />
           <ol className="space-y-16">
             {parcours.map((s) => (
-              <li key={s.period} className="relative">
+              <li key={s.org} className="relative">
                 <span
                   aria-hidden
                   className="absolute -left-8 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-lime md:-left-14"
@@ -67,10 +69,10 @@ export function Parcours() {
                 <article className="museum-frame glass rounded-2xl p-2.5">
                   <div className="rounded-xl border border-white/10 p-6 md:p-9">
                     <p className="eyebrow">
-                      {s.period} · {s.place}
+                      {s.period[lang]} · {s.place}
                     </p>
                     <h3 className="mt-3 text-[clamp(22px,2.6vw,32px)] font-bold leading-tight tracking-tight">
-                      {s.title}
+                      {s.title[lang]}
                     </h3>
                     <p className="mt-1 text-[18px] text-lime">
                       {s.href ? (
@@ -81,7 +83,7 @@ export function Parcours() {
                         s.org
                       )}
                     </p>
-                    <p className="mt-3 max-w-[640px] text-muted">{s.text}</p>
+                    <p className="mt-3 max-w-[640px] text-muted">{s.text[lang]}</p>
                   </div>
                 </article>
               </li>

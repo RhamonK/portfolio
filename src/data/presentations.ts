@@ -6,7 +6,9 @@
 // qui ne vienne pas de ces sources.
 // ============================================================
 
-export type Lang = "fr" | "en";
+import type { Lang } from "@/i18n";
+
+export type { Lang };
 type T = Record<Lang, string>;
 
 export type Slide = {

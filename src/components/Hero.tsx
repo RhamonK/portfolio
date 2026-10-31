@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { site } from "@/data/site";
+import { site, siteCopy } from "@/data/site";
+import { ui, type Lang } from "@/i18n";
 
 // Scène A — le CV vivant. Le texte est visible tout de suite ;
 // les feuilles de CV en verre glissent derrière le titre au chargement,
@@ -14,7 +15,9 @@ const sheets = [
   { x: -20, y: -10, r: -2 },
 ];
 
-export function Hero() {
+export function Hero({ lang }: { lang: Lang }) {
+  const t = ui[lang];
+  const copy = siteCopy[lang];
   const root = useRef<HTMLElement>(null);
   const top = useRef<HTMLDivElement>(null);
 
@@ -84,20 +87,20 @@ export function Hero() {
           {site.name}
         </h1>
         <p className="mx-auto mt-6 max-w-[720px] text-[clamp(17px,2vw,22px)] text-ink/80">
-          {site.role} · {site.position}
+          {copy.role} · {copy.position}
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <a href="#projets" className="btn btn-lime">
-            Voir mes projets ↓
+            {t.seeProjects}
           </a>
-          <a href={site.cv.fr} download className="btn btn-glass">
-            Télécharger mon CV
+          <a href={site.cv[lang]} download className="btn btn-glass">
+            {t.downloadCv}
           </a>
         </div>
       </div>
 
       <p className="eyebrow hint-bob absolute inset-x-0 bottom-8 text-center !text-ink/70">
-        molette pour entrer dans la salle ↓
+        {t.hint}
       </p>
     </section>
   );
