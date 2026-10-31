@@ -15,20 +15,20 @@ import { lockScroll, scrollToY } from "@/lib/scroll";
 // et la molette fait tourner le cercle autour de lui, projet par projet.
 // Mobile ou mouvement réduit : carrousel horizontal plat (voir globals.css).
 
-const SCREEN_DEG = 38; // largeur d'un écran sur l'anneau
-const STEP = 46; // écart entre deux écrans
-const STRIPS = 16; // bandes par écran : plus il y en a, plus la courbe est douce
-const RATIO = 0.64; // hauteur / largeur d'un écran
+const SCREEN_DEG = 60; // largeur d'un écran sur l'anneau : grand arc = écran large et bien courbé
+const STEP = 66; // écart entre deux écrans
+const STRIPS = 28; // bandes par écran : plus il y en a, plus la courbe est douce
+const RATIO = 0.6; // hauteur / largeur maximale d'un écran
 const rad = (d: number) => (d * Math.PI) / 180;
 const pad = (n: number) => String(n).padStart(2, "0");
 
-// Rayon de l'anneau : l'écran de face (bords courbés compris) tient dans
-// la hauteur libre entre le titre et la légende, sans les chevaucher.
-function radiusFor(w: number, stageH: number) {
-  const byWidth = Math.min(Math.max(w * 0.72, 600), 1150);
-  const bow = 1 / Math.cos(rad(SCREEN_DEG / 2)); // les bords courbés paraissent plus hauts
-  const byHeight = (stageH * 0.84) / (RATIO * rad(SCREEN_DEG) * bow);
-  return Math.round(Math.max(320, Math.min(byWidth, byHeight)));
+// Rayon de l'anneau selon la largeur de la fenêtre ; la hauteur des écrans
+// suit la place libre entre le titre et la légende, sans les chevaucher.
+function geometryFor(w: number, stageH: number) {
+  const radius = Math.round(Math.min(Math.max(w * 0.56, 420), 1000));
+  const width = 2 * radius * Math.tan(rad(SCREEN_DEG / STRIPS) / 2) * STRIPS;
+  const height = Math.round(Math.min(width * RATIO, stageH * 0.82));
+  return { radius, height };
 }
 
 export function ProjectRoom() {
@@ -40,15 +40,16 @@ export function ProjectRoom() {
   const lastFocus = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
-  const [radius, setRadius] = useState(1000);
-  const radiusRef = useRef(1000);
+  const [{ radius, height: screenH }, setGeo] = useState({ radius: 800, height: 420 });
+  const radiusRef = useRef(800);
   const n = projects.length;
 
   useEffect(() => {
     const onResize = () => {
       const stageH = stage3d.current?.clientHeight || window.innerHeight * 0.55;
-      radiusRef.current = radiusFor(window.innerWidth, stageH);
-      setRadius(radiusRef.current);
+      const geo = geometryFor(window.innerWidth, stageH);
+      radiusRef.current = geo.radius;
+      setGeo(geo);
     };
     onResize();
     const ro = new ResizeObserver(onResize);
@@ -70,10 +71,11 @@ export function ProjectRoom() {
         gsap.set(cylinder.current, { z: radiusRef.current, rotationY: a * STEP });
         screens.forEach((el, i) => {
           const ad = Math.abs(i - a);
+          const hidden = ad * STEP > 110;
           const strips = el.children;
           gsap.set(strips, {
-            opacity: ad * STEP > 95 ? 0 : 1 - Math.min(ad, 1.6) * 0.42,
-            visibility: ad * STEP > 95 ? "hidden" : "visible",
+            opacity: hidden ? 0 : 1 - Math.min(ad, 1.5) * 0.4,
+            visibility: hidden ? "hidden" : "visible",
           });
         });
         setActive(Math.round(a));
@@ -166,7 +168,6 @@ export function ProjectRoom() {
   const stripDeg = SCREEN_DEG / STRIPS;
   const stripW = 2 * radius * Math.tan(rad(stripDeg) / 2);
   const screenW = stripW * STRIPS;
-  const screenH = screenW * RATIO;
   const current = projects[active];
 
   return (
