@@ -42,11 +42,11 @@ export const projects: Project[] = [
     href: null,
   },
   {
-    slug: "chichicuties",
-    name: "ChiChicuties",
+    slug: "studio-nala",
+    name: "Studio Nala",
     pitch: "Un salon qui prend ses rendez-vous tout seul, sur tous les canaux.",
     description:
-      "Site et système de réservation pour un salon de coiffure. Les clientes réservent en ligne (prestation, date, créneau, photo de référence) ou avec une assistante IA sur le site, Telegram, WhatsApp, Messenger ou Instagram. La propriétaire valide chaque demande d'un tap sur Telegram ; la cliente reçoit sa confirmation par SMS et courriel, l'agenda se met à jour, et des rappels partent 24 h et 2 h avant.",
+      "Site et système de réservation pour un salon de tresses. Les clientes réservent en ligne (prestation, date, créneau, photo de référence) ou avec une assistante IA sur le site, Telegram, WhatsApp, Messenger ou Instagram. La propriétaire valide chaque demande d'un tap sur Telegram ; la cliente reçoit sa confirmation par SMS et courriel, l'agenda se met à jour, et des rappels partent 24 h et 2 h avant.",
     tech: "Next.js, Supabase, n8n",
     href: null,
   },

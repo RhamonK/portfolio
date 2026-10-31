@@ -92,7 +92,7 @@ function Abo() {
   );
 }
 
-function ChiChicuties() {
+function StudioNala() {
   return (
     <>
       {/* conversation */}
@@ -204,7 +204,7 @@ function Fraul() {
 const arts: Record<string, () => React.JSX.Element> = {
   mamashop: MamaShop,
   abo: Abo,
-  chichicuties: ChiChicuties,
+  "studio-nala": StudioNala,
   kelthen: Kelthen,
   fraul: Fraul,
 };

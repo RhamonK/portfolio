@@ -247,9 +247,9 @@ const abo: Presentation = {
   ],
 };
 
-// Sources : repo RhamonK/cuties-chichi, workflows n8n « AURA » et « Cuties Chichi — Validation ».
-const chichicuties: Presentation = {
-  slug: "chichicuties",
+// Sources : repo du projet et workflows n8n de réservation. Nom du client remplacé par un nom d'emprunt.
+const studioNala: Presentation = {
+  slug: "studio-nala",
   tech: "Next.js · Supabase · n8n",
   slides: [
     {
@@ -257,18 +257,18 @@ const chichicuties: Presentation = {
       title: { fr: "Le téléphone qui sonne", en: "The phone that keeps ringing" },
       lines: {
         fr: [
-          "Un salon de coiffure reçoit ses demandes par appels et messages, sur plusieurs réseaux.",
+          "Un salon de tresses reçoit ses demandes par appels et messages, sur plusieurs réseaux.",
           "Ça prend du temps, et des clientes oublient leur rendez-vous.",
         ],
         en: [
-          "A hair salon gets requests by calls and messages, across several apps.",
+          "A braiding salon gets requests by calls and messages, across several apps.",
           "It takes time, and some clients forget their appointment.",
         ],
       },
       keywords: { fr: ["salon", "messages", "oublis"], en: ["salon", "messages", "no-shows"] },
       speech: {
-        fr: "Un salon de coiffure recevait ses demandes partout, par appels et messages. Ça prend du temps, et des clientes oublient.",
-        en: "A hair salon got requests everywhere, by calls and messages. It takes time, and clients forget.",
+        fr: "Un salon de tresses recevait ses demandes partout, par appels et messages. Ça prend du temps, et des clientes oublient.",
+        en: "A braiding salon got requests everywhere, by calls and messages. It takes time, and clients forget.",
       },
     },
     {
@@ -594,7 +594,7 @@ const fraul: Presentation = {
 export const presentations: Record<string, Presentation> = {
   mamashop,
   abo,
-  chichicuties,
+  "studio-nala": studioNala,
   kelthen,
   fraul,
 };
