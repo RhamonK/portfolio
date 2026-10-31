@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "art": "tsx --tsconfig scripts/tsconfig.json scripts/export-art.tsx"
   },
   "dependencies": {
     "@react-three/fiber": "^8.17.10",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^18",
     "@types/three": "^0.169.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

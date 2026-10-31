@@ -59,7 +59,7 @@ export const projects: Project[] = [
     tech: "n8n, Supabase",
     href: "https://kelthen.com",
     hrefLabel: "kelthen.com",
-    image: "/projets/kelthen/accueil.jpg",
+    image: "/projets/kelthen/accueil.webp",
   },
   {
     slug: "fraul",

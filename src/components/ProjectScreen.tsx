@@ -1,8 +1,8 @@
 import type { Project } from "@/data/projects";
-import { ProjectArt } from "@/components/ProjectArt";
 
 // Contenu d'un écran de projet : la vraie capture si elle existe,
-// sinon le dessin du projet.
+// sinon le dessin du projet (public/projets/<slug>/dessin.svg, généré
+// par `npm run art` depuis src/components/ProjectArt.tsx).
 export function ScreenContent({ project }: { project: Project }) {
   if (project.image) {
     return (
@@ -18,9 +18,14 @@ export function ScreenContent({ project }: { project: Project }) {
   }
   return (
     <div className="relative h-full w-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,255,58,0.10),transparent_60%),rgba(16,18,14,0.92)]">
-      <div className="absolute inset-0 p-[4%]">
-        <ProjectArt slug={project.slug} />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/projets/${project.slug}/dessin.svg`}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-contain p-[4%]"
+      />
       <span className="absolute left-[4%] top-[3%] font-mono text-[11px] tracking-wide text-lime/80">
         {project.name.toLowerCase()}
       </span>
