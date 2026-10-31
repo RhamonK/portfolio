@@ -8,13 +8,13 @@ Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par 
 
 - [ ] MamaShop — `public/projets/mamashop/`
 - [ ] ABO — `public/projets/abo/`
-- [ ] ChiChicuties — `public/projets/chichicuties/`
+- [ ] Studio Nala — `public/projets/studio-nala/`
 - [ ] Kelthen Inc. — `public/projets/kelthen/`
 - [ ] Fraul — `public/projets/fraul/`
 
 ## Captures
 - [x] Kelthen Inc. — capture de kelthen.com, faite depuis le repo `Kelthen/kelthen`
-- [ ] MamaShop, ChiChicuties, Fraul — les sites n'ont pas pu être lancés ici (installation de leurs dépendances refusée dans cette session, et kelthen.com / Vercel bloqués par le réseau)
+- [ ] MamaShop, Studio Nala, Fraul — les sites n'ont pas pu être lancés ici (installation de leurs dépendances refusée dans cette session, et kelthen.com / Vercel bloqués par le réseau)
 - [ ] ABO — le repo `RhamonK/abo` est vide sur GitHub
 
 ## Infos projets à confirmer
