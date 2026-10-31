@@ -23,6 +23,8 @@ export type Project = {
   hrefLabel?: T;
   /** Vraie capture dans /public/projets/<slug>/ ; sinon le dessin du projet. */
   image?: string;
+  /** Cadrage de la capture (CSS object-position) ; par défaut en haut à gauche. */
+  imagePosition?: string;
 };
 
 export const projects: Project[] = [
@@ -40,6 +42,8 @@ export const projects: Project[] = [
     tech: "React Native, Supabase",
     href: "https://github.com/RhamonK/bizup-africa",
     hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
+    image: "/projets/mamashop/connexion.webp",
+    imagePosition: "center",
   },
   {
     slug: "abo",
@@ -68,6 +72,7 @@ export const projects: Project[] = [
     },
     tech: "Next.js, Supabase, n8n",
     href: null,
+    image: "/projets/studio-nala/reservation.webp",
   },
   {
     slug: "kelthen",
@@ -98,5 +103,7 @@ export const projects: Project[] = [
     },
     tech: "Next.js, Three.js, Supabase",
     href: null,
+    image: "/projets/fraul/walk.webp",
+    imagePosition: "center",
   },
 ];

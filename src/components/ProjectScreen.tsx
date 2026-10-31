@@ -12,7 +12,8 @@ export function ScreenContent({ project }: { project: Project }) {
         alt=""
         loading="lazy"
         decoding="async"
-        className="h-full w-full object-cover object-left-top"
+        className="h-full w-full object-cover"
+        style={{ objectPosition: project.imagePosition ?? "left top" }}
       />
     );
   }

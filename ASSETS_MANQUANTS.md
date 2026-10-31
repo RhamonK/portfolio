@@ -6,15 +6,17 @@ Tout ce qui s'affiche encore comme emplacement neutre sur le site.
 Les écrans affichent pour l'instant un dessin de chaque projet (`src/components/ProjectArt.tsx`).
 Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par projet, dans `public/projets/<slug>/` :
 
-- [ ] MamaShop — `public/projets/mamashop/`
+- [x] MamaShop — `public/projets/mamashop/`
 - [ ] ABO — `public/projets/abo/`
-- [ ] Studio Nala — `public/projets/studio-nala/`
-- [ ] Kelthen Inc. — `public/projets/kelthen/`
-- [ ] Fraul — `public/projets/fraul/`
+- [x] Studio Nala — `public/projets/studio-nala/`
+- [x] Kelthen Inc. — `public/projets/kelthen/`
+- [x] Fraul — `public/projets/fraul/`
 
 ## Captures
 - [x] Kelthen Inc. — capture de kelthen.com, faite depuis le repo `Kelthen/kelthen`
-- [ ] MamaShop, Studio Nala, Fraul — les sites n'ont pas pu être lancés ici (installation de leurs dépendances refusée dans cette session, et kelthen.com / Vercel bloqués par le réseau)
+- [x] Fraul — le Fraul Walk (repo lancé en local, données de démonstration)
+- [x] Studio Nala — le module de réservation, nom anonymisé ; sans photo ni adresse du vrai salon
+- [x] MamaShop — l'écran de connexion (version web Expo). Les écrans intérieurs demandent un compte et la base Supabase : à capturer depuis ton téléphone si tu veux les montrer
 - [ ] ABO — le repo `RhamonK/abo` est vide sur GitHub
 
 ## Infos projets à confirmer
