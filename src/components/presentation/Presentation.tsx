@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import type { Project } from "@/data/projects";
 import type { Lang, Presentation as Pres } from "@/data/presentations";
-import { ProjectArt } from "@/components/ProjectArt";
+import { ScreenContent } from "@/components/ProjectScreen";
 import { MOUTH_Y, type PresenterSignals } from "@/components/presentation/signals";
 
 // La 3D n'est chargée qu'à l'ouverture d'une présentation.
@@ -29,7 +29,8 @@ export function Presentation({
   project: Project;
   presentation: Pres;
   onClose: () => void;
-  onNextProject: () => void;
+  /** Absent sur le dernier projet. */
+  onNextProject?: () => void;
 }) {
   const slides = presentation.slides;
   const root = useRef<HTMLDivElement>(null);
@@ -277,8 +278,8 @@ export function Presentation({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="relative hidden min-h-[160px] overflow-hidden rounded-2xl border border-glass-line bg-black/30 p-3 md:block">
-                <ProjectArt slug={project.slug} />
+              <div className="relative hidden min-h-[160px] overflow-hidden rounded-2xl border border-glass-line bg-black/30 md:block">
+                <ScreenContent project={project} />
               </div>
             </div>
             {last && (
@@ -288,9 +289,11 @@ export function Presentation({
                     {t.see}
                   </a>
                 )}
-                <button type="button" onClick={onNextProject} className="btn btn-glass">
-                  {t.nextProject}
-                </button>
+                {onNextProject && (
+                  <button type="button" onClick={onNextProject} className="btn btn-glass">
+                    {t.nextProject}
+                  </button>
+                )}
                 {presentation.tech && (
                   <span className="rounded-full border border-glass-line px-3 py-1.5 font-mono text-[12px] text-muted">
                     {t.tech} · {presentation.tech}

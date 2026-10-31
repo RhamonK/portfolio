@@ -12,11 +12,14 @@ Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par 
 - [ ] Kelthen Inc. — `public/projets/kelthen/`
 - [ ] Fraul — `public/projets/fraul/`
 
+## Captures
+- [x] Kelthen Inc. — capture de kelthen.com, faite depuis le repo `Kelthen/kelthen`
+- [ ] MamaShop, ChiChicuties, Fraul — les sites n'ont pas pu être lancés ici (installation de leurs dépendances refusée dans cette session, et kelthen.com / Vercel bloqués par le réseau)
+- [ ] ABO — le repo `RhamonK/abo` est vide sur GitHub
+
 ## Infos projets à confirmer
-- [ ] ABO : technologies à citer
-- [ ] ChiChicuties : lien public
-- [ ] Kelthen Inc. : technologies à citer (optionnel)
-- [ ] Fraul : ce que le site permet, pour qui, lien public, technologies
+- [ ] ABO : lien public (le repo GitHub est vide)
+- [ ] Fraul : lien public quand le site sera lancé (la preview est fermée à Google)
 
 ## Présentateur 3D
 - [ ] Phase 2 : 3 à 5 photos (face, trois-quarts gauche et droite, lumière douce, sans lunettes de soleil)
