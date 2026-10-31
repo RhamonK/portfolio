@@ -96,7 +96,7 @@ export function Hero() {
         </div>
       </div>
 
-      <p className="eyebrow hint-bob absolute inset-x-0 bottom-8 text-center">
+      <p className="eyebrow hint-bob absolute inset-x-0 bottom-8 text-center !text-ink/70">
         molette pour entrer dans la salle ↓
       </p>
     </section>

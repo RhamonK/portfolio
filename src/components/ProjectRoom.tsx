@@ -17,7 +17,7 @@ import { lockScroll, scrollToY } from "@/lib/scroll";
 
 const SCREEN_DEG = 60; // largeur d'un écran sur l'anneau : grand arc = écran large et bien courbé
 const STEP = 66; // écart entre deux écrans
-const STRIPS = 28; // bandes par écran : plus il y en a, plus la courbe est douce
+const STRIPS = 22; // bandes par écran : plus il y en a, plus la courbe est douce
 const RATIO = 0.6; // hauteur / largeur maximale d'un écran
 const rad = (d: number) => (d * Math.PI) / 180;
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -40,6 +40,34 @@ export function ProjectRoom() {
   const lastFocus = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
+  // Salle 3D affichée (desktop, mouvement normal) : la liste plate n'est
+  // alors lue que par les lecteurs d'écran et ne doit pas prendre le focus.
+  const [is3d, setIs3d] = useState(false);
+  // Les bandes des écrans ne sont construites qu'à l'approche de la salle,
+  // pour ne pas alourdir le chargement de la page.
+  const [near, setNear] = useState(false);
+  const placeRef = useRef<((a: number) => void) | null>(null);
+
+  useEffect(() => {
+    const el = section.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "100% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const st = trigger.current;
+    if (near && st) placeRef.current?.(st.progress * (projects.length - 1));
+  }, [near]);
   const [{ radius, height: screenH }, setGeo] = useState({ radius: 800, height: 420 });
   const radiusRef = useRef(800);
   const n = projects.length;
@@ -66,13 +94,14 @@ export function ProjectRoom() {
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-      const screens = gsap.utils.toArray<HTMLElement>(".cyl-screen", cylinder.current);
+      setIs3d(true);
       const place = (a: number) => {
         gsap.set(cylinder.current, { z: radiusRef.current, rotationY: a * STEP });
-        screens.forEach((el, i) => {
+        gsap.utils.toArray<HTMLElement>(".cyl-screen", cylinder.current).forEach((el, i) => {
           const ad = Math.abs(i - a);
           const hidden = ad * STEP > 110;
           const strips = el.children;
+          if (!strips.length) return;
           gsap.set(strips, {
             opacity: hidden ? 0 : 1 - Math.min(ad, 1.5) * 0.4,
             visibility: hidden ? "hidden" : "visible",
@@ -81,6 +110,7 @@ export function ProjectRoom() {
         setActive(Math.round(a));
       };
 
+      placeRef.current = place;
       place(0);
       const st = ScrollTrigger.create({
         trigger: section.current,
@@ -100,6 +130,8 @@ export function ProjectRoom() {
       trigger.current = st;
       return () => {
         trigger.current = null;
+        placeRef.current = null;
+        setIs3d(false);
       };
     });
 
@@ -176,6 +208,7 @@ export function ProjectRoom() {
       id="projets"
       aria-labelledby="titre-projets"
       aria-roledescription="carrousel"
+      aria-describedby="aide-projets"
       tabIndex={0}
       onKeyDown={onKeyDown}
       className="room relative flex h-[100svh] flex-col overflow-hidden pt-20"
@@ -202,6 +235,9 @@ export function ProjectRoom() {
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
           Some <span className="text-lime">projects</span>.
         </h2>
+        <p id="aide-projets" className="sr-only">
+          Flèches gauche et droite pour changer de projet, Entrée pour lancer la présentation.
+        </p>
       </div>
 
       {/* ===== cylindre (desktop) ===== */}
@@ -212,7 +248,7 @@ export function ProjectRoom() {
         >
           {projects.map((p, i) => (
             <div key={p.slug} className="cyl-screen [transform-style:preserve-3d]" onClick={() => (i === active ? launch(i) : goTo(i))}>
-              {Array.from({ length: STRIPS }).map((_, j) => {
+              {near && Array.from({ length: STRIPS }).map((_, j) => {
                 const angle = -(i * STEP + (j - (STRIPS - 1) / 2) * stripDeg);
                 const first = j === 0;
                 const last = j === STRIPS - 1;
@@ -221,7 +257,7 @@ export function ProjectRoom() {
                     key={j}
                     className="absolute cursor-pointer overflow-hidden border-y border-lime/60 [backface-visibility:hidden]"
                     style={{
-                      width: stripW + 1,
+                      width: stripW + 2,
                       height: screenH,
                       left: -stripW / 2,
                       top: -screenH / 2,
@@ -284,7 +320,7 @@ export function ProjectRoom() {
             <h3 className="mt-1 text-[24px] font-bold tracking-tight">{p.name}</h3>
             <p className="mt-1 text-muted">{p.pitch}</p>
             {presentations[p.slug] && (
-              <button type="button" className="btn btn-lime mt-4" onClick={() => launch(i)}>
+              <button type="button" className="btn btn-lime mt-4" tabIndex={is3d ? -1 : undefined} onClick={() => launch(i)}>
                 ▶ Lancer la présentation · 60 s
               </button>
             )}
