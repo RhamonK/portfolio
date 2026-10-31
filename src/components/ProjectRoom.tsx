@@ -22,10 +22,13 @@ const RATIO = 0.64; // hauteur / largeur d'un écran
 const rad = (d: number) => (d * Math.PI) / 180;
 const pad = (n: number) => String(n).padStart(2, "0");
 
-function radiusFor(w: number, h: number) {
-  const byWidth = Math.min(Math.max(w * 0.72, 700), 1150);
-  const byHeight = (h * 0.5) / (RATIO * rad(SCREEN_DEG));
-  return Math.round(Math.min(byWidth, byHeight));
+// Rayon de l'anneau : l'écran de face (bords courbés compris) tient dans
+// la hauteur libre entre le titre et la légende, sans les chevaucher.
+function radiusFor(w: number, stageH: number) {
+  const byWidth = Math.min(Math.max(w * 0.72, 600), 1150);
+  const bow = 1 / Math.cos(rad(SCREEN_DEG / 2)); // les bords courbés paraissent plus hauts
+  const byHeight = (stageH * 0.84) / (RATIO * rad(SCREEN_DEG) * bow);
+  return Math.round(Math.max(320, Math.min(byWidth, byHeight)));
 }
 
 export function ProjectRoom() {
@@ -43,12 +46,18 @@ export function ProjectRoom() {
 
   useEffect(() => {
     const onResize = () => {
-      radiusRef.current = radiusFor(window.innerWidth, window.innerHeight);
+      const stageH = stage3d.current?.clientHeight || window.innerHeight * 0.55;
+      radiusRef.current = radiusFor(window.innerWidth, stageH);
       setRadius(radiusRef.current);
     };
     onResize();
+    const ro = new ResizeObserver(onResize);
+    if (stage3d.current) ro.observe(stage3d.current);
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -175,12 +184,12 @@ export function ProjectRoom() {
         aria-hidden
         className="room-3d pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-[radial-gradient(ellipse_at_50%_100%,rgba(212,255,58,0.18),transparent_65%)]"
       />
-      <div aria-hidden className="room-3d pointer-events-none absolute inset-x-0 bottom-[-20vh] flex justify-center [perspective:900px]">
+      <div aria-hidden className="room-3d pointer-events-none absolute inset-x-0 bottom-[-34vh] flex justify-center [perspective:900px]">
         <div className="relative h-[62vh] w-[150vw] [transform:rotateX(78deg)]">
           {[100, 74, 48].map((s) => (
             <div
               key={s}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-lime/35"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-lime/25"
               style={{ width: `${s}%`, height: `${s}%` }}
             />
           ))}
@@ -190,9 +199,8 @@ export function ProjectRoom() {
       <div className="wrap relative z-10 md:text-center">
         <p className="eyebrow">// projets</p>
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
-          Ce que j&apos;ai <span className="text-lime">fait</span>.
+          Some <span className="text-lime">projects</span>.
         </h2>
-        <p className="eyebrow room-3d absolute bottom-2 right-6 hidden lg:block">molette ou ← → pour tourner</p>
       </div>
 
       {/* ===== cylindre (desktop) ===== */}
