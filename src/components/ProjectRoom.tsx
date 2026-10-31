@@ -298,7 +298,7 @@ export function ProjectRoom() {
           project={projects.find((p) => p.slug === open)!}
           presentation={presentations[open]}
           onClose={closePresentation}
-          onNextProject={nextProject}
+          onNextProject={projects.findIndex((p) => p.slug === open) < n - 1 ? nextProject : undefined}
         />,
         document.body,
       )}

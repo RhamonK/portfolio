@@ -1,7 +1,9 @@
 // ============================================================
 // Présentations de 60 s (6 diapos d'environ 10 s), FR et EN.
-// Écrites UNIQUEMENT à partir de la fiche projet : bénéfices et
-// usages, jamais comment c'est construit. Aucun chiffre inventé.
+// Écrites à partir des sources réelles (README des repos, site
+// kelthen.com, workflows n8n, ancienne étude de cas ABO) :
+// bénéfices et usages, jamais comment c'est construit. Aucun chiffre
+// qui ne vienne pas de ces sources.
 // ============================================================
 
 export type Lang = "fr" | "en";
@@ -33,112 +35,108 @@ const kinds: T[] = [
   { fr: "Le projet", en: "The project" },
 ];
 
+// Source : README de RhamonK/bizup-africa.
 const mamashop: Presentation = {
   slug: "mamashop",
   tech: "React Native · Supabase",
   slides: [
     {
       kind: kinds[0],
-      title: { fr: "Tout suivre, partout", en: "Track everything, anywhere" },
+      title: { fr: "Le réseau ne suit pas", en: "The network can't keep up" },
       lines: {
         fr: [
-          "Un grossiste de fruits et légumes à Lomé.",
-          "Le stock, les ventes et les crédits clients à suivre chaque jour.",
-          "Sur le terrain, le réseau ne suit pas toujours.",
+          "Les petits commerces d'Afrique de l'Ouest suivent stock, ventes et crédits au quotidien.",
+          "Le réseau est instable, et les outils sont souvent trop techniques.",
         ],
         en: [
-          "A fruit and vegetable wholesaler in Lomé.",
-          "Stock, sales and customer credit to track every day.",
-          "Out in the field, the network isn't always there.",
+          "Small West African shops track stock, sales and credit every day.",
+          "The network is unstable, and tools are often too technical.",
         ],
       },
-      keywords: { fr: ["grossiste", "stock", "crédits", "terrain"], en: ["wholesaler", "stock", "credit", "field"] },
+      keywords: { fr: ["petits commerces", "réseau instable", "crédits"], en: ["small shops", "unstable network", "credit"] },
       speech: {
-        fr: "Un grossiste de fruits et légumes doit suivre son stock, ses ventes et ses crédits clients, même quand le réseau ne suit pas.",
-        en: "A fruit and vegetable wholesaler has to track stock, sales and customer credit, even when the network drops.",
+        fr: "Les petits commerces d'Afrique de l'Ouest gèrent stock, ventes et crédits tous les jours, avec un réseau instable.",
+        en: "Small shops in West Africa manage stock, sales and credit every day, on an unstable network.",
       },
     },
     {
       kind: kinds[1],
-      title: { fr: "Une app de gestion", en: "A management app" },
+      title: { fr: "Une app, trois rôles", en: "One app, three roles" },
       lines: {
         fr: [
-          "Une application mobile, pensée pour ce grossiste.",
-          "Trois espaces selon le rôle : gérant, agent de terrain, diaspora.",
+          "Une application mobile de gestion de boutique, en français et en FCFA.",
+          "Chaque profil ne voit que ses écrans : gérant, agent de terrain, diaspora.",
         ],
         en: [
-          "A mobile app built for this wholesaler.",
-          "Three spaces by role: manager, field agent, diaspora.",
+          "A mobile shop-management app, in French and in CFA francs.",
+          "Each profile only sees its own screens: manager, field agent, diaspora.",
         ],
       },
       keywords: { fr: ["mobile", "gérant", "agent", "diaspora"], en: ["mobile", "manager", "agent", "diaspora"] },
       speech: {
-        fr: "J'ai construit MamaShop : une application mobile avec trois espaces, pour le gérant, l'agent de terrain et la diaspora.",
-        en: "I built MamaShop: a mobile app with three spaces, for the manager, the field agent and the diaspora.",
+        fr: "MamaShop est une app mobile de gestion de boutique, avec trois espaces : le gérant, l'agent de terrain et la diaspora.",
+        en: "MamaShop is a mobile shop-management app with three spaces: the manager, the field agent and the diaspora.",
       },
     },
     {
       kind: kinds[2],
-      title: { fr: "Trois bénéfices", en: "Three benefits" },
+      title: { fr: "Tout au même endroit", en: "Everything in one place" },
       lines: {
         fr: [
-          "Stock, ventes et crédits clients au même endroit.",
-          "Un tableau de bord en direct.",
-          "Utilisable même sans réseau.",
+          "Le gérant suit finances, marges, stock, fournisseurs et employés.",
+          "Les crédits clients et la fidélité sont suivis client par client.",
+          "Des conseils pour négocier avec les fournisseurs, selon les prix déjà payés.",
         ],
         en: [
-          "Stock, sales and customer credit in one place.",
-          "A live dashboard.",
-          "Works even without a network.",
+          "The manager tracks finances, margins, stock, suppliers and staff.",
+          "Customer credit and loyalty are tracked customer by customer.",
+          "Tips for negotiating with suppliers, based on past prices paid.",
         ],
       },
-      keywords: { fr: ["même endroit", "en direct", "sans réseau"], en: ["one place", "live", "offline"] },
+      keywords: { fr: ["marges", "crédits clients", "fournisseurs"], en: ["margins", "customer credit", "suppliers"] },
       speech: {
-        fr: "Tout est au même endroit, le tableau de bord se met à jour en direct, et l'app fonctionne même sans réseau.",
-        en: "Everything lives in one place, the dashboard updates live, and the app keeps working without a network.",
+        fr: "Le gérant voit ses finances et ses marges, suit les crédits clients, et reçoit des conseils pour négocier avec ses fournisseurs.",
+        en: "The manager sees finances and margins, tracks customer credit, and gets tips to negotiate with suppliers.",
       },
     },
     {
       kind: kinds[3],
-      title: { fr: "En trois étapes", en: "In three steps" },
+      title: { fr: "Même hors ligne", en: "Even offline" },
       lines: {
         fr: [
-          "1. On ouvre l'espace de son rôle.",
-          "2. On enregistre le stock, une vente ou un crédit.",
-          "3. Le tableau de bord se met à jour.",
+          "1. L'agent enregistre une vente ou un arrivage, même sans réseau.",
+          "2. L'app synchronise tout seule au retour du réseau.",
+          "3. La famille à l'étranger suit l'activité en lecture seule.",
         ],
         en: [
-          "1. Open the space for your role.",
-          "2. Record stock, a sale or a credit.",
-          "3. The dashboard updates.",
+          "1. The agent records a sale or a delivery, even without a network.",
+          "2. The app syncs on its own when the network returns.",
+          "3. Family abroad follows the activity, read-only.",
         ],
       },
-      keywords: { fr: ["son rôle", "enregistrer", "tableau de bord"], en: ["your role", "record", "dashboard"] },
+      keywords: { fr: ["hors ligne", "synchro", "famille"], en: ["offline", "sync", "family"] },
       speech: {
-        fr: "Chacun ouvre son espace, enregistre le stock, une vente ou un crédit, et le tableau de bord suit.",
-        en: "Each person opens their space, records stock, a sale or a credit, and the dashboard follows.",
+        fr: "L'agent enregistre ses ventes même sans réseau, l'app synchronise toute seule, et la famille à l'étranger suit l'activité.",
+        en: "The agent records sales even offline, the app syncs on its own, and family abroad follows the activity.",
       },
     },
     {
       kind: kinds[4],
-      title: { fr: "Une vue claire", en: "A clear view" },
+      title: { fr: "Une boutique sous contrôle", en: "A shop under control" },
       lines: {
-        fr: ["Toute l'activité visible au même endroit, en direct.", "Même quand le réseau coupe."],
-        en: ["All the activity visible in one place, live.", "Even when the network cuts out."],
+        fr: ["Chaque vente met le stock à jour, sans écart.", "Le commerce reste suivi, même quand le réseau coupe."],
+        en: ["Every sale updates the stock, with no mismatch.", "The shop stays on track, even when the network drops."],
       },
-      keywords: { fr: ["activité", "en direct", "fiable"], en: ["activity", "live", "reliable"] },
+      keywords: { fr: ["stock juste", "fiable", "en direct"], en: ["accurate stock", "reliable", "live"] },
       speech: {
-        fr: "Résultat : le grossiste voit toute son activité au même endroit, en direct, même quand le réseau coupe.",
-        en: "The result: the wholesaler sees all the activity in one place, live, even when the network cuts out.",
+        fr: "Chaque vente met le stock à jour sans écart, et le commerce reste suivi, même quand le réseau coupe.",
+        en: "Every sale updates the stock with no mismatch, and the shop stays on track even when the network drops.",
       },
     },
     {
       kind: kinds[5],
       title: { fr: "Voir le projet", en: "See the project" },
-      lines: {
-        fr: ["Le code est en ligne sur GitHub."],
-        en: ["The code is online on GitHub."],
-      },
+      lines: { fr: ["Le code est en ligne sur GitHub."], en: ["The code is online on GitHub."] },
       keywords: { fr: ["MamaShop", "GitHub"], en: ["MamaShop", "GitHub"] },
       speech: {
         fr: "Tu peux voir le projet sur GitHub, ou passer au projet suivant.",
@@ -148,6 +146,7 @@ const mamashop: Presentation = {
   ],
 };
 
+// Source : ancienne étude de cas ABO (le repo RhamonK/abo est vide).
 const abo: Presentation = {
   slug: "abo",
   slides: [
@@ -176,14 +175,8 @@ const abo: Presentation = {
       kind: kinds[1],
       title: { fr: "Des artisans vérifiés", en: "Verified tradespeople" },
       lines: {
-        fr: [
-          "Une place de marché qui met en relation clients et artisans.",
-          "Chaque artisan peut obtenir un badge de confiance.",
-        ],
-        en: [
-          "A marketplace connecting clients and tradespeople.",
-          "Each tradesperson can earn a trust badge.",
-        ],
+        fr: ["Une place de marché qui met en relation clients et artisans.", "Chaque artisan peut obtenir un badge de confiance."],
+        en: ["A marketplace connecting clients and tradespeople.", "Each tradesperson can earn a trust badge."],
       },
       keywords: { fr: ["place de marché", "artisans", "badge"], en: ["marketplace", "tradespeople", "badge"] },
       speech: {
@@ -200,11 +193,7 @@ const abo: Presentation = {
           "Des documents d'identité gardés en sécurité.",
           "Des avis vérifiés, liés à une vraie demande.",
         ],
-        en: [
-          "Identity checked before the “Vérifié ABO” badge.",
-          "Identity documents kept secure.",
-          "Verified reviews, tied to a real request.",
-        ],
+        en: ["Identity checked before the “Vérifié ABO” badge.", "Identity documents kept secure.", "Verified reviews, tied to a real request."],
       },
       keywords: { fr: ["identité", "documents", "avis vérifiés"], en: ["identity", "documents", "verified reviews"] },
       speech: {
@@ -221,11 +210,7 @@ const abo: Presentation = {
           "2. On consulte le profil, les travaux et les avis.",
           "3. On demande un devis, puis on échange sur WhatsApp.",
         ],
-        en: [
-          "1. Search by trade and neighbourhood.",
-          "2. Check the profile, past work and reviews.",
-          "3. Request a quote, then talk on WhatsApp.",
-        ],
+        en: ["1. Search by trade and neighbourhood.", "2. Check the profile, past work and reviews.", "3. Request a quote, then talk on WhatsApp."],
       },
       keywords: { fr: ["métier", "quartier", "devis", "WhatsApp"], en: ["trade", "neighbourhood", "quote", "WhatsApp"] },
       speech: {
@@ -237,14 +222,8 @@ const abo: Presentation = {
       kind: kinds[4],
       title: { fr: "La confiance, visible", en: "Trust you can see" },
       lines: {
-        fr: [
-          "Les clients savent à qui ils ouvrent leur porte.",
-          "Les artisans sérieux ont enfin une présence crédible en ligne.",
-        ],
-        en: [
-          "Clients know who they're letting in.",
-          "Serious tradespeople finally get a credible online presence.",
-        ],
+        fr: ["Les clients savent à qui ils font appel.", "Les artisans sérieux ont enfin une présence crédible en ligne."],
+        en: ["Clients know who they're hiring.", "Serious tradespeople finally get a credible online presence."],
       },
       keywords: { fr: ["clients", "artisans", "crédible"], en: ["clients", "tradespeople", "credible"] },
       speech: {
@@ -254,54 +233,61 @@ const abo: Presentation = {
     },
     {
       kind: kinds[5],
-      title: { fr: "Voir le projet", en: "See the project" },
-      lines: { fr: ["Le code est en ligne sur GitHub."], en: ["The code is online on GitHub."] },
-      keywords: { fr: ["ABO", "GitHub"], en: ["ABO", "GitHub"] },
+      title: { fr: "Le projet", en: "The project" },
+      lines: {
+        fr: ["Une plateforme pensée pour le mobile, au service de la confiance."],
+        en: ["A mobile-first platform built around trust."],
+      },
+      keywords: { fr: ["ABO", "confiance"], en: ["ABO", "trust"] },
       speech: {
-        fr: "Tu peux voir le projet sur GitHub, ou passer au projet suivant.",
-        en: "You can see the project on GitHub, or move on to the next one.",
+        fr: "Une plateforme pensée pour le mobile, au service de la confiance. Passons au projet suivant.",
+        en: "A mobile-first platform built around trust. Let's move on to the next project.",
       },
     },
   ],
 };
 
+// Sources : repo RhamonK/cuties-chichi, workflows n8n « AURA » et « Cuties Chichi — Validation ».
 const chichicuties: Presentation = {
   slug: "chichicuties",
-  tech: "Telegram · automatisation",
+  tech: "Next.js · Supabase · n8n",
   slides: [
     {
       kind: kinds[0],
-      title: { fr: "Des rendez-vous perdus", en: "Missed appointments" },
+      title: { fr: "Le téléphone qui sonne", en: "The phone that keeps ringing" },
       lines: {
         fr: [
-          "Un salon de coiffure gère ses rendez-vous par appels et messages.",
-          "Ça prend du temps, et des clients oublient leur rendez-vous.",
+          "Un salon de coiffure reçoit ses demandes par appels et messages, sur plusieurs réseaux.",
+          "Ça prend du temps, et des clientes oublient leur rendez-vous.",
         ],
         en: [
-          "A hair salon handles bookings by calls and messages.",
+          "A hair salon gets requests by calls and messages, across several apps.",
           "It takes time, and some clients forget their appointment.",
         ],
       },
-      keywords: { fr: ["salon", "appels", "oublis"], en: ["salon", "calls", "no-shows"] },
+      keywords: { fr: ["salon", "messages", "oublis"], en: ["salon", "messages", "no-shows"] },
       speech: {
-        fr: "Un salon de coiffure prenait ses rendez-vous par appels et messages. Ça prend du temps, et des clients oublient.",
-        en: "A hair salon took bookings by calls and messages. It takes time, and clients forget.",
+        fr: "Un salon de coiffure recevait ses demandes partout, par appels et messages. Ça prend du temps, et des clientes oublient.",
+        en: "A hair salon got requests everywhere, by calls and messages. It takes time, and clients forget.",
       },
     },
     {
       kind: kinds[1],
-      title: { fr: "Un bot Telegram", en: "A Telegram bot" },
+      title: { fr: "Une réceptionniste qui ne dort pas", en: "A receptionist that never sleeps" },
       lines: {
         fr: [
-          "Un bot qui prend les réservations dans Telegram.",
-          "Aucune application à installer pour le client.",
+          "Un site avec réservation en ligne, galerie et services.",
+          "Une assistante IA qui répond sur le site, Telegram, WhatsApp, Messenger et Instagram.",
         ],
-        en: ["A bot that takes bookings inside Telegram.", "No app for the client to install."],
+        en: [
+          "A website with online booking, a gallery and services.",
+          "An AI assistant answering on the site, Telegram, WhatsApp, Messenger and Instagram.",
+        ],
       },
-      keywords: { fr: ["bot", "Telegram", "réservations"], en: ["bot", "Telegram", "bookings"] },
+      keywords: { fr: ["site", "assistante IA", "multicanal"], en: ["website", "AI assistant", "multichannel"] },
       speech: {
-        fr: "ChiChicuties, c'est un bot Telegram qui prend les réservations. Le client n'a rien à installer.",
-        en: "ChiChicuties is a Telegram bot that takes bookings. The client has nothing to install.",
+        fr: "J'ai construit le site du salon et une assistante IA qui répond aux clientes sur le site, WhatsApp, Instagram et ailleurs.",
+        en: "I built the salon's website and an AI assistant that answers clients on the site, WhatsApp, Instagram and more.",
       },
     },
     {
@@ -309,80 +295,96 @@ const chichicuties: Presentation = {
       title: { fr: "Trois bénéfices", en: "Three benefits" },
       lines: {
         fr: [
-          "Réserver à toute heure, sans appeler.",
-          "Une confirmation immédiate.",
-          "Un rappel automatique avant le rendez-vous.",
+          "Réserver à toute heure, avec une photo de référence.",
+          "Une confirmation par SMS et courriel, et l'agenda à jour tout seul.",
+          "Des rappels automatiques 24 h et 2 h avant le rendez-vous.",
         ],
-        en: ["Book any time, without calling.", "Instant confirmation.", "An automatic reminder before the appointment."],
+        en: [
+          "Book any time, with a reference photo.",
+          "Confirmation by SMS and email, and the calendar updates itself.",
+          "Automatic reminders 24 h and 2 h before the appointment.",
+        ],
       },
-      keywords: { fr: ["à toute heure", "confirmation", "rappel"], en: ["any time", "confirmation", "reminder"] },
+      keywords: { fr: ["24 h/24", "confirmation", "rappels"], en: ["24/7", "confirmation", "reminders"] },
       speech: {
-        fr: "On réserve à toute heure sans appeler, la confirmation arrive tout de suite, et un rappel part avant le rendez-vous.",
-        en: "Clients book any time without calling, get instant confirmation, and a reminder goes out before the appointment.",
+        fr: "Les clientes réservent à toute heure, reçoivent leur confirmation par SMS et courriel, puis des rappels avant le rendez-vous.",
+        en: "Clients book any time, get confirmation by SMS and email, then reminders before the appointment.",
       },
     },
     {
       kind: kinds[3],
-      title: { fr: "En trois étapes", en: "In three steps" },
+      title: { fr: "En quatre gestes", en: "In four moves" },
       lines: {
-        fr: ["1. On choisit une prestation.", "2. On choisit le jour et le créneau.", "3. On reçoit la confirmation, puis le rappel."],
-        en: ["1. Pick a service.", "2. Pick the day and time slot.", "3. Get the confirmation, then the reminder."],
+        fr: [
+          "1. La cliente choisit sa prestation, sa date et son créneau.",
+          "2. La propriétaire reçoit la demande sur Telegram, photo jointe.",
+          "3. Un tap pour confirmer ou décliner.",
+          "4. Confirmation, agenda et rappels partent tout seuls.",
+        ],
+        en: [
+          "1. The client picks a service, a date and a time slot.",
+          "2. The owner gets the request on Telegram, photo attached.",
+          "3. One tap to confirm or decline.",
+          "4. Confirmation, calendar and reminders happen on their own.",
+        ],
       },
-      keywords: { fr: ["prestation", "créneau", "confirmation"], en: ["service", "time slot", "confirmation"] },
+      keywords: { fr: ["créneau", "Telegram", "un tap"], en: ["time slot", "Telegram", "one tap"] },
       speech: {
-        fr: "Le client choisit sa prestation, puis son créneau, en quelques boutons. Il reçoit la confirmation, puis le rappel.",
-        en: "Clients pick a service, then a time slot, in a few taps. They get the confirmation, then the reminder.",
+        fr: "La cliente choisit son créneau, la propriétaire valide d'un tap sur Telegram, et tout le reste part tout seul.",
+        en: "The client picks a slot, the owner approves with one tap on Telegram, and everything else happens on its own.",
       },
     },
     {
       kind: kinds[4],
-      title: { fr: "Moins d'oublis", en: "Fewer no-shows" },
+      title: { fr: "Le salon respire", en: "The salon can breathe" },
       lines: {
-        fr: ["Moins d'appels à gérer pour le salon.", "Des clients rappelés automatiquement."],
-        en: ["Fewer calls for the salon to handle.", "Clients reminded automatically."],
+        fr: ["Personne n'a à taper un message pour gérer une réservation.", "La propriétaire garde la main sur chaque rendez-vous."],
+        en: ["Nobody has to type a message to handle a booking.", "The owner stays in control of every appointment."],
       },
-      keywords: { fr: ["moins d'appels", "rappels", "automatique"], en: ["fewer calls", "reminders", "automatic"] },
+      keywords: { fr: ["automatique", "en contrôle", "moins d'oublis"], en: ["automatic", "in control", "fewer no-shows"] },
       speech: {
-        fr: "Le salon gère moins d'appels, et chaque client est rappelé automatiquement avant son rendez-vous.",
-        en: "The salon handles fewer calls, and every client is reminded automatically before their appointment.",
+        fr: "Plus besoin de taper un message pour gérer une réservation, et la propriétaire garde la main sur chaque rendez-vous.",
+        en: "No more typing messages to handle bookings, and the owner stays in control of every appointment.",
       },
     },
     {
       kind: kinds[5],
       title: { fr: "Le projet", en: "The project" },
       lines: {
-        fr: ["Un exemple concret d'automatisation au service d'un commerce."],
-        en: ["A concrete example of automation serving a business."],
+        fr: ["Un système de réservation complet, de la demande au rappel."],
+        en: ["A complete booking system, from request to reminder."],
       },
-      keywords: { fr: ["ChiChicuties", "automatisation"], en: ["ChiChicuties", "automation"] },
+      keywords: { fr: ["réservation", "de bout en bout"], en: ["booking", "end to end"] },
       speech: {
-        fr: "Un exemple concret d'automatisation au service d'un commerce. Passons au projet suivant.",
-        en: "A concrete example of automation serving a business. Let's move on to the next project.",
+        fr: "Un système de réservation complet, de la demande au rappel. Passons au projet suivant.",
+        en: "A complete booking system, from request to reminder. Let's move on to the next project.",
       },
     },
   ],
 };
 
+// Sources : site kelthen.com (repo Kelthen/kelthen) et workflows n8n Kelthen.
 const kelthen: Presentation = {
   slug: "kelthen",
+  tech: "n8n · Supabase",
   slides: [
     {
       kind: kinds[0],
-      title: { fr: "Gagner du temps", en: "Saving time" },
+      title: { fr: "Freinés par leurs outils", en: "Held back by their tools" },
       lines: {
         fr: [
-          "Beaucoup d'entreprises ont un site qui ne travaille pas pour elles.",
-          "Et des tâches répétitives qui leur prennent du temps.",
+          "Trop d'entreprises sont freinées par des sites lents et des outils compliqués.",
+          "Et par des tâches manuelles qu'un peu de technologie réglerait en secondes.",
         ],
         en: [
-          "Many businesses have a website that doesn't work for them.",
-          "And repetitive tasks that eat up their time.",
+          "Too many businesses are held back by slow sites and complicated tools.",
+          "And by manual tasks a bit of technology could solve in seconds.",
         ],
       },
-      keywords: { fr: ["entreprises", "site web", "tâches"], en: ["businesses", "website", "tasks"] },
+      keywords: { fr: ["sites lents", "tâches manuelles", "entreprises"], en: ["slow sites", "manual tasks", "businesses"] },
       speech: {
-        fr: "Beaucoup d'entreprises ont un site qui ne travaille pas pour elles, et des tâches répétitives qui leur prennent du temps.",
-        en: "Many businesses have a website that doesn't work for them, and repetitive tasks that eat up their time.",
+        fr: "Trop d'entreprises sont freinées par des sites lents, des outils compliqués et des tâches manuelles.",
+        en: "Too many businesses are held back by slow sites, complicated tools and manual tasks.",
       },
     },
     {
@@ -390,57 +392,79 @@ const kelthen: Presentation = {
       title: { fr: "Mon agence", en: "My agency" },
       lines: {
         fr: [
-          "Kelthen Inc., à Gatineau : sites web, automatisation et intégration d'IA.",
-          "J'en suis le directeur exécutif et le référent du développement des sites.",
+          "Kelthen Inc., au Canada : sites, applications et automatisations sur mesure.",
+          "Je la dirige et je pilote le développement des sites.",
         ],
         en: [
-          "Kelthen Inc., in Gatineau: websites, automation and AI integration.",
-          "I'm its executive director and lead for website development.",
+          "Kelthen Inc., in Canada: custom websites, apps and automations.",
+          "I run it and lead website development.",
         ],
       },
-      keywords: { fr: ["Kelthen", "agence", "directeur"], en: ["Kelthen", "agency", "director"] },
+      keywords: { fr: ["Kelthen", "sur mesure", "directeur"], en: ["Kelthen", "custom", "director"] },
       speech: {
-        fr: "Kelthen, c'est mon agence à Gatineau. J'en suis le directeur exécutif, et je pilote le développement des sites.",
-        en: "Kelthen is my agency in Gatineau. I'm its executive director, and I lead website development.",
+        fr: "Kelthen, c'est mon agence au Canada : sites, applications et automatisations sur mesure. Je la dirige.",
+        en: "Kelthen is my agency in Canada: custom websites, apps and automations. I run it.",
       },
     },
     {
       kind: kinds[2],
-      title: { fr: "Trois services", en: "Three services" },
+      title: { fr: "Ce qu'on livre", en: "What we deliver" },
       lines: {
-        fr: ["Des sites web rapides et sur mesure.", "L'automatisation des tâches répétitives.", "L'intégration d'IA dans les outils du quotidien."],
-        en: ["Fast, custom websites.", "Automation of repetitive tasks.", "AI built into everyday tools."],
+        fr: [
+          "Un site qui attire des clients, avec réservation en ligne et acompte.",
+          "Une secrétaire virtuelle par IA et des rappels SMS et courriel.",
+          "La visibilité sur Google et plus d'avis clients.",
+        ],
+        en: [
+          "A website that brings clients, with online booking and deposits.",
+          "An AI virtual receptionist and SMS and email reminders.",
+          "Visibility on Google and more customer reviews.",
+        ],
       },
-      keywords: { fr: ["sites web", "automatisation", "IA"], en: ["websites", "automation", "AI"] },
+      keywords: { fr: ["réservation", "secrétaire IA", "Google"], en: ["booking", "AI receptionist", "Google"] },
       speech: {
-        fr: "On construit des sites web sur mesure, on automatise les tâches répétitives, et on intègre l'IA dans les outils du quotidien.",
-        en: "We build custom websites, automate repetitive tasks, and bring AI into everyday tools.",
+        fr: "On livre des sites qui attirent des clients, la réservation en ligne, une secrétaire IA, des rappels et plus d'avis Google.",
+        en: "We deliver sites that bring clients, online booking, an AI receptionist, reminders and more Google reviews.",
       },
     },
     {
       kind: kinds[3],
-      title: { fr: "Comment on travaille", en: "How we work" },
+      title: { fr: "Une agence automatisée", en: "An automated agency" },
       lines: {
-        fr: ["1. On cadre le besoin avec le client.", "2. On conçoit et on construit.", "3. On met en ligne."],
-        en: ["1. Scope the need with the client.", "2. Design and build.", "3. Launch."],
+        fr: [
+          "1. La prospection repère les commerces qui ont besoin d'aide.",
+          "2. Les courriels et les relances partent tout seuls.",
+          "3. Les réponses sont détectées et signalées, et les réseaux sociaux publiés automatiquement.",
+        ],
+        en: [
+          "1. Prospecting spots the businesses that need help.",
+          "2. Emails and follow-ups go out on their own.",
+          "3. Replies are detected and flagged, and social posts go out automatically.",
+        ],
       },
-      keywords: { fr: ["cadrage", "construire", "mise en ligne"], en: ["scoping", "build", "launch"] },
+      keywords: { fr: ["prospection", "relances", "automatique"], en: ["prospecting", "follow-ups", "automatic"] },
       speech: {
-        fr: "On cadre le besoin avec le client, on conçoit et on construit, puis on met le projet en ligne.",
-        en: "We scope the need with the client, design and build, then launch the project.",
+        fr: "J'ai aussi automatisé l'agence : la prospection, les courriels, les relances, le suivi des réponses et les publications.",
+        en: "I also automated the agency itself: prospecting, emails, follow-ups, reply tracking and social posts.",
       },
     },
     {
       kind: kinds[4],
       title: { fr: "De A à Z", en: "From A to Z" },
       lines: {
-        fr: ["Un seul interlocuteur, du cadrage à la mise en ligne.", "Des outils qui font gagner du temps aux équipes."],
-        en: ["One point of contact, from scoping to launch.", "Tools that save teams time."],
+        fr: [
+          "Un audit gratuit en 48 h, une offre claire à prix fixe.",
+          "Une petite équipe joignable, qui reste là après la mise en ligne.",
+        ],
+        en: [
+          "A free audit in 48 h, a clear fixed-price offer.",
+          "A small, reachable team that stays after launch.",
+        ],
       },
-      keywords: { fr: ["de A à Z", "interlocuteur", "temps"], en: ["end to end", "one contact", "time"] },
+      keywords: { fr: ["audit 48 h", "prix fixe", "petite équipe"], en: ["48 h audit", "fixed price", "small team"] },
       speech: {
-        fr: "Le client a un seul interlocuteur, du cadrage à la mise en ligne, et des outils qui font gagner du temps.",
-        en: "Clients get one point of contact from scoping to launch, and tools that save time.",
+        fr: "Un audit gratuit en 48 heures, une offre claire à prix fixe, et une petite équipe qui reste après la mise en ligne.",
+        en: "A free audit in 48 hours, a clear fixed-price offer, and a small team that stays after launch.",
       },
     },
     {
@@ -456,10 +480,121 @@ const kelthen: Presentation = {
   ],
 };
 
-// Fraul : pas de présentation tant que le contenu n'est pas confirmé.
+// Sources : repo Kelthen/fraul-ecommerce (README, STATUS).
+const fraul: Presentation = {
+  slug: "fraul",
+  tech: "Next.js · Three.js · Supabase",
+  slides: [
+    {
+      kind: kinds[0],
+      title: { fr: "Une boutique comme les autres ?", en: "Just another shop?" },
+      lines: {
+        fr: [
+          "Un commerçant de vêtements et chaussures veut vendre en ligne.",
+          "Une grille de produits de plus ne donne pas envie de flâner.",
+        ],
+        en: [
+          "A clothing and shoe retailer wants to sell online.",
+          "Yet another product grid doesn't make people want to browse.",
+        ],
+      },
+      keywords: { fr: ["mode", "boutique en ligne", "flâner"], en: ["fashion", "online shop", "browse"] },
+      speech: {
+        fr: "Un commerçant de mode voulait vendre en ligne, sans faire une boutique de plus où personne ne flâne.",
+        en: "A fashion retailer wanted to sell online without building yet another shop nobody browses.",
+      },
+    },
+    {
+      kind: kinds[1],
+      title: { fr: "Un centre commercial en 3D", en: "A 3D shopping mall" },
+      lines: {
+        fr: [
+          "Le Fraul Walk : on se promène dans un mall en 3D.",
+          "Une boutique par marque ; on touche la vitrine pour entrer.",
+        ],
+        en: ["The Fraul Walk: you stroll through a 3D mall.", "One shop per brand; tap the window to walk in."],
+      },
+      keywords: { fr: ["Fraul Walk", "3D", "une boutique par marque"], en: ["Fraul Walk", "3D", "one shop per brand"] },
+      speech: {
+        fr: "Avec l'équipe Kelthen, on a créé le Fraul Walk : un centre commercial en 3D, avec une boutique par marque.",
+        en: "With the Kelthen team, we built the Fraul Walk: a 3D shopping mall with one shop per brand.",
+      },
+    },
+    {
+      kind: kinds[2],
+      title: { fr: "Trois envies", en: "Three wishes" },
+      lines: {
+        fr: [
+          "Composer sa tenue pièce par pièce.",
+          "Garder ses envies de côté et les retrouver plus tard.",
+          "Demander une pièce introuvable au comptoir « sur demande ».",
+        ],
+        en: [
+          "Build an outfit piece by piece.",
+          "Save favourites and find them later.",
+          "Request a hard-to-find piece at the “on request” desk.",
+        ],
+      },
+      keywords: { fr: ["tenue", "envies", "sur demande"], en: ["outfit", "favourites", "on request"] },
+      speech: {
+        fr: "On peut composer sa tenue, garder ses envies, et demander une pièce introuvable au comptoir sur demande.",
+        en: "You can build an outfit, save favourites, and request a hard-to-find piece at the on-request desk.",
+      },
+    },
+    {
+      kind: kinds[3],
+      title: { fr: "Une visite vivante", en: "A living visit" },
+      lines: {
+        fr: [
+          "1. On entre dans le mall et on se promène devant les vitrines.",
+          "2. Les vitrines montrent les pièces phares, et la lumière suit l'heure du visiteur.",
+          "3. On entre, on choisit, on passe au panier et on suit sa commande.",
+        ],
+        en: [
+          "1. Walk into the mall and stroll past the windows.",
+          "2. Windows show the key pieces, and the light follows the visitor's time of day.",
+          "3. Step in, choose, check out and track your order.",
+        ],
+      },
+      keywords: { fr: ["vitrines", "heure du jour", "panier"], en: ["windows", "time of day", "cart"] },
+      speech: {
+        fr: "On se promène devant les vitrines, la lumière suit l'heure du visiteur, puis on entre, on choisit et on suit sa commande.",
+        en: "You stroll past the windows, the light follows your time of day, then you step in, choose and track your order.",
+      },
+    },
+    {
+      kind: kinds[4],
+      title: { fr: "Faire du shopping, pas défiler", en: "Shopping, not scrolling" },
+      lines: {
+        fr: ["Une expérience qu'on a envie d'explorer, même sur téléphone.", "Projet en cours, avec l'équipe Kelthen."],
+        en: ["An experience people want to explore, even on a phone.", "In progress, with the Kelthen team."],
+      },
+      keywords: { fr: ["explorer", "téléphone", "en cours"], en: ["explore", "phone", "in progress"] },
+      speech: {
+        fr: "Le but : donner envie d'explorer, même sur téléphone. Le projet est en cours avec l'équipe Kelthen.",
+        en: "The goal: make people want to explore, even on a phone. The project is in progress with the Kelthen team.",
+      },
+    },
+    {
+      kind: kinds[5],
+      title: { fr: "Le projet", en: "The project" },
+      lines: {
+        fr: ["Une boutique de mode qu'on visite, au lieu de la faire défiler."],
+        en: ["A fashion shop you visit, instead of scrolling through."],
+      },
+      keywords: { fr: ["Fraul", "Fraul Walk"], en: ["Fraul", "Fraul Walk"] },
+      speech: {
+        fr: "Une boutique de mode qu'on visite, au lieu de la faire défiler. Merci d'avoir regardé.",
+        en: "A fashion shop you visit instead of scrolling through. Thanks for watching.",
+      },
+    },
+  ],
+};
+
 export const presentations: Record<string, Presentation> = {
   mamashop,
   abo,
   chichicuties,
   kelthen,
+  fraul,
 };
