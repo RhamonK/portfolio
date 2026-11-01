@@ -14,7 +14,7 @@ import type { PresenterSignals } from "@/components/presentation/signals";
 const LIME = "#d4ff3a";
 const lerp = THREE.MathUtils.lerp;
 
-function Figure({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
+export function Figure({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
   const root = useRef<THREE.Group>(null!);
   const head = useRef<THREE.Group>(null!);
   const eyes = useRef<THREE.Group>(null!);

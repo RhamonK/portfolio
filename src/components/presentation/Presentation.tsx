@@ -10,6 +10,8 @@ import { MOUTH_Y, type PresenterSignals } from "@/components/presentation/signal
 
 // La 3D n'est chargée qu'à l'ouverture d'une présentation.
 const Presenter = dynamic(() => import("@/components/presentation/Presenter"), { ssr: false });
+// Desktop : une seule pièce (salle Blender + diapo sur l'écran + présentateur).
+const Stage3D = dynamic(() => import("@/components/presentation/Stage3D"), { ssr: false });
 
 const SLIDE_S = 10; // durée d'une diapo, en secondes
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -26,8 +28,11 @@ export function Presentation({
   onClose,
   onNextProject,
   initialLang = "fr",
+  projectIndex = 0,
 }: {
   project: Project;
+  /** Rang du projet dans la salle (écran de face). */
+  projectIndex?: number;
   presentation: Pres;
   onClose: () => void;
   /** Langue de la page qui ouvre la présentation. */
@@ -36,6 +41,16 @@ export function Presentation({
   onNextProject?: () => void;
 }) {
   const slides = presentation.slides;
+  // Scène unique en 3D : grand écran, WebGL et mouvement normal.
+  const [scene3d] = useState(() => {
+    if (typeof window === "undefined") return false;
+    if (!window.matchMedia("(min-width: 1024px) and (prefers-reduced-motion: no-preference)").matches) return false;
+    try {
+      return !!document.createElement("canvas").getContext("webgl2");
+    } catch {
+      return false;
+    }
+  });
   const root = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const presenterBox = useRef<HTMLDivElement>(null);
@@ -144,7 +159,7 @@ export function Presentation({
       gsap.fromTo(".slide-card", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: reduced ? 0 : 0.5, ease: "power2.out" });
 
       const box = presenterBox.current!.getBoundingClientRect();
-      const mouthX = box.left + box.width / 2;
+      const mouthX = box.left + box.width * (signals.current.mouthX ?? 0.5);
       const mouthY = box.top + box.height * (signals.current.mouthY ?? MOUTH_Y);
       const words = gsap.utils.toArray<HTMLElement>(".sub-word");
       const pills = gsap.utils.toArray<HTMLElement>(".kw-pill");
@@ -268,9 +283,26 @@ export function Presentation({
       </div>
 
       {/* diapo (≈ 65 %) + présentateur (≈ 35 %) */}
-      <div ref={stage} className="relative z-10 grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-2 md:gap-4 px-5 md:grid-cols-[minmax(0,65fr)_minmax(0,35fr)] md:grid-rows-1 md:px-8">
-        <div className="flex min-w-0 flex-col md:min-h-0">
-          <article className="slide-card glass flex flex-col rounded-3xl p-5 md:min-h-0 md:flex-1 md:p-9" aria-live="polite">
+      <div
+        ref={stage}
+        className={
+          scene3d
+            ? "relative z-10 flex min-h-0 flex-1 flex-col"
+            : "relative z-10 grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-2 md:gap-4 px-5 md:grid-cols-[minmax(0,65fr)_minmax(0,35fr)] md:grid-rows-1 md:px-8"
+        }
+      >
+        {scene3d && (
+          <div ref={presenterBox} className="relative min-h-0 flex-1" aria-hidden>
+            <Stage3D
+              signals={signals}
+              projectIndex={projectIndex}
+              view={{ slide, lang, index: idx, image: project.image ?? `/projets/${project.slug}/dessin.svg` }}
+            />
+          </div>
+        )}
+        <div className={scene3d ? "relative z-10 flex flex-col items-center px-8" : "flex min-w-0 flex-col md:min-h-0"}>
+          {/* en 3D, la diapo est dessinée sur l'écran : ce texte reste lu par les lecteurs d'écran */}
+          <article className={scene3d ? "sr-only" : "slide-card glass flex flex-col rounded-3xl p-5 md:min-h-0 md:flex-1 md:p-9"} aria-live="polite">
             <p className="eyebrow">
               {pad(idx + 1)} · {slide.kind[lang]}
             </p>
@@ -285,7 +317,7 @@ export function Presentation({
                 <ScreenContent project={project} />
               </div>
             </div>
-            {last && (
+            {last && !scene3d && (
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 {project.href && (
                   <a href={project.href} target="_blank" rel="noreferrer" className="btn btn-lime">
@@ -306,7 +338,11 @@ export function Presentation({
             )}
           </article>
           {/* sous-titres */}
-          <p className="mx-auto mt-4 min-h-[3.2em] max-w-[820px] text-center text-[clamp(16px,1.6vw,21px)] leading-snug">
+          <p
+            className={`mx-auto mt-4 min-h-[3.2em] max-w-[820px] text-center text-[clamp(16px,1.6vw,21px)] leading-snug ${
+              ""
+            }`}
+          >
             {slide.speech[lang].split(" ").map((w, i) => (
               <span key={`${idx}-${lang}-${i}`} className="sub-word">
                 {w}{" "}
@@ -315,9 +351,11 @@ export function Presentation({
           </p>
         </div>
 
-        <div ref={presenterBox} className="relative min-h-[26svh] md:h-auto" aria-hidden>
-          <Presenter signals={signals} />
-        </div>
+        {!scene3d && (
+          <div ref={presenterBox} className="relative min-h-[26svh] md:h-auto" aria-hidden>
+            <Presenter signals={signals} />
+          </div>
+        )}
 
         {/* mots-clés qui tombent vers la bouche du présentateur */}
         <div aria-hidden className="pointer-events-none fixed inset-0 z-20">
@@ -356,6 +394,25 @@ export function Presentation({
           <button type="button" onClick={() => go(slides.length - 1)} className="btn !min-h-10 text-[14px] text-muted hover:text-ink">
             {t.skip}
           </button>
+          {scene3d && last && (
+            <div className="flex flex-wrap items-center justify-center gap-2 border-l border-glass-line pl-3">
+              {project.href && (
+                <a href={project.href} target="_blank" rel="noreferrer" className="btn btn-lime">
+                  {t.see}
+                </a>
+              )}
+              {onNextProject && (
+                <button type="button" onClick={onNextProject} className="btn btn-glass">
+                  {t.nextProject}
+                </button>
+              )}
+              {presentation.tech && (
+                <span className="rounded-full border border-glass-line bg-bg/70 px-3 py-1.5 font-mono text-[12px] text-muted">
+                  {t.tech} · {presentation.tech}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
