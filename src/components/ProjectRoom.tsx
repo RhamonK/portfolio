@@ -56,6 +56,9 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   const placeRef = useRef<((a: number) => void) | null>(null);
   // WebGL disponible : la salle Blender remplace le cylindre en bandes CSS.
   const [webgl, setWebgl] = useState(false);
+  // Bande de la scène 3D (fractions de la section) : entre le titre et la
+  // légende, pour qu'aucun trait ni cadre ne passe derrière le texte.
+  const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55 });
   const drive = useRef<RoomDrive>({ a: 0, tunnel: 0, band: { top: 0.2, bottom: 0.7 } });
   const images = projects.map((p) => p.image ?? `/projets/${p.slug}/dessin.svg`);
 
@@ -99,7 +102,13 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       const sec = section.current?.getBoundingClientRect();
       const st = stage3d.current?.getBoundingClientRect();
       if (sec && st && sec.height > 0) {
-        drive.current.band = { top: (st.top - sec.top) / sec.height, bottom: (st.bottom - sec.top) / sec.height };
+        const top = (st.top - sec.top) / sec.height;
+        const bottom = (st.bottom - sec.top) / sec.height;
+        const ctop = Math.max(top - 0.01, 0);
+        const h = Math.min(bottom + 0.015, 1) - ctop;
+        setCanvasBox({ top: ctop, h });
+        // bande de l'écran exprimée en fractions de la scène 3D
+        drive.current.band = { top: (top + 0.02 - ctop) / h, bottom: (bottom - 0.03 - ctop) / h };
       }
       radiusRef.current = geo.radius;
       setGeo(geo);
@@ -191,7 +200,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         tl.to(cylinder.current, { z: radiusRef.current * 1.85, duration: 0.8, ease: "power3.in" }, 0)
           .to(stage3d.current, { filter: "blur(6px)", duration: 0.8, ease: "power2.in" }, 0);
       } else {
-        tl.to(drive.current, { tunnel: 1, duration: 0.8, ease: "power3.in" }, 0);
+        tl.to(drive.current, { tunnel: 1, duration: 0.8, ease: "power3.in" }, 0)
+          .to(section.current!.querySelectorAll(".room-text"), { opacity: 0, duration: 0.3 }, 0);
       }
     } else setOpen(p.slug);
   };
@@ -205,6 +215,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         gsap.to(stage3d.current, { filter: "blur(0px)", duration: 0.6, clearProps: "filter" });
       } else {
         gsap.to(drive.current, { tunnel: 0, duration: 0.6, ease: "power3.out" });
+        gsap.to(section.current!.querySelectorAll(".room-text"), { opacity: 1, duration: 0.4, delay: 0.3 });
       }
     }
     lastFocus.current?.focus();
@@ -267,7 +278,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         </>
       )}
 
-      <div className="wrap relative z-10 md:text-center">
+      <div className="room-text wrap relative z-10 md:text-center">
         <p className="eyebrow">{t.projectsEyebrow}</p>
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
           {t.projectsTitle[0]}
@@ -282,7 +293,16 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       {/* ===== cylindre (desktop) ===== */}
       {/* ===== salle Blender (desktop, WebGL) : toute la section, derrière le texte ===== */}
       {webgl && is3d && near && (
-        <div aria-hidden className="room-3d absolute inset-0 z-0">
+        <div
+          aria-hidden
+          className="room-3d absolute inset-x-0 z-0"
+          style={{
+            top: `${canvasBox.top * 100}%`,
+            height: `${canvasBox.h * 100}%`,
+            maskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
+          }}
+        >
           <Room3D images={images} drive={drive} onPick={(i) => (i === active ? launch(i) : goTo(i))} />
         </div>
       )}
@@ -332,10 +352,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       </div>
 
       {/* légende de l'écran de face (desktop) */}
-      <div className="room-3d wrap relative z-10 pb-10 text-center" aria-live="polite">
-        {webgl && (
-          <div aria-hidden className="pointer-events-none absolute inset-x-[10%] -bottom-4 -top-6 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(10,11,10,0.92)_35%,transparent_72%)]" />
-        )}
+      <div className="room-3d room-text wrap relative z-10 pb-10 text-center" aria-live="polite">
         <span className="eyebrow">
           {pad(active + 1)} / {pad(n)}
         </span>
