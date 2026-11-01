@@ -53,6 +53,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   // Les bandes des écrans ne sont construites qu'à l'approche de la salle,
   // pour ne pas alourdir le chargement de la page.
   const [near, setNear] = useState(false);
+  // Salle visible à l'écran : sinon la scène 3D arrête de se dessiner.
+  const [onScreen, setOnScreen] = useState(false);
   const placeRef = useRef<((a: number) => void) | null>(null);
   // WebGL disponible : la salle Blender remplace le cylindre en bandes CSS.
   const [webgl, setWebgl] = useState(false);
@@ -83,13 +85,26 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       { rootMargin: "0px 0px -15% 0px" },
     );
     io.observe(el);
-    return () => io.disconnect();
+    const seen = new IntersectionObserver((entries) => setOnScreen(entries.some((e) => e.isIntersecting)));
+    seen.observe(el);
+    return () => {
+      io.disconnect();
+      seen.disconnect();
+    };
   }, []);
 
   useEffect(() => {
     const st = trigger.current;
     if (near && st) placeRef.current?.(st.progress * (projects.length - 1));
-  }, [near]);
+    // le présentateur (2,6 Mo) se charge pendant qu'on regarde la salle,
+    // pour que la présentation s'ouvre sans à-coup
+    if (near && webgl) {
+      const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1200));
+      idle(() => {
+        fetch("/presenter/presenter.glb", { priority: "low" } as RequestInit).catch(() => {});
+      });
+    }
+  }, [near, webgl]);
   const [{ radius, height: screenH }, setGeo] = useState({ radius: 800, height: 420 });
   const radiusRef = useRef(800);
   const n = projects.length;
@@ -129,6 +144,33 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
 
     mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       setIs3d(true);
+      // Arrivée : la salle s'ouvre en cercle (portail) pendant qu'on descend,
+      // puis le titre monte mot par mot et la légende se décale.
+      gsap.fromTo(
+        section.current,
+        { "--portal": "0%" },
+        {
+          "--portal": "140%",
+          ease: "power2.in",
+          scrollTrigger: { trigger: section.current, start: "top 95%", end: "top top", scrub: 0.5 },
+        },
+      );
+      gsap.from(".st-word", {
+        yPercent: 110,
+        rotate: 6,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.08,
+        ease: "expo.out",
+        scrollTrigger: { trigger: section.current, start: "top 45%", toggleActions: "play none none reverse" },
+      });
+      gsap.from(".room-caption", {
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        ease: "power3.out",
+        scrollTrigger: { trigger: section.current, start: "top 20%", toggleActions: "play none none reverse" },
+      });
       const place = (a: number) => {
         drive.current.a = a;
         if (cylinder.current) gsap.set(cylinder.current, { z: radiusRef.current, rotationY: a * STEP });
@@ -281,9 +323,13 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       <div className="room-text wrap relative z-10 md:text-center">
         <p className="eyebrow">{t.projectsEyebrow}</p>
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
-          {t.projectsTitle[0]}
-          <span className="text-lime">{t.projectsTitle[1]}</span>
-          {t.projectsTitle[2]}
+          <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+            <span className="st-word">{t.projectsTitle[0].trim()}</span>
+          </span>{" "}
+          <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+            <span className="st-word text-lime">{t.projectsTitle[1]}</span>
+            <span className="st-word">{t.projectsTitle[2]}</span>
+          </span>
         </h2>
         <p id="aide-projets" className="sr-only">
           {t.roomHelp}
@@ -295,7 +341,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       {webgl && is3d && near && (
         <div
           aria-hidden
-          className="room-3d absolute inset-x-0 z-0"
+          className="room-3d room-portal absolute inset-x-0 z-0"
           style={{
             top: `${canvasBox.top * 100}%`,
             height: `${canvasBox.h * 100}%`,
@@ -303,7 +349,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
             WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
           }}
         >
-          <Room3D images={images} drive={drive} onPick={(i) => (i === active ? launch(i) : goTo(i))} />
+          <Room3D images={images} drive={drive} paused={!!open || !onScreen} onPick={(i) => (i === active ? launch(i) : goTo(i))} />
         </div>
       )}
 
@@ -352,7 +398,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       </div>
 
       {/* légende de l'écran de face (desktop) */}
-      <div className="room-3d room-text wrap relative z-10 pb-10 text-center" aria-live="polite">
+      <div className="room-3d room-text room-caption wrap relative z-10 pb-10 text-center" aria-live="polite">
         <span className="eyebrow">
           {pad(active + 1)} / {pad(n)}
         </span>

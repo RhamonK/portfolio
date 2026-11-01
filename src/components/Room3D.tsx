@@ -105,9 +105,12 @@ function Scene({
     pitch.current = SCREEN_ELEV - (0.5 - (top + bottom) / 2) * vfov;
   }, [camera, size, drive]);
 
+  const invalidate = useThree((s) => s.invalidate);
   useFrame(() => {
     const target = drive.current.a;
     current.current += (target - current.current) * 0.14;
+    if (Math.abs(target - current.current) > 0.0005) invalidate();
+    else current.current = target;
     const a = current.current;
     group.current.rotation.y = a * STEP;
     screens.forEach((mat, i) => {
@@ -135,20 +138,47 @@ function Scene({
   );
 }
 
+// Rendu à la demande : on ne redessine que quand la salle bouge
+// (défilement, tunnel, rotation encore en cours), jamais à vide.
+function Wake({ drive }: { drive: React.MutableRefObject<RoomDrive> }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    let raf = 0;
+    let a = NaN;
+    let t = NaN;
+    const tick = () => {
+      const d = drive.current;
+      if (d.a !== a || d.tunnel !== t) {
+        a = d.a;
+        t = d.tunnel;
+        invalidate();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [drive, invalidate]);
+  return null;
+}
+
 export default function Room3D({
   images,
   drive,
   onPick,
+  paused = false,
 }: {
   images: string[];
   drive: React.MutableRefObject<RoomDrive>;
   onPick: (i: number) => void;
+  /** Présentation ouverte ou salle hors écran : plus aucun rendu. */
+  paused?: boolean;
 }) {
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      frameloop={paused ? "never" : "demand"}
+      dpr={[1, 1.25]}
       camera={{ position: [0, EYE, 0], fov: 40, near: 0.05, far: 30 }}
-      gl={{ antialias: true }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
       }}
@@ -160,6 +190,7 @@ export default function Room3D({
       <pointLight position={[0, 0.15, 0]} color="#d4ff3a" intensity={6} distance={7} decay={1.6} />
       {/* lumière blanc chaud de l'anneau du plafond */}
       <pointLight position={[0, 4.0, -1.5]} color="#ffd9b0" intensity={4} distance={9} decay={1.4} />
+      <Wake drive={drive} />
       <Suspense fallback={null}>
         <Scene images={images} drive={drive} onPick={onPick} />
       </Suspense>

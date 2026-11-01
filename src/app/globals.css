@@ -198,3 +198,67 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ===== ENTRÉE — nom, projecteur, souris, grain ===== */
+/* Avant que l'intro démarre, le nom et les rôles restent cachés (pas de flash).
+   Filet de sécurité : s'ils n'ont pas été animés, ils réapparaissent seuls. */
+@keyframes intro-safety { to { visibility: visible; } }
+.js .intro-hide { visibility: hidden; animation: intro-safety 0s 3.5s forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .js .intro-hide { visibility: visible; animation: none; }
+}
+.hero-spot {
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 45%), rgba(212, 255, 58, 0.09), transparent 60%);
+}
+.h-letter {
+  transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  will-change: transform;
+}
+@media (pointer: fine) {
+  .h-letter:hover {
+    color: var(--lime);
+    text-shadow: 0 0 40px rgba(212, 255, 58, 0.6);
+    transform: translateY(-0.08em) rotate(-4deg);
+  }
+}
+.scroll-mouse {
+  position: relative;
+  width: 22px;
+  height: 34px;
+  border: 1.5px solid rgba(242, 243, 238, 0.5);
+  border-radius: 12px;
+}
+.scroll-mouse::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 3px;
+  height: 7px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--lime);
+  animation: wheel 1.6s ease-in-out infinite;
+}
+@keyframes wheel {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+/* grain de pellicule, très léger, sur toute la page */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+/* portail : la salle s'ouvre en cercle quand on arrive dessus */
+.room-portal {
+  clip-path: circle(var(--portal, 140%) at 50% 55%);
+}
+.st-word {
+  display: inline-block;
+}
