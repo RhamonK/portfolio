@@ -178,9 +178,12 @@ export function Presentation({
       } else {
         timeline.set(words, { opacity: 0.12 }, 0);
         pills.forEach((pill, i) => {
-          const startX = box.left + box.width * (0.15 + Math.random() * 0.7) - pill.offsetWidth / 2;
+          // en 3D, ils tombent au-dessus du présentateur, jamais sur la diapo
+          const startX = scene3d
+            ? mouthX + 50 + Math.random() * 110
+            : box.left + box.width * (0.15 + Math.random() * 0.7) - pill.offsetWidth / 2;
           timeline
-            .fromTo(pill, { x: startX, y: box.top - 30, opacity: 0, scale: 1 }, { y: box.top + box.height * 0.12, opacity: 1, duration: 0.45, ease: "power2.out" }, 0.3 + i * 0.6)
+            .fromTo(pill, { x: startX, y: box.top + (scene3d ? 12 : -30), opacity: 0, scale: 1 }, { y: box.top + box.height * 0.12, opacity: 1, duration: 0.45, ease: "power2.out" }, 0.3 + i * 0.6)
             .to(pill, { x: mouthX - pill.offsetWidth / 2, y: mouthY - pill.offsetHeight / 2, scale: 0.15, opacity: 0, duration: 0.9, ease: "power2.in" }, ">");
         });
         timeline.call(() => { signals.current.pointing = true; }, [], 1.1);
