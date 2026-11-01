@@ -97,7 +97,7 @@ function Scene({
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const { top, bottom } = drive.current.band;
-    const frac = Math.max(bottom - top, 0.2) * 0.9;
+    const frac = Math.max(bottom - top, 0.2) * 0.86;
     const vfov = SCREEN_ANGLE / frac;
     cam.fov = THREE.MathUtils.radToDeg(THREE.MathUtils.clamp(vfov, 0.5, 1.6));
     cam.updateProjectionMatrix();
