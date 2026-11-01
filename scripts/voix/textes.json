@@ -1,0 +1,362 @@
+[
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 0,
+    "text": "Les petits commerces d'Afrique de l'Ouest gèrent stock, ventes et crédits tous les jours, avec un réseau instable."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 1,
+    "text": "MamaShop est une app mobile de gestion de boutique, avec trois espaces : le gérant, l'agent de terrain et la diaspora."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 2,
+    "text": "Le gérant voit ses finances et ses marges, suit les crédits clients, et reçoit des conseils pour négocier avec ses fournisseurs."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 3,
+    "text": "L'agent enregistre ses ventes même sans réseau, l'app synchronise toute seule, et la famille à l'étranger suit l'activité."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 4,
+    "text": "Chaque vente met le stock à jour sans écart, et le commerce reste suivi, même quand le réseau coupe."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "fr",
+    "slide": 5,
+    "text": "Tu peux voir le projet sur GitHub, ou passer au projet suivant."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 0,
+    "text": "Small shops in West Africa manage stock, sales and credit every day, on an unstable network."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 1,
+    "text": "MamaShop is a mobile shop-management app with three spaces: the manager, the field agent and the diaspora."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 2,
+    "text": "The manager sees finances and margins, tracks customer credit, and gets tips to negotiate with suppliers."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 3,
+    "text": "The agent records sales even offline, the app syncs on its own, and family abroad follows the activity."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 4,
+    "text": "Every sale updates the stock with no mismatch, and the shop stays on track even when the network drops."
+  },
+  {
+    "slug": "mamashop",
+    "lang": "en",
+    "slide": 5,
+    "text": "You can see the project on GitHub, or move on to the next one."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 0,
+    "text": "Trouver un bon artisan à Lomé, c'est souvent le bouche-à-oreille. Et les artisans sérieux n'ont aucun moyen de le prouver."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 1,
+    "text": "ABO, c'est une place de marché qui met en relation les clients et des artisans vérifiés, avec un badge de confiance."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 2,
+    "text": "L'identité est vérifiée avant le badge, les documents restent protégés, et les avis viennent de vraies demandes."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 3,
+    "text": "Le client cherche par métier et quartier, regarde le profil et les avis, puis demande un devis et continue sur WhatsApp."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 4,
+    "text": "Les clients savent à qui ils font appel, et les artisans sérieux ont enfin une présence crédible en ligne."
+  },
+  {
+    "slug": "abo",
+    "lang": "fr",
+    "slide": 5,
+    "text": "Une plateforme pensée pour le mobile, au service de la confiance. Passons au projet suivant."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 0,
+    "text": "Finding a good tradesperson in Lomé often means word of mouth. And serious tradespeople have no way to prove it."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 1,
+    "text": "ABO is a marketplace connecting clients with verified tradespeople, with a trust badge."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 2,
+    "text": "Identity is checked before the badge, documents stay protected, and reviews come from real requests."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 3,
+    "text": "Clients search by trade and neighbourhood, check the profile and reviews, then request a quote and continue on WhatsApp."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 4,
+    "text": "Clients know who they're hiring, and serious tradespeople finally get a credible online presence."
+  },
+  {
+    "slug": "abo",
+    "lang": "en",
+    "slide": 5,
+    "text": "A mobile-first platform built around trust. Let's move on to the next project."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 0,
+    "text": "Un salon de tresses recevait ses demandes partout, par appels et messages. Ça prend du temps, et des clientes oublient."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 1,
+    "text": "J'ai construit le site du salon et une assistante IA qui répond aux clientes sur le site, WhatsApp, Instagram et ailleurs."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 2,
+    "text": "Les clientes réservent à toute heure, reçoivent leur confirmation par SMS et courriel, puis des rappels avant le rendez-vous."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 3,
+    "text": "La cliente choisit son créneau, la propriétaire valide d'un tap sur Telegram, et tout le reste part tout seul."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 4,
+    "text": "Plus besoin de taper un message pour gérer une réservation, et la propriétaire garde la main sur chaque rendez-vous."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "fr",
+    "slide": 5,
+    "text": "Un système de réservation complet, de la demande au rappel. Passons au projet suivant."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 0,
+    "text": "A braiding salon got requests everywhere, by calls and messages. It takes time, and clients forget."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 1,
+    "text": "I built the salon's website and an AI assistant that answers clients on the site, WhatsApp, Instagram and more."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 2,
+    "text": "Clients book any time, get confirmation by SMS and email, then reminders before the appointment."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 3,
+    "text": "The client picks a slot, the owner approves with one tap on Telegram, and everything else happens on its own."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 4,
+    "text": "No more typing messages to handle bookings, and the owner stays in control of every appointment."
+  },
+  {
+    "slug": "studio-nala",
+    "lang": "en",
+    "slide": 5,
+    "text": "A complete booking system, from request to reminder. Let's move on to the next project."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 0,
+    "text": "Trop d'entreprises sont freinées par des sites lents, des outils compliqués et des tâches manuelles."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 1,
+    "text": "Kelthen, c'est mon agence au Canada : sites, applications et automatisations sur mesure. Je la dirige."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 2,
+    "text": "On livre des sites qui attirent des clients, la réservation en ligne, une secrétaire IA, des rappels et plus d'avis Google."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 3,
+    "text": "J'ai aussi automatisé l'agence : la prospection, les courriels, les relances, le suivi des réponses et les publications."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 4,
+    "text": "Un audit gratuit en 48 heures, une offre claire à prix fixe, et une petite équipe qui reste après la mise en ligne."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "fr",
+    "slide": 5,
+    "text": "Tu peux découvrir l'agence sur kelthen.com, ou passer au projet suivant."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 0,
+    "text": "Too many businesses are held back by slow sites, complicated tools and manual tasks."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 1,
+    "text": "Kelthen is my agency in Canada: custom websites, apps and automations. I run it."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 2,
+    "text": "We deliver sites that bring clients, online booking, an AI receptionist, reminders and more Google reviews."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 3,
+    "text": "I also automated the agency itself: prospecting, emails, follow-ups, reply tracking and social posts."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 4,
+    "text": "A free audit in 48 hours, a clear fixed-price offer, and a small team that stays after launch."
+  },
+  {
+    "slug": "kelthen",
+    "lang": "en",
+    "slide": 5,
+    "text": "You can discover the agency at kelthen.com, or move on to the next project."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 0,
+    "text": "Un commerçant de mode voulait vendre en ligne, sans faire une boutique de plus où personne ne flâne."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 1,
+    "text": "Avec l'équipe Kelthen, on a créé le Fraul Walk : un centre commercial en 3D, avec une boutique par marque."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 2,
+    "text": "On peut composer sa tenue, garder ses envies, et demander une pièce introuvable au comptoir sur demande."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 3,
+    "text": "On se promène devant les vitrines, la lumière suit l'heure du visiteur, puis on entre, on choisit et on suit sa commande."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 4,
+    "text": "Le but : donner envie d'explorer, même sur téléphone. Le projet est en cours avec l'équipe Kelthen."
+  },
+  {
+    "slug": "fraul",
+    "lang": "fr",
+    "slide": 5,
+    "text": "Une boutique de mode qu'on visite, au lieu de la faire défiler. Merci d'avoir regardé."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 0,
+    "text": "A fashion retailer wanted to sell online without building yet another shop nobody browses."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 1,
+    "text": "With the Kelthen team, we built the Fraul Walk: a 3D shopping mall with one shop per brand."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 2,
+    "text": "You can build an outfit, save favourites, and request a hard-to-find piece at the on-request desk."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 3,
+    "text": "You stroll past the windows, the light follows your time of day, then you step in, choose and track your order."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 4,
+    "text": "The goal: make people want to explore, even on a phone. The project is in progress with the Kelthen team."
+  },
+  {
+    "slug": "fraul",
+    "lang": "en",
+    "slide": 5,
+    "text": "A fashion shop you visit instead of scrolling through. Thanks for watching."
+  }
+]
