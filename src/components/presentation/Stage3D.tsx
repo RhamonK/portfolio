@@ -17,7 +17,13 @@ import { PresenterModel, PRESENTER_URL } from "@/components/presentation/Present
 const STEP = THREE.MathUtils.degToRad(66);
 const lerp = THREE.MathUtils.lerp;
 /** Où se tient le présentateur (mètres) : devant l'écran, côté droit. */
-const SPOT = new THREE.Vector3(2.15, 0, -3.0);
+const SPOT = new THREE.Vector3(1.9, 0, -2.45);
+/**
+ * Salle ronde : le présentateur se tourne vers le centre de la pièce, dans
+ * l'axe de la courbe de l'écran (et non face à la caméra), un peu ouvert
+ * vers le public.
+ */
+const FACING = Math.atan2(-SPOT.x, -SPOT.z) * 0.85;
 const W = 2048;
 const H = 1222;
 
@@ -214,7 +220,7 @@ function Bust({ scene, signals }: { scene: THREE.Object3D; signals: React.Mutabl
   });
 
   return (
-    <group position={[SPOT.x, BUST_TOP - BUST_HEIGHT / 2, SPOT.z]}>
+    <group position={[SPOT.x, BUST_TOP - BUST_HEIGHT / 2, SPOT.z]} rotation={[0, FACING, 0]}>
       <group ref={pivot} rotation={[0, -Math.PI / 2, 0]} scale={fit.s}>
         <primitive object={scene} position={fit.offset} />
       </group>
@@ -239,7 +245,7 @@ function PresenterAuto({ signals, silhouette }: { signals: React.MutableRefObjec
 
   if (rigged) {
     return (
-      <group position={SPOT.toArray()}>
+      <group position={SPOT.toArray()} rotation={[0, FACING, 0]}>
         <PresenterModel signals={signals} inRoom />
       </group>
     );
@@ -286,12 +292,12 @@ export default function Stage3D({
 
   // Silhouette de la phase 1, mise à l'échelle d'une personne de 1,75 m.
   const silhouette = (
-    <group position={[SPOT.x, 1.2, SPOT.z]} scale={0.83}>
+    <group position={[SPOT.x, 1.2, SPOT.z]} rotation={[0, FACING, 0]} scale={0.83}>
       <Figure signals={signals} />
     </group>
   );
   const body = (
-    <group position={[SPOT.x, 1.2, SPOT.z]} scale={0.83}>
+    <group position={[SPOT.x, 1.2, SPOT.z]} rotation={[0, FACING, 0]} scale={0.83}>
       <Figure signals={signals} headless />
     </group>
   );

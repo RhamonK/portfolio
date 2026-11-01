@@ -25,8 +25,7 @@ Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par 
 
 ## Présentateur 3D
 - [ ] Phase 2 : 3 à 5 photos (face, trois-quarts gauche et droite, lumière douce, sans lunettes de soleil)
-- [x] `public/presenter/presenter.glb` — buste provisoire (Tripo, sans squelette), posé sur le corps de la silhouette
-- [ ] Version animée (squelette + bouche `mouthOpen` + actions) : `docs/prompt-blender-presentateur.md`
+- [x] `public/presenter/presenter.glb` — personnage animé (50 os, idle / talk / point / wave / nod, mouthOpen / blink…), 1,75 m, 34 k triangles, 2,6 Mo
 
 ## Voix
 - [ ] `public/voix/<projet>-fr.mp3` et `public/voix/<projet>-en.mp3` (environ 30 à 40 s par projet)
