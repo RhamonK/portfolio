@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -15,6 +15,7 @@ import { PresenterModel, PRESENTER_URL } from "@/components/presentation/Present
 // l'échelle humaine, éclairé par l'écran — comme quelqu'un qui expose son projet.
 
 const STEP = THREE.MathUtils.degToRad(66);
+const lerp = THREE.MathUtils.lerp;
 /** Où se tient le présentateur (mètres) : devant l'écran, côté droit. */
 const SPOT = new THREE.Vector3(2.15, 0, -3.0);
 const W = 2048;
@@ -180,6 +181,77 @@ function Rig({ signals, usesModel }: { signals: React.MutableRefObject<Presenter
   return null;
 }
 
+// Buste provisoire (statique, sans squelette) : posé sur le corps de la
+// silhouette, il suit un peu la souris et bouge légèrement en parlant.
+const BUST_HEIGHT = 0.75; // mètres, du haut du crâne au bas du buste
+const BUST_TOP = 1.76;
+
+function Bust({ scene, signals }: { scene: THREE.Object3D; signals: React.MutableRefObject<PresenterSignals> }) {
+  const pivot = useRef<THREE.Group>(null!);
+  const { camera } = useThree();
+  const mouth = useMemo(() => new THREE.Vector3(), []);
+  const fit = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const s = BUST_HEIGHT / (size.y || 1);
+    // le visage regarde +X dans le fichier : on le tourne vers la caméra (+Z)
+    return { s, offset: center.multiplyScalar(-1), depth: (size.x / 2) * 0.9, mouthY: size.y * 0.08 };
+  }, [scene]);
+
+  useFrame((state) => {
+    const sig = signals.current;
+    const t = state.clock.elapsedTime;
+    const move = sig.still ? 0 : 1;
+    const p = pivot.current;
+    p.rotation.y = lerp(p.rotation.y, -Math.PI / 2 + sig.mouse.x * 0.25, 0.08);
+    p.rotation.z = lerp(p.rotation.z, sig.mouse.y * 0.08 + sig.speaking * 0.035 * Math.sin(t * 7) * move, 0.2);
+    // position de la bouche à l'écran, pour les mots-clés qui tombent
+    p.localToWorld(mouth.set(fit.depth, fit.mouthY, 0).multiplyScalar(1));
+    mouth.project(camera);
+    sig.mouthX = (mouth.x + 1) / 2;
+    sig.mouthY = (1 - mouth.y) / 2;
+  });
+
+  return (
+    <group position={[SPOT.x, BUST_TOP - BUST_HEIGHT / 2, SPOT.z]}>
+      <group ref={pivot} rotation={[0, -Math.PI / 2, 0]} scale={fit.s}>
+        <primitive object={scene} position={fit.offset} />
+      </group>
+    </group>
+  );
+}
+
+// Modèle avec squelette → présentateur animé ; buste statique → monté sur la silhouette.
+function PresenterAuto({ signals, silhouette }: { signals: React.MutableRefObject<PresenterSignals>; silhouette: ReactNode }) {
+  const gltf = useLoader(GLTFLoader, PRESENTER_URL, (loader) => {
+    const draco = new DRACOLoader();
+    draco.setDecoderPath("/draco/");
+    loader.setDRACOLoader(draco);
+  });
+  const rigged = useMemo(() => {
+    let found = false;
+    gltf.scene.traverse((o) => {
+      if ((o as THREE.SkinnedMesh).isSkinnedMesh) found = true;
+    });
+    return found;
+  }, [gltf]);
+
+  if (rigged) {
+    return (
+      <group position={SPOT.toArray()}>
+        <PresenterModel signals={signals} inRoom />
+      </group>
+    );
+  }
+  return (
+    <>
+      {silhouette}
+      <Bust scene={gltf.scene} signals={signals} />
+    </>
+  );
+}
+
 class Fallback extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
@@ -218,6 +290,11 @@ export default function Stage3D({
       <Figure signals={signals} />
     </group>
   );
+  const body = (
+    <group position={[SPOT.x, 1.2, SPOT.z]} scale={0.83}>
+      <Figure signals={signals} headless />
+    </group>
+  );
 
   return (
     <Canvas dpr={[1, 1.5]} camera={{ position: [0, 1.5, 1.7], fov: 40, near: 0.05, far: 30 }} gl={{ antialias: true }}>
@@ -237,9 +314,7 @@ export default function Stage3D({
       {hasModel ? (
         <Fallback fallback={silhouette}>
           <Suspense fallback={silhouette}>
-            <group position={SPOT.toArray()}>
-              <PresenterModel signals={signals} inRoom />
-            </group>
+            <PresenterAuto signals={signals} silhouette={body} />
           </Suspense>
         </Fallback>
       ) : (
