@@ -123,7 +123,7 @@ function Room({ view, projectIndex }: { view: SlideView; projectIndex: number })
     const t = new THREE.CanvasTexture(canvas);
     t.flipY = false;
     t.colorSpace = THREE.SRGBColorSpace;
-    t.anisotropy = 8;
+    t.anisotropy = 4;
     // la salle est affichée en miroir : on remet l'image à l'endroit
     t.wrapS = THREE.RepeatWrapping;
     t.repeat.x = -1;
@@ -303,7 +303,7 @@ export default function Stage3D({
   );
 
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 1.5, 1.7], fov: 40, near: 0.05, far: 30 }} gl={{ antialias: true }}>
+    <Canvas dpr={[1, 1.25]} camera={{ position: [0, 1.5, 1.7], fov: 40, near: 0.05, far: 30 }} gl={{ antialias: true, powerPreference: "high-performance" }}>
       <color attach="background" args={["#0a0b0a"]} />
       <fog attach="fog" args={["#0a0b0a", 8, 14]} />
       <ambientLight intensity={0.3} />

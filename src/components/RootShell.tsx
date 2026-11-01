@@ -40,8 +40,10 @@ export function RootShell({ lang, children }: { lang: Lang; children: React.Reac
   };
 
   return (
-    <html lang={lang} className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang={lang} suppressHydrationWarning className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body>
+        {/* classe « js » posée avant l'affichage : l'intro peut cacher le nom sans flash */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         <a href="#contenu" className="sr-only-focusable btn btn-lime fixed left-4 top-4 z-[100]">
           {ui[lang].skip}
         </a>
