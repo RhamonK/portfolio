@@ -33,15 +33,10 @@ def purge():
 for ob in meshes:
     share = len(ob.data.polygons) / max(total, 1)
     goal = max(500, int(TARGET * share))
-    # 1. fusionner les sommets en double (fréquent dans les GLB générés)
     bpy.ops.object.select_all(action="DESELECT")
     ob.select_set(True)
     bpy.context.view_layer.objects.active = ob
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.remove_doubles(threshold=0.0001)
-    bpy.ops.object.mode_set(mode="OBJECT")
-    # 2. réduction progressive
+    # réduction progressive (une grosse réduction d'un coup fait manquer de mémoire)
     while len(ob.data.polygons) > goal * 1.05:
         ratio = max(goal / len(ob.data.polygons), 0.25)
         md = ob.modifiers.new("dec", "DECIMATE")
@@ -52,7 +47,7 @@ for ob in meshes:
         purge()
         print(ob.name, "->", len(ob.data.polygons))
 
-# 3. textures : 2048 px maximum
+# textures : 2048 px maximum
 for img in bpy.data.images:
     if img.size[0] > MAX_TEX or img.size[1] > MAX_TEX:
         s = MAX_TEX / max(img.size)
