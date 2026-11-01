@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef } from "react";
+import { Component, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { PresenterModel, PRESENTER_URL } from "@/components/presentation/PresenterModel";
 import * as THREE from "three";
 import type { PresenterSignals } from "@/components/presentation/signals";
 
 // Présentateur — phase 1 : silhouette 3D stylée, toujours de face.
 // Yeux lime lumineux, bâton de présentation dans la main droite.
-// Phase 2 : un modèle GLB ressemblant remplacera cette silhouette.
+// Phase 2 : si public/presenter/presenter.glb existe, il remplace la silhouette
+// (qui reste affichée pendant le chargement et si le modèle échoue).
 
 const LIME = "#d4ff3a";
 const lerp = THREE.MathUtils.lerp;
@@ -121,7 +123,33 @@ function Figure({ signals }: { signals: React.MutableRefObject<PresenterSignals>
   );
 }
 
+// Si le modèle échoue au chargement, on garde la silhouette.
+class Fallback extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
 export default function Presenter({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
+  const [hasModel, setHasModel] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(PRESENTER_URL, { method: "HEAD" })
+      .then((r) => {
+        const type = r.headers.get("content-type") ?? "";
+        if (!cancelled && r.ok && !type.includes("text/html")) setHasModel(true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const figure = <Figure signals={signals} />;
   return (
     <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4.3], fov: 35 }} gl={{ antialias: true, alpha: true }}>
       <ambientLight intensity={0.35} />
@@ -130,7 +158,15 @@ export default function Presenter({ signals }: { signals: React.MutableRefObject
       <pointLight position={[0, -2.2, 1.4]} color={LIME} intensity={1.6} distance={5} />
       <directionalLight position={[-3, 1.5, -3]} color={LIME} intensity={1.4} />
       <directionalLight position={[3, 1, -3]} color={LIME} intensity={0.8} />
-      <Figure signals={signals} />
+      {hasModel ? (
+        <Fallback fallback={figure}>
+          <Suspense fallback={figure}>
+            <PresenterModel signals={signals} />
+          </Suspense>
+        </Fallback>
+      ) : (
+        figure
+      )}
     </Canvas>
   );
 }

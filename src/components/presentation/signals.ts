@@ -9,6 +9,8 @@ export type PresenterSignals = {
   mouse: { x: number; y: number };
   /** Mouvement réduit : pas de balancement. */
   still: boolean;
+  /** Position réelle de la bouche (fraction depuis le haut), donnée par le modèle 3D. */
+  mouthY?: number;
 };
 
 /** Position verticale de la bouche dans le canvas (fraction depuis le haut). */

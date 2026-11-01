@@ -145,7 +145,7 @@ export function Presentation({
 
       const box = presenterBox.current!.getBoundingClientRect();
       const mouthX = box.left + box.width / 2;
-      const mouthY = box.top + box.height * MOUTH_Y;
+      const mouthY = box.top + box.height * (signals.current.mouthY ?? MOUTH_Y);
       const words = gsap.utils.toArray<HTMLElement>(".sub-word");
       const pills = gsap.utils.toArray<HTMLElement>(".kw-pill");
 
