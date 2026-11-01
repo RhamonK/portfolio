@@ -14,7 +14,14 @@ import type { PresenterSignals } from "@/components/presentation/signals";
 const LIME = "#d4ff3a";
 const lerp = THREE.MathUtils.lerp;
 
-export function Figure({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
+export function Figure({
+  signals,
+  headless = false,
+}: {
+  signals: React.MutableRefObject<PresenterSignals>;
+  /** Sans tête : le buste 3D de Rhamone est posé dessus. */
+  headless?: boolean;
+}) {
   const root = useRef<THREE.Group>(null!);
   const head = useRef<THREE.Group>(null!);
   const eyes = useRef<THREE.Group>(null!);
@@ -42,10 +49,10 @@ export function Figure({ signals }: { signals: React.MutableRefObject<PresenterS
       blink.current.until = t + 0.12;
       blink.current.next = t + 2.5 + Math.random() * 3;
     }
-    eyes.current.scale.y = lerp(eyes.current.scale.y, t < blink.current.until ? 0.08 : 1, 0.5);
+    if (eyes.current) eyes.current.scale.y = lerp(eyes.current.scale.y, t < blink.current.until ? 0.08 : 1, 0.5);
 
     // bouche pilotée par la voix
-    mouth.current.scale.y = lerp(mouth.current.scale.y, 0.25 + s.speaking * 3.2, 0.35);
+    if (mouth.current) mouth.current.scale.y = lerp(mouth.current.scale.y, 0.25 + s.speaking * 3.2, 0.35);
 
     // bras droit (côté diapo) : lève le bâton vers la diapo
     point.current = lerp(point.current, s.pointing ? 1 : 0, 0.07);
@@ -64,18 +71,20 @@ export function Figure({ signals }: { signals: React.MutableRefObject<PresenterS
   return (
     <group ref={root}>
       {/* buste */}
-      <mesh position={[0, -0.72, 0]}>
+      <mesh position={[0, -0.72, 0]} scale={headless ? [0.68, 1, 0.8] : 1}>
         <capsuleGeometry args={[0.42, 0.6, 8, 24]} />
         {body}
       </mesh>
       {/* col lime */}
-      <mesh position={[0, -0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.17, 0.018, 8, 32]} />
-        {glow}
-      </mesh>
+      {!headless && (
+        <mesh position={[0, -0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.17, 0.018, 8, 32]} />
+          {glow}
+        </mesh>
+      )}
 
       {/* tête */}
-      <group ref={head} position={[0, 0.3, 0]}>
+      <group ref={head} position={[0, 0.3, 0]} visible={!headless}>
         <mesh>
           <sphereGeometry args={[0.36, 32, 32]} />
           {body}
@@ -97,7 +106,7 @@ export function Figure({ signals }: { signals: React.MutableRefObject<PresenterS
       </group>
 
       {/* bras droit + bâton (à gauche de l'écran, côté diapo) */}
-      <group ref={armR} position={[-0.5, -0.3, 0]}>
+      <group ref={armR} position={headless ? [-0.3, 0.06, 0] : [-0.5, -0.3, 0]}>
         <mesh position={[0, -0.32, 0]}>
           <capsuleGeometry args={[0.09, 0.45, 6, 16]} />
           {body}
@@ -113,7 +122,7 @@ export function Figure({ signals }: { signals: React.MutableRefObject<PresenterS
       </group>
 
       {/* bras gauche */}
-      <group ref={armL} position={[0.5, -0.3, 0]}>
+      <group ref={armL} position={headless ? [0.3, 0.06, 0] : [0.5, -0.3, 0]}>
         <mesh position={[0, -0.32, 0]}>
           <capsuleGeometry args={[0.09, 0.45, 6, 16]} />
           {body}
@@ -161,7 +170,7 @@ export default function Presenter({ signals }: { signals: React.MutableRefObject
       {hasModel ? (
         <Fallback fallback={figure}>
           <Suspense fallback={figure}>
-            <PresenterModel signals={signals} />
+            <PresenterModel signals={signals} fallback={figure} />
           </Suspense>
         </Fallback>
       ) : (

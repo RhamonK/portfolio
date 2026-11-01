@@ -19,8 +19,11 @@ const lerp = THREE.MathUtils.lerp;
 export function PresenterModel({
   signals,
   inRoom = false,
+  fallback = null,
 }: {
   signals: React.MutableRefObject<PresenterSignals>;
+  /** Affiché si le fichier n'a pas de squelette (buste statique). */
+  fallback?: React.ReactNode;
   /** Placé dans la salle : la scène gère la caméra elle-même. */
   inRoom?: boolean;
 }) {
@@ -60,7 +63,8 @@ export function PresenterModel({
 
   // Cadrage buste, de face ; le personnage regarde la caméra (+Z).
   useEffect(() => {
-    if (!inRoom) {
+    // pas de cadrage pour un buste statique : la silhouette garde sa caméra
+    if (!inRoom && (rig.faces.length > 0 || gltf.animations.length > 0)) {
       const cam = camera as THREE.PerspectiveCamera;
       const box = new THREE.Box3().setFromObject(gltf.scene);
       const h = box.max.y - box.min.y || 1.75;
@@ -138,5 +142,7 @@ export function PresenterModel({
     }
   });
 
+  const rigged = rig.faces.length > 0 || gltf.animations.length > 0;
+  if (!rigged) return <>{fallback}</>;
   return <primitive object={gltf.scene} />;
 }
