@@ -27,7 +27,7 @@ const FACING = Math.atan2(-SPOT.x, -SPOT.z) * 0.85;
 const W = 2048;
 const H = 1222;
 
-type SlideView = { slide: Slide; lang: Lang; index: number; image: string };
+type SlideView = { slide: Slide; lang: Lang; index: number; images: string[] };
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number) {
   const words = text.split(" ");
@@ -45,7 +45,37 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number) {
 }
 
 // La diapo dessinée en image, aux proportions exactes de l'écran (1,676).
-function drawSlide(canvas: HTMLCanvasElement, v: SlideView, img: HTMLImageElement) {
+// Comme un exposé : un titre court en haut, et surtout la capture du site
+// qui montre ce qui est dit (deux captures côte à côte quand il le faut).
+// Le détail parlé passe en sous-titres, pas sur l'écran.
+function frame(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+  const r = Math.min(w / img.width, h / img.height);
+  const iw = img.width * r;
+  const ih = img.height * r;
+  const ix = x + (w - iw) / 2;
+  const iy = y + (h - ih) / 2;
+  ctx.save();
+  ctx.shadowColor = "rgba(212,255,58,0.18)";
+  ctx.shadowBlur = 60;
+  ctx.beginPath();
+  ctx.roundRect(ix, iy, iw, ih, 22);
+  ctx.fillStyle = "#0a0b0a";
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(ix, iy, iw, ih, 22);
+  ctx.clip();
+  ctx.drawImage(img, ix, iy, iw, ih);
+  ctx.restore();
+  ctx.strokeStyle = "rgba(242,243,238,0.22)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(ix, iy, iw, ih, 22);
+  ctx.stroke();
+}
+
+function drawSlide(canvas: HTMLCanvasElement, v: SlideView, imgs: HTMLImageElement[]) {
   const ctx = canvas.getContext("2d")!;
   const css = getComputedStyle(document.documentElement);
   const display = getComputedStyle(document.body).fontFamily;
@@ -57,51 +87,28 @@ function drawSlide(canvas: HTMLCanvasElement, v: SlideView, img: HTMLImageElemen
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  const x = 130;
+  const x = 110;
   ctx.fillStyle = "#d4ff3a";
-  ctx.font = `500 36px ${mono}`;
-  ctx.fillText(`${String(v.index + 1).padStart(2, "0")} · ${v.slide.kind[v.lang]}`, x, 150);
-
+  ctx.font = `500 34px ${mono}`;
+  ctx.fillText(`${String(v.index + 1).padStart(2, "0")} · ${v.slide.kind[v.lang]}`, x, 120);
   ctx.fillStyle = "#f2f3ee";
-  ctx.font = `700 112px ${display}`;
-  let y = 290;
-  for (const l of wrap(ctx, v.slide.title[v.lang], W - 2 * x)) {
-    ctx.fillText(l, x, y);
-    y += 118;
-  }
+  ctx.font = `700 88px ${display}`;
+  const title = wrap(ctx, v.slide.title[v.lang], W - 2 * x)[0] ?? "";
+  ctx.fillText(title, x, 222);
 
-  const top = y + 30;
-  ctx.fillStyle = "#d9dbd3";
-  ctx.font = `400 46px ${display}`;
-  let ly = top + 40;
-  for (const line of v.slide.lines[v.lang]) {
-    for (const l of wrap(ctx, line, 900)) {
-      ctx.fillText(l, x, ly);
-      ly += 62;
-    }
-    ly += 22;
+  const top = 290;
+  const bottom = H - 70;
+  const h = bottom - top;
+  const w = W - 2 * x;
+  if (imgs.length >= 2) {
+    const gap = 50;
+    const portrait = imgs[1].height > imgs[1].width;
+    const w2 = portrait ? w * 0.26 : (w - gap) * 0.42;
+    frame(ctx, imgs[0], x, top, w - w2 - gap, h);
+    frame(ctx, imgs[1], x + w - w2, top, w2, h);
+  } else {
+    frame(ctx, imgs[0], x, top, w, h);
   }
-
-  // capture ou dessin du projet, dans un cadre à droite
-  const bx = 1110;
-  const bw = W - bx - x;
-  const bh = H - top - 110;
-  ctx.save();
-  ctx.beginPath();
-  ctx.roundRect(bx, top, bw, bh, 28);
-  ctx.fillStyle = "#0a0b0a";
-  ctx.fill();
-  ctx.clip();
-  const r = Math.min(bw / img.width, bh / img.height);
-  const iw = img.width * r;
-  const ih = img.height * r;
-  ctx.drawImage(img, bx + (bw - iw) / 2, top + (bh - ih) / 2, iw, ih);
-  ctx.restore();
-  ctx.strokeStyle = "rgba(242,243,238,0.18)";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.roundRect(bx, top, bw, bh, 28);
-  ctx.stroke();
 }
 
 function Room({ view, projectIndex }: { view: SlideView; projectIndex: number }) {
@@ -110,7 +117,7 @@ function Room({ view, projectIndex }: { view: SlideView; projectIndex: number })
     draco.setDecoderPath("/draco/");
     loader.setDRACOLoader(draco);
   });
-  const projectImg = useLoader(THREE.ImageLoader, view.image);
+  const imgs = useLoader(THREE.ImageLoader, view.images) as HTMLImageElement[];
   const scene = useMemo(() => gltf.scene.clone(true), [gltf]);
 
   const canvas = useMemo(() => {
@@ -132,9 +139,9 @@ function Room({ view, projectIndex }: { view: SlideView; projectIndex: number })
   }, [canvas]);
 
   useEffect(() => {
-    drawSlide(canvas, view, projectImg);
+    drawSlide(canvas, view, imgs);
     texture.needsUpdate = true;
-  }, [canvas, texture, view, projectImg]);
+  }, [canvas, texture, view, imgs]);
 
   useMemo(() => {
     scene.traverse((o) => {

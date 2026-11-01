@@ -19,6 +19,8 @@ export type Slide = {
   keywords: Record<Lang, string[]>;
   /** Texte parlé (≈ 10 s, 25 mots max), affiché en sous-titre. */
   speech: T;
+  /** Captures montrées sur l'écran pendant la diapo (1 ou 2). Sinon : image du projet. */
+  shots?: string[];
 };
 
 export type Presentation = {
@@ -600,3 +602,25 @@ export const presentations: Record<string, Presentation> = {
   kelthen,
   fraul,
 };
+
+// Captures par diapo : ce qu'on voit à l'écran colle à ce qui est dit.
+// Faites sur les sites lancés en local (Studio Nala : nom anonymisé, photos
+// floutées, données de réservation de démonstration).
+const SHOTS: Record<string, (string[] | undefined)[]> = {
+  kelthen: [
+    ["probleme"],
+    ["accueil"],
+    ["services"],
+    ["hub", "nuit"],
+    ["etapes", "prix"],
+    ["realisations"],
+  ],
+  fraul: [["marques"], ["mall"], ["tenue", "sur-demande"], ["boutique", "produit"], ["mall", "mobile"], ["accueil"]],
+  "studio-nala": [["/projets/studio-nala/dessin.svg"], ["site"], ["services", "creneau"], ["date", "coordonnees"], undefined, ["styles"]],
+};
+for (const [slug, list] of Object.entries(SHOTS)) {
+  list.forEach((names, i) => {
+    const slide = presentations[slug]?.slides[i];
+    if (slide && names) slide.shots = names.map((n) => (n.startsWith("/") ? n : `/projets/${slug}/slides/${n}.webp`));
+  });
+}

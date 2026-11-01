@@ -299,7 +299,7 @@ export function Presentation({
             <Stage3D
               signals={signals}
               projectIndex={projectIndex}
-              view={{ slide, lang, index: idx, image: project.image ?? `/projets/${project.slug}/dessin.svg` }}
+              view={{ slide, lang, index: idx, images: slide.shots ?? [project.image ?? `/projets/${project.slug}/dessin.svg`] }}
             />
           </div>
         )}
@@ -316,8 +316,17 @@ export function Presentation({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="relative hidden min-h-[160px] overflow-hidden rounded-2xl border border-glass-line bg-black/30 md:block">
-                <ScreenContent project={project} />
+              <div className="relative order-first min-h-[180px] overflow-hidden rounded-2xl border border-glass-line bg-black/30 lg:order-none">
+                {slide.shots ? (
+                  <div className="flex h-full gap-3 p-2">
+                    {slide.shots.map((src) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={src} src={src} alt="" className="min-w-0 flex-1 rounded-xl object-contain" />
+                    ))}
+                  </div>
+                ) : (
+                  <ScreenContent project={project} />
+                )}
               </div>
             </div>
             {last && !scene3d && (
