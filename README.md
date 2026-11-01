@@ -27,6 +27,9 @@ npm run build    # build de production
 - Captures et dessins des projets : `public/projets/<slug>/`. Les dessins (`dessin.svg`) sont générés
   depuis `src/components/ProjectArt.tsx` avec `npm run art`.
 - Présentations de 60 s (FR / EN) : `src/data/presentations.ts`.
+- Salle d'écrans 3D : modèle Blender `public/salle/salle.glb` (prompt : `docs/prompt-blender-salle.md`),
+  affiché par `src/components/Room3D.tsx` (WebGL, desktop). Décodeur Draco dans `public/draco/`.
+  Sans WebGL, sur mobile ou en mouvement réduit : écrans en CSS / carrousel plat.
 - Ce qui manque encore : voir `ASSETS_MANQUANTS.md`.
 
 ## Règles
