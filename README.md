@@ -9,7 +9,8 @@ avec **GSAP / ScrollTrigger** et **Lenis** pour le défilement, et **React Three
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # build de production
+npm run build    # site statique dans out/
+npm start        # sert out/ en local
 ```
 
 ## Contenu
@@ -37,5 +38,12 @@ npm run build    # build de production
 - `prefers-reduced-motion` coupe les animations lourdes.
 - Rien d'inventé : un asset manquant = emplacement neutre.
 
+## Sécurité
+- Site 100 % statique (`output: "export"`) : aucun serveur Next en production, donc pas d'API,
+  pas de formulaire côté serveur, aucune donnée stockée.
+- En-têtes de sécurité dans `vercel.json` : Content-Security-Policy stricte, HSTS, anti-iframe,
+  `nosniff`, Referrer-Policy, Permissions-Policy.
+- Liens externes en `rel="noreferrer"` ; aucune clé ni secret dans le code.
+
 ## Déploiement
-Vercel, aucune variable d'environnement requise.
+Vercel détecte Next.js et publie le dossier `out/`. Aucune variable d'environnement requise.
