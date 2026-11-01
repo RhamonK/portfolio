@@ -405,6 +405,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         createPortal(
         <Presentation
           initialLang={lang}
+          projectIndex={projects.findIndex((p) => p.slug === open)}
           project={projects.find((p) => p.slug === open)!}
           presentation={presentations[open]}
           onClose={closePresentation}

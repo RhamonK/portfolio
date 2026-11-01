@@ -16,7 +16,14 @@ export const PRESENTER_URL = "/presenter/presenter.glb";
 
 const lerp = THREE.MathUtils.lerp;
 
-export function PresenterModel({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
+export function PresenterModel({
+  signals,
+  inRoom = false,
+}: {
+  signals: React.MutableRefObject<PresenterSignals>;
+  /** Placé dans la salle : la scène gère la caméra elle-même. */
+  inRoom?: boolean;
+}) {
   const gltf = useLoader(GLTFLoader, PRESENTER_URL, (loader) => {
     const draco = new DRACOLoader();
     draco.setDecoderPath("/draco/");
@@ -53,13 +60,15 @@ export function PresenterModel({ signals }: { signals: React.MutableRefObject<Pr
 
   // Cadrage buste, de face ; le personnage regarde la caméra (+Z).
   useEffect(() => {
-    const cam = camera as THREE.PerspectiveCamera;
-    const box = new THREE.Box3().setFromObject(gltf.scene);
-    const h = box.max.y - box.min.y || 1.75;
-    cam.position.set(0, h * 0.8, h * 1.35);
-    cam.fov = 30;
-    cam.lookAt(0, h * 0.78, 0);
-    cam.updateProjectionMatrix();
+    if (!inRoom) {
+      const cam = camera as THREE.PerspectiveCamera;
+      const box = new THREE.Box3().setFromObject(gltf.scene);
+      const h = box.max.y - box.min.y || 1.75;
+      cam.position.set(0, h * 0.8, h * 1.35);
+      cam.fov = 30;
+      cam.lookAt(0, h * 0.78, 0);
+      cam.updateProjectionMatrix();
+    }
 
     const { idle, talk, point } = rig;
     idle?.play();
@@ -74,7 +83,7 @@ export function PresenterModel({ signals }: { signals: React.MutableRefObject<Pr
     return () => {
       rig.mixer.stopAllAction();
     };
-  }, [camera, gltf, rig]);
+  }, [camera, gltf, rig, inRoom]);
 
   const state = useRef({ talk: 0, pointing: false, blinkNext: 2.5, blinkUntil: 0 });
   const tmp = useMemo(() => new THREE.Vector3(), []);
@@ -125,6 +134,7 @@ export function PresenterModel({ signals }: { signals: React.MutableRefObject<Pr
       tmp.y -= 0.05;
       tmp.project(camera);
       s.mouthY = THREE.MathUtils.clamp((1 - tmp.y) / 2, 0.05, 0.95);
+      s.mouthX = THREE.MathUtils.clamp((tmp.x + 1) / 2, 0.05, 0.95);
     }
   });
 
