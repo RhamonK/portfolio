@@ -25,6 +25,7 @@ Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par 
 
 ## Présentateur 3D
 - [ ] Phase 2 : 3 à 5 photos (face, trois-quarts gauche et droite, lumière douce, sans lunettes de soleil)
+- [ ] `public/presenter/presenter.glb` — à créer dans Blender avec `docs/prompt-blender-presentateur.md`
 
 ## Voix
 - [ ] `public/voix/<projet>-fr.mp3` et `public/voix/<projet>-en.mp3` (environ 30 à 40 s par projet)
