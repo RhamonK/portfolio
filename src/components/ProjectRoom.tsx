@@ -12,6 +12,8 @@ import { presentations } from "@/data/presentations";
 import { Presentation } from "@/components/presentation/Presentation";
 import { lockScroll, scrollToY } from "@/lib/scroll";
 import { ui, type Lang } from "@/i18n";
+import { SplitTitle } from "@/components/SplitTitle";
+import { useReveal } from "@/lib/reveal";
 
 // La salle 3D (modèle Blender, WebGL) n'est chargée qu'à l'approche de la section.
 const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
@@ -19,6 +21,7 @@ const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
 // Scène B — salle d'écrans (modèle Blender, WebGL) : le visiteur est au
 // centre, la molette fait tourner les écrans autour de lui, projet par projet.
 // Mobile, mouvement réduit ou pas de WebGL : carrousel plat (voir globals.css).
+// L'ancien portail circulaire d'entrée est retiré : le Fil INFINITE fait le lien entre sections.
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -44,6 +47,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   // légende, pour qu'aucun trait ni cadre ne passe derrière le texte.
   const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55 });
   const drive = useRef<RoomDrive>({ a: 0, tunnel: 0, band: { top: 0.2, bottom: 0.7 } });
+  useReveal(section);
   const images = projects.map((p) => p.image ?? `/projets/${p.slug}/dessin.svg`);
 
   useEffect(() => {
@@ -119,33 +123,20 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
 
     mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       setIs3d(true);
-      // Arrivée : la salle s'ouvre en cercle (portail) pendant qu'on descend,
-      // puis le titre monte mot par mot et la légende se décale.
+      // Légende de l'écran de face : apparaît une seule fois (même langage que les autres sections).
       gsap.fromTo(
-        section.current,
-        { "--portal": "0%" },
+        ".room-caption",
+        { y: 40, opacity: 0 },
         {
-          "--portal": "140%",
-          ease: "power2.in",
-          scrollTrigger: { trigger: section.current, start: "top 95%", end: "top top", scrub: 0.5 },
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          immediateRender: true,
+          clearProps: "transform,opacity",
+          scrollTrigger: { trigger: section.current, start: "top 20%", once: true },
         },
       );
-      gsap.from(".st-word", {
-        yPercent: 110,
-        rotate: 6,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.08,
-        ease: "expo.out",
-        scrollTrigger: { trigger: section.current, start: "top 45%", toggleActions: "play none none reverse" },
-      });
-      gsap.from(".room-caption", {
-        y: 40,
-        opacity: 0,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: { trigger: section.current, start: "top 20%", toggleActions: "play none none reverse" },
-      });
       const place = (a: number) => {
         drive.current.a = a;
         setActive(Math.round(a));
@@ -155,10 +146,12 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         pin: true,
         start: "top top",
         end: () => `+=${(n - 1) * window.innerHeight * 0.8}`,
+        // aimantage doux : seulement quand on s'arrête de défiler, vers le projet le plus proche
         snap: {
           snapTo: 1 / (n - 1),
-          duration: { min: 0.2, max: 0.6 },
-          delay: 0.08,
+          directional: false,
+          delay: 0.45,
+          duration: { min: 0.3, max: 0.8 },
           ease: "power2.inOut",
         },
         invalidateOnRefresh: true,
@@ -244,14 +237,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     >
       <div className="room-text wrap relative z-10 md:text-center">
         <p className="eyebrow">{t.projectsEyebrow}</p>
-        <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
-          <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-            <span className="st-word">{t.projectsTitle[0].trim()}</span>
-          </span>{" "}
-          <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-            <span className="st-word text-lime">{t.projectsTitle[1]}</span>
-            <span className="st-word">{t.projectsTitle[2]}</span>
-          </span>
+        <h2 id="titre-projets" data-reveal-title className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
+          <SplitTitle parts={[{ t: t.projectsTitle[0] }, { t: t.projectsTitle[1], em: true }, { t: t.projectsTitle[2] }]} />
         </h2>
         <p id="aide-projets" className="sr-only">
           {t.roomHelp}
@@ -262,7 +249,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       {webgl && is3d && near && (
         <div
           aria-hidden
-          className="room-3d room-portal absolute inset-x-0 z-0"
+          className="room-3d absolute inset-x-0 z-0"
           style={{
             top: `${canvasBox.top * 100}%`,
             height: `${canvasBox.h * 100}%`,

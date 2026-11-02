@@ -3,7 +3,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { detectCoreTier, type CoreTier } from "@/lib/device";
 import type { CoreScene } from "./scene";
-import { POSTER_PATH, POSTER_VIEWBOX } from "./poster-path";
+import { POSTER_DOT, POSTER_STROKES, POSTER_VIEWBOX } from "./poster-path";
 
 // INFINITY CORE dans la page.
 // - Toujours : l'image fixe (rendue avec la même scène), servie dans le HTML.
@@ -13,6 +13,23 @@ import { POSTER_PATH, POSTER_VIEWBOX } from "./poster-path";
 // Pendant l'intro, le tracé est dessiné en SVG sur l'image du verre seul : il reste
 // fluide sur tous les appareils, et la 3D ne se charge qu'une fois l'intro finie.
 // Le noyau n'est jamais nécessaire pour naviguer : il est décoratif (aria-hidden).
+
+/** Tracé séquentiel de l'intro : chaque trait se dessine dans sa portion de la progression. */
+function applyTrace(svg: SVGSVGElement | null, p: number) {
+  if (!svg) return;
+  svg.querySelectorAll("path").forEach((path, i) => {
+    const s = POSTER_STROKES[i];
+    const local = Math.max(0, Math.min(1, (p - s.start) / s.len));
+    path.style.strokeDashoffset = String(1 - local);
+    path.style.opacity = local > 0 ? "1" : "0";
+  });
+  const dot = svg.querySelector("circle");
+  if (dot) dot.style.opacity = p >= POSTER_DOT.start ? "1" : "0";
+}
+
+/** Impulsion SVG (niveau léger) : une seule impulsion parcourt la signature, même vitesse que la 3D. */
+const PULSE_PERIOD = 9000;
+const PULSE_DASH = 0.08;
 
 export type InfinityCoreHandle = {
   /** Part du trait tracée, de 0 à 1 (intro). */
@@ -29,7 +46,8 @@ type Props = {
 
 export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function InfinityCore({ className = "", tracing = false, defer = false }, ref) {
   const box = useRef<HTMLDivElement>(null);
-  const tracePath = useRef<SVGPathElement>(null);
+  const traceSvg = useRef<SVGSVGElement | null>(null);
+  const pulseSvg = useRef<SVGSVGElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const scene = useRef<CoreScene | null>(null);
   const draw = useRef(1);
@@ -52,12 +70,42 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
   useImperativeHandle(ref, () => ({
     setDraw: (p) => {
       draw.current = p;
-      if (tracePath.current) tracePath.current.style.strokeDashoffset = String(1 - p);
+      applyTrace(traceSvg.current, p);
       scene.current?.setDraw(p);
     },
   }));
 
   useEffect(() => setTier(detectCoreTier()), []);
+
+  // ----- impulsion SVG (niveau 1) : 30 images / s au plus, seulement quand le noyau est visible -----
+  useEffect(() => {
+    if (tier !== 1 || showTrace || !pulseSvg.current || !box.current) return;
+    const paths = [...pulseSvg.current.querySelectorAll("path")];
+    let raf = 0;
+    let last = 0;
+    let visible = true;
+    const t0 = performance.now();
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+      if (!visible || now - last < 33) return;
+      last = now;
+      const g = ((now - t0) % PULSE_PERIOD) / PULSE_PERIOD;
+      paths.forEach((path, i) => {
+        const s = POSTER_STROKES[i];
+        const local = (g - s.start) / s.len;
+        const on = local >= -PULSE_DASH && local <= 1;
+        path.style.opacity = on ? "1" : "0";
+        if (on) path.style.strokeDashoffset = String(-local);
+      });
+    };
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
+    io.observe(box.current);
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
+  }, [tier, showTrace]);
 
   // ----- 3D (niveaux 2 et 3) -----
   useEffect(() => {
@@ -170,13 +218,19 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
         className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${tracing ? "opacity-0" : "opacity-100"}`}
       />
       {showTrace && (
-        <svg viewBox={POSTER_VIEWBOX} className="core-trace absolute inset-0 h-full w-full">
-          <path ref={tracePath} d={POSTER_PATH} pathLength={1} style={{ strokeDashoffset: 1 - draw.current }} />
+        <svg ref={(el) => { traceSvg.current = el; applyTrace(el, draw.current); }} viewBox={POSTER_VIEWBOX} className="core-trace absolute inset-0 h-full w-full">
+          {POSTER_STROKES.map((s, i) => (
+            <path key={i} d={s.d} pathLength={1} />
+          ))}
+          <circle cx={POSTER_DOT.cx} cy={POSTER_DOT.cy} r={POSTER_DOT.r} />
         </svg>
       )}
       {tier === 1 && !showTrace && (
-        <svg viewBox={POSTER_VIEWBOX} className="core-pulse absolute inset-0 h-full w-full">
-          <path d={POSTER_PATH} pathLength={1} />
+        <svg ref={pulseSvg} viewBox={POSTER_VIEWBOX} className="core-pulse absolute inset-0 h-full w-full">
+          {POSTER_STROKES.map((s, i) => (
+            // une seule impulsion parcourt la signature, trait après trait
+            <path key={i} d={s.d} pathLength={1} />
+          ))}
         </svg>
       )}
       {tier !== null && tier >= 2 && (

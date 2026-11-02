@@ -1,23 +1,30 @@
-// INFINITY CORE — la signature RN : un seul trait fermé, sans début ni fin.
-// R puis N, puis une boucle de retour qui repasse en profondeur sous les
-// lettres, comme le soulignement d'une signature. Unités de la scène 3D.
+// INFINITY CORE — la signature RN de Rhamone, reproduite d'après son logo manuscrit
+// (docs/logo/rn-logo-v2.pdf). Les traits sont extraits automatiquement de la ligne
+// centrale du dessin (scripts/trace-logo.py → signature-data.ts) ; ce fichier leur
+// ajoute un léger relief dans l'épaisseur du verre et définit le bloc, la pose et le cadrage.
 
-export const SIGNATURE: readonly (readonly [number, number, number])[] = [
-  [-1.15, -0.72, 0.1], [-1.15, -0.1, 0.1], [-1.15, 0.68, 0.1], [-1.1, 0.76, 0.1], // fût du R
-  [-0.72, 0.77, 0.1], [-0.47, 0.6, 0.1], [-0.45, 0.32, 0.1], //                       panse
-  [-0.66, 0.12, 0.1], [-1.08, 0.08, 0.1], [-0.92, 0.0, 0.1],
-  [-0.62, -0.4, 0.1], [-0.42, -0.7, 0.1], //                                            jambe
-  [-0.3, -0.74, 0.02], [-0.05, -0.74, 0.02], //                                         liaison, un peu en retrait
-  [0.1, -0.7, 0.1], [0.12, -0.05, 0.1], [0.14, 0.7, 0.1], [0.2, 0.74, 0.1], //          N, premier jambage
-  [0.58, 0.0, 0.1], [0.94, -0.7, 0.1], [1.0, -0.72, 0.1], //                             diagonale
-  [1.02, -0.05, 0.1], [1.04, 0.74, 0.1], //                                              N, second jambage
-  [1.2, 0.5, -0.3], [1.24, -0.5, -0.4], //                                               retour, en profondeur
-  [0.95, -0.98, -0.42], [0.0, -1.04, -0.42], [-0.95, -0.98, -0.4], //                    soulignement
-  [-1.28, -0.86, -0.22],
-];
+import * as THREE from "three";
+import { SIGNATURE_STROKES } from "./signature-data";
+
+/** Profondeur moyenne de la signature dans le verre, et amplitude du relief. */
+export const SIGNATURE_Z = 0.06;
+export const RELIEF = 0.11;
+
+/** Une courbe 3D par trait, avec une ondulation douce en profondeur (le trait « respire » dans le verre). */
+export function signatureCurves() {
+  return SIGNATURE_STROKES.map((stroke, si) => {
+    const n = stroke.length;
+    const pts = stroke.map(([x, y], i) => {
+      const s = n > 1 ? i / (n - 1) : 0;
+      const z = SIGNATURE_Z + RELIEF * Math.sin(s * Math.PI * 2.2 + si * 1.3) * (si === 1 ? 1 : 0.5);
+      return new THREE.Vector3(x, y, z);
+    });
+    return new THREE.CatmullRomCurve3(pts, false, "centripetal", 0.5);
+  });
+}
 
 /** Bloc de verre poli : superellipsoïde (demi-axes et exposant). */
-export const BODY = { rx: 1.75, ry: 1.3, rz: 0.5, exponent: 0.55 } as const;
+export const BODY = { rx: 1.75, ry: 1.38, rz: 0.5, exponent: 0.55 } as const;
 
 /** Pose de repos de l'objet (radians) et cadrage caméra, communs à la 3D et à l'image fixe. */
 export const POSE = { x: 0.08, y: -0.22, z: 0.02 } as const;
