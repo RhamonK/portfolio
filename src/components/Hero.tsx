@@ -222,8 +222,10 @@ export function Hero({ lang }: { lang: Lang }) {
       </div>
 
       <p className="h-hint eyebrow absolute inset-x-0 bottom-8 flex flex-col items-center gap-3 text-center !text-ink/70">
-        <span aria-hidden className="scroll-mouse" />
-        {t.hint}
+        <span aria-hidden className="scroll-mouse hidden md:block" />
+        {/* mobile : pas de molette ni de salle 3D (carrousel plat) */}
+        <span className="md:hidden">{t.hintTouch}</span>
+        <span className="hidden md:inline">{t.hint}</span>
       </p>
     </section>
   );
