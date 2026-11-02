@@ -88,32 +88,49 @@ export function Hero({ lang }: { lang: Lang }) {
           defaults: { ease: "expo.out" },
           onComplete: () => finishRef.current(),
         });
-        tl.fromTo(".h-core", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0)
+        // fromTo partout : valeurs d'arrivée explicites. Un from() relit l'état courant,
+        // que la transition CSS de survol des lettres fausse (lettres figées à -90°).
+        tl.fromTo(".h-core", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", clearProps: "transform,opacity" }, 0)
           .to(trace, { d: 1, duration: 1.3, ease: "power2.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.5)
           .add(() => setTracing(false), 1.8)
           .set(".intro-hide", { visibility: "visible" }, 1.6)
-          .from(
+          .fromTo(
             letters,
+            { yPercent: 110, rotateX: -90, opacity: 0, filter: "blur(10px)", transition: "none" },
             {
-              yPercent: 110,
-              rotateX: -90,
-              opacity: 0,
-              filter: "blur(10px)",
+              yPercent: 0,
+              rotateX: 0,
+              opacity: 1,
+              filter: "blur(0px)",
               duration: 1.0,
               stagger: { each: 0.035, from: "start" },
-              clearProps: "filter",
+              immediateRender: true,
+              // on rend la main au CSS (effet de survol des lettres)
+              clearProps: "transform,opacity,filter,transition",
             },
             1.6,
           )
-          .from(".h-eyebrow", { y: 16, opacity: 0, duration: 0.7 }, 2.6)
-          .from(".h-line", { scaleX: 0, duration: 0.7, ease: "power3.inOut" }, 2.4)
-          .from(".h-cta > *", { y: 24, opacity: 0, scale: 0.94, duration: 0.7, stagger: 0.08, ease: "back.out(2)" }, 2.9)
-          .from(".h-hint", { opacity: 0, y: -8, duration: 0.5 }, 3.2);
+          .fromTo(".h-eyebrow", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, immediateRender: true, clearProps: "transform,opacity" }, 2.6)
+          .fromTo(".h-line", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.inOut", immediateRender: true, clearProps: "transform" }, 2.4)
+          .fromTo(
+            ".h-cta > *",
+            { y: 24, opacity: 0, scale: 0.94 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.08, ease: "back.out(2)", immediateRender: true, clearProps: "transform,opacity" },
+            2.9,
+          )
+          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5, immediateRender: true, clearProps: "transform,opacity" }, 3.2);
         roles.forEach((r, i) => tl.add(scramble(r, 0.8), 2.0 + i * 0.3));
 
         // fin immédiate : bouton « Passer », défilement, toucher, clavier
         finishRef.current = () => {
           if (tl.progress() < 1) tl.progress(1);
+          // lettres posées net : sans quoi la transition CSS de survol les ferait rebondir depuis -90°
+          letters.forEach((el) => {
+            el.style.transition = "none";
+            el.style.transform = "";
+          });
+          void document.body.offsetHeight;
+          requestAnimationFrame(() => letters.forEach((el) => (el.style.transition = "")));
           core.current?.setDraw(1);
           setTracing(false);
           setIntro(false);
