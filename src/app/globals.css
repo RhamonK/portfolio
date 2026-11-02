@@ -128,33 +128,17 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+/* Carrousel plat : mobile, mouvement réduit, ou navigateur sans WebGL (.is-flat). */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
-  .room {
-    height: auto;
-    padding-bottom: 64px;
-  }
-  .room-3d {
-    display: none !important;
-  }
-  .room-flat {
-    position: static;
-    width: auto;
-    height: auto;
-    clip: auto;
-    white-space: normal;
-    display: flex;
-    gap: 16px;
-    margin-top: 32px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 0 24px 12px;
-    scrollbar-width: none;
-  }
-  .room-flat > li {
-    flex: 0 0 min(85%, 560px);
-    scroll-snap-align: center;
-  }
+  .room { height: auto; padding-bottom: 64px; }
+  .room .room-3d { display: none !important; }
+  .room .room-flat { position: static; width: auto; height: auto; clip: auto; white-space: normal; display: flex; gap: 16px; margin-top: 32px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 24px 12px; scrollbar-width: none; }
+  .room .room-flat > li { flex: 0 0 min(85%, 560px); scroll-snap-align: center; }
 }
+.room.is-flat { height: auto; padding-bottom: 64px; }
+.room.is-flat .room-3d { display: none !important; }
+.room.is-flat .room-flat { position: static; width: auto; height: auto; clip: auto; white-space: normal; display: flex; gap: 16px; margin-top: 32px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 24px 12px; scrollbar-width: none; }
+.room.is-flat .room-flat > li { flex: 0 0 min(85%, 560px); scroll-snap-align: center; }
 
 /* ===== SCÈNE D — cadres de musée ===== */
 .museum-frame {

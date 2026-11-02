@@ -3,8 +3,7 @@
 Tout ce qui s'affiche encore comme emplacement neutre sur le site.
 
 ## Captures des projets
-Les écrans affichent pour l'instant un dessin de chaque projet (`src/components/ProjectArt.tsx`).
-Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par projet, dans `public/projets/<slug>/` :
+Une capture par projet dans `public/projets/<slug>/`, et une capture par diapo dans `public/projets/<slug>/slides/` :
 
 - [x] MamaShop — `public/projets/mamashop/`
 - [ ] ABO — `public/projets/abo/`
@@ -24,11 +23,14 @@ Ils seront remplacés par une vraie capture (ou une courte vidéo d'écran) par 
 - [ ] Fraul : lien public quand le site sera lancé (la preview est fermée à Google)
 
 ## Présentateur 3D
-- [ ] Phase 2 : 3 à 5 photos (face, trois-quarts gauche et droite, lumière douce, sans lunettes de soleil)
 - [x] `public/presenter/presenter.glb` — personnage animé (50 os, idle / talk / point / wave / nod, mouthOpen / blink…), 1,75 m, 34 k triangles, 2,6 Mo
 
 ## Voix
-- [ ] `public/voix/<projet>-fr.mp3` et `public/voix/<projet>-en.mp3` (environ 30 à 40 s par projet)
+- [ ] `public/voix/<projet>-fr.mp3` et `public/voix/<projet>-en.mp3` (pistes de 60 s, voir `docs/prompt-voix.md`), puis les ajouter à `VOICES` dans `Presentation.tsx`
+
+## Diapos à compléter
+- [ ] MamaShop : écrans intérieurs (gérant, agent, diaspora) — seul l'écran de connexion est capturé
+- [ ] ABO : captures (le repo est vide, les diapos montrent le dessin)
 
 ## CV
 - [x] `public/cv/Rhamone_Nyavedji.pdf` (FR)
