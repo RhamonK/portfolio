@@ -49,7 +49,7 @@ const entry = `
       ctx.drawImage(canvas, 0, 0, c.width, c.height);
       out[w] = c.toDataURL("image/webp", 0.86);
     }
-    return { images: out, path: projectSignature(${W}, ${H}) };
+    return { images: out, proj: projectSignature(${W}, ${H}) };
   };
 `;
 
@@ -70,7 +70,7 @@ page.on("pageerror", (e) => console.error(e.message));
 await page.setContent(
   `<!doctype html><html><body style="margin:0;background:#0a0b0a"><canvas style="width:${W}px;height:${H}px;display:block"></canvas><script>${bundle.outputFiles[0].text}</script></body></html>`,
 );
-const { images, path: pts } = await page.evaluate((s) => window.__render(s, true), SIZES);
+const { images, proj } = await page.evaluate((s) => window.__render(s, true), SIZES);
 // verre seul : fond du tracé de l'intro (le filament est dessiné en SVG par-dessus)
 const { images: glass } = await page.evaluate((s) => window.__render(s, false), SIZES);
 await browser.close();
@@ -85,9 +85,23 @@ for (const [name, set] of [["signature", images], ["verre", glass]]) {
   }
 }
 
-const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("") + "Z";
+// un sous-tracé SVG par trait, avec sa part de la longueur totale (tracé séquentiel de l'intro)
+const total = proj.lengths.reduce((a, l) => a + l, 0) * 1.06;
+let acc = 0;
+const strokes = proj.strokes.map((pts, i) => {
+  const d = pts.map(([x, y], k) => `${k ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+  const span = { d, start: +(acc / total).toFixed(4), len: +(proj.lengths[i] / total).toFixed(4) };
+  acc += proj.lengths[i];
+  return span;
+});
+const [cx, cy, r] = proj.dot;
 writeFileSync(
   path.join(root, "src/components/core/poster-path.ts"),
-  `// Généré par scripts/render-core.mjs — ne pas modifier à la main.\n// Tracé de la signature projeté dans l'image fixe (${W} × ${H}).\nexport const POSTER_VIEWBOX = "0 0 ${W} ${H}";\nexport const POSTER_PATH = "${d}";\n`,
+  `// Généré par scripts/render-core.mjs — ne pas modifier à la main.
+// Signature projetée dans l'image fixe (${W} × ${H}) : un tracé par trait, dans l'ordre de l'intro.
+export const POSTER_VIEWBOX = "0 0 ${W} ${H}";
+export const POSTER_STROKES: readonly { d: string; start: number; len: number }[] = ${JSON.stringify(strokes)};
+export const POSTER_DOT = { cx: ${cx.toFixed(1)}, cy: ${cy.toFixed(1)}, r: ${r.toFixed(1)}, start: ${(acc / total).toFixed(4)} };
+`,
 );
 console.log("src/components/core/poster-path.ts");

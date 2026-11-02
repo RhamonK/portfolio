@@ -31,6 +31,12 @@ npm start        # sert out/ en local
 - Salle d'écrans 3D : modèle Blender `public/salle/salle.glb` (prompt : `docs/prompt-blender-salle.md`),
   affiché par `src/components/Room3D.tsx` (WebGL, desktop). Décodeur Draco dans `public/draco/`.
   Sans WebGL, sur mobile ou en mouvement réduit : écrans en CSS / carrousel plat.
+- INFINITY CORE (noyau du Hero) : la signature manuscrite `docs/logo/rn-logo-v2.pdf` dans un bloc de verre.
+  Scène Three.js `src/components/core/scene.ts`, chargée après l'intro ; image fixe et tracés SVG pour les
+  appareils légers. Pour régénérer après un changement de signature :
+  `pdftoppm -r 300 -png -gray docs/logo/rn-logo-v2.pdf /tmp/rn && python3 scripts/trace-logo.py /tmp/rn-1.png && npm run core`.
+- Palette : `src/app/globals.css` (`:root`) et son miroir JS `src/lib/palette.ts`, vérifiés par `npm run check`.
+- Fil INFINITE (`src/components/InfiniteThread.tsx`) : progression dans la marge, repères de sections cliquables.
 - Ce qui manque encore : voir `ASSETS_MANQUANTS.md`.
 
 ## Règles

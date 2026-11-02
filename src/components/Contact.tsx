@@ -1,19 +1,24 @@
+"use client";
+
+import { useRef } from "react";
 import { CvButtons } from "@/components/CvButtons";
+import { SplitTitle } from "@/components/SplitTitle";
+import { useReveal } from "@/lib/reveal";
 import { site, siteCopy } from "@/data/site";
 import { ui, type Lang } from "@/i18n";
 
 // Scène E — contact et CV.
 export function Contact({ lang }: { lang: Lang }) {
   const t = ui[lang];
+  const root = useRef<HTMLElement>(null);
+  useReveal(root);
   return (
-    <section id="contact" aria-labelledby="titre-contact" className="py-28">
+    <section ref={root} id="contact" aria-labelledby="titre-contact" className="py-28">
       <div className="wrap grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
-        <h2 id="titre-contact" className="display text-[clamp(40px,6vw,80px)]">
-          {t.contactTitle[0]}
-          <span className="text-lime">{t.contactTitle[1]}</span>
-          {t.contactTitle[2]}
+        <h2 id="titre-contact" data-reveal-title className="display text-[clamp(40px,6vw,80px)]">
+          <SplitTitle parts={[{ t: t.contactTitle[0] }, { t: t.contactTitle[1], em: true }, { t: t.contactTitle[2] }]} />
         </h2>
-        <div className="glass rounded-3xl p-7 md:p-9">
+        <div className="glass rounded-3xl p-7 md:p-9" data-reveal>
           <p className="eyebrow">
             <span className="text-lime">●</span> {siteCopy[lang].availability}
           </p>

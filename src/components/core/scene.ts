@@ -8,7 +8,8 @@
 
 import * as THREE from "three";
 import { palette } from "@/lib/palette";
-import { BODY, CAMERA, POSE, SIGNATURE } from "./shape";
+import { BODY, CAMERA, POSE, RELIEF, SIGNATURE_Z, signatureCurves } from "./shape";
+import { SIGNATURE_DOT } from "./signature-data";
 
 export type CoreQuality = "high" | "medium";
 
@@ -40,20 +41,27 @@ type Options = {
 };
 
 // Ajouts au shader standard du filament : tracé de l'intro et impulsion de lumière.
+// La signature compte plusieurs traits : chacun occupe une portion [uStart, uStart + uLen]
+// de la longueur totale. Le tracé de l'intro les dessine dans l'ordre, et une seule
+// impulsion parcourt toute la signature, trait après trait, sans fin.
 const FILAMENT_UNIFORMS = /* glsl */ `
   uniform float uTime;
   uniform float uDraw;
   uniform float uPulse;
+  uniform float uStart;
+  uniform float uLen;
   varying float vU;
 `;
 const FILAMENT_COLOR = /* glsl */ `
   #include <color_fragment>
-  if (vU > uDraw) discard;
+  float local = clamp((uDraw - uStart) / uLen, 0.0, 1.0);
+  if (vU > local || local <= 0.0) discard;
   // tête du tracé plus vive pendant l'intro
-  float head = uDraw < 1.0 ? smoothstep(0.06, 0.0, uDraw - vU) * 1.4 : 0.0;
-  // impulsion qui parcourt le trait en boucle
-  float d = fract(vU - uTime * 0.11);
-  float pulse = uPulse * (smoothstep(0.09, 0.0, d) + smoothstep(0.91, 1.0, d) * 0.35) * 1.6;
+  float head = local < 1.0 ? smoothstep(0.06, 0.0, local - vU) * 1.4 : 0.0;
+  // impulsion qui parcourt toute la signature en boucle
+  float g = uStart + vU * uLen;
+  float d = fract(g - uTime * 0.11);
+  float pulse = uPulse * (smoothstep(0.07, 0.0, d) + smoothstep(0.93, 1.0, d) * 0.35) * 1.6;
   diffuseColor.rgb *= 1.0 + head + pulse;
 `;
 
@@ -167,13 +175,19 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
   front.renderOrder = 2;
   group.add(back, front);
 
-  // ----- filament -----
-  const curve = new THREE.CatmullRomCurve3(
-    SIGNATURE.map(([x, y, z]) => new THREE.Vector3(x, y, z)),
-    true,
-    "centripetal",
-    0.5,
-  );
+  // ----- filament : la signature (traits extraits de docs/logo/rn-logo-v2.pdf) -----
+  const curves = signatureCurves();
+  const lengths = curves.map((c) => c.getLength());
+  const dotLen = 0.06; // part de l'intro réservée au point final
+  const total = lengths.reduce((a, l) => a + l, 0) * (1 + dotLen);
+  let acc = 0;
+  const spans = lengths.map((l) => {
+    const span = { start: acc / total, len: l / total };
+    acc += l;
+    return span;
+  });
+  const dotStart = acc / total;
+
   const uniforms = {
     uTime: { value: 0 },
     uDraw: { value: 1 },
@@ -181,8 +195,7 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
   };
   const lime = new THREE.Color(palette.lime);
   const hot = new THREE.Color("#ffffff").lerp(lime, 0.4);
-  const r = 0.022;
-  const segments = high ? 1600 : 900;
+  const r = 0.02;
   // [rayon, couleur, opacité] — la gaine la plus large est retirée en qualité moyenne
   const layers: [number, THREE.Color, number][] = [
     ...(high ? ([[r * 5.5, lime, 0.06]] as [number, THREE.Color, number][]) : []),
@@ -190,64 +203,79 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
     [r, lime, 0.82],
     [r * 0.45, hot, 0.7],
   ];
-  const filaments = layers.map(([radius, color, opacity]) => {
-    const geo = new THREE.TubeGeometry(curve, segments, radius, high ? 10 : 6, true);
-    // Matériau standard (même rendu que les maquettes validées) + tracé et impulsion injectés.
-    const mat = new THREE.MeshBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-    });
-    mat.onBeforeCompile = (shader) => {
-      shader.uniforms.uTime = uniforms.uTime;
-      shader.uniforms.uDraw = uniforms.uDraw;
-      shader.uniforms.uPulse = uniforms.uPulse;
-      shader.vertexShader = "varying float vU;\n" + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n  vU = uv.x;");
-      shader.fragmentShader = FILAMENT_UNIFORMS + shader.fragmentShader.replace("#include <color_fragment>", FILAMENT_COLOR);
-    };
-    mat.customProgramCacheKey = () => "infinity-filament";
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.visible = filament;
-    mesh.userData.color = color;
-    // dessiné après le verre (comme sur les maquettes validées) : le verre ne l'éteint pas,
-    // la profondeur est rendue par l'atténuation des parties du trait situées au fond
-    mesh.renderOrder = 3;
-    group.add(mesh);
-    return mesh;
+  const filaments: THREE.Mesh[] = [];
+  curves.forEach((curve, si) => {
+    const segments = Math.max(24, Math.round(lengths[si] * (high ? 260 : 140)));
+    const stroke = { uStart: { value: spans[si].start }, uLen: { value: spans[si].len } };
+    for (const [radius, color, opacity] of layers) {
+      const geo = new THREE.TubeGeometry(curve, segments, radius, high ? 10 : 6, false);
+      // Matériau standard (même rendu que les maquettes validées) + tracé et impulsion injectés.
+      const mat = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      });
+      mat.onBeforeCompile = (shader) => {
+        shader.uniforms.uTime = uniforms.uTime;
+        shader.uniforms.uDraw = uniforms.uDraw;
+        shader.uniforms.uPulse = uniforms.uPulse;
+        shader.uniforms.uStart = stroke.uStart;
+        shader.uniforms.uLen = stroke.uLen;
+        shader.vertexShader = "varying float vU;\n" + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n  vU = uv.x;");
+        shader.fragmentShader = FILAMENT_UNIFORMS + shader.fragmentShader.replace("#include <color_fragment>", FILAMENT_COLOR);
+      };
+      mat.customProgramCacheKey = () => "infinity-filament";
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.visible = filament;
+      mesh.userData.color = color;
+      // dessiné après le verre (comme sur les maquettes validées) : le verre ne l'éteint pas
+      mesh.renderOrder = 3;
+      group.add(mesh);
+      filaments.push(mesh);
+    }
   });
 
-  // Luminosité selon la profondeur vue de la caméra, calculée dans la pose de repos :
-  // les parties au fond du verre s'atténuent (le soulignement devient un reflet).
-  {
-    group.updateMatrixWorld(true);
-    const v = new THREE.Vector3();
-    let zmin = Infinity;
-    let zmax = -Infinity;
-    for (const m of filaments) {
-      const p = m.geometry.attributes.position;
-      for (let i = 0; i < p.count; i++) {
-        v.fromBufferAttribute(p, i).applyMatrix4(m.matrixWorld);
-        zmin = Math.min(zmin, v.z);
-        zmax = Math.max(zmax, v.z);
-      }
+  // point final : petite perle de lumière, apparaît à la fin du tracé
+  const [dx, dy, dr] = SIGNATURE_DOT;
+  const dotMeshes = (
+    [
+      [dr * 2.4, lime, 0.14],
+      [dr, lime, 0.85],
+      [dr * 0.5, hot, 0.7],
+    ] as [number, THREE.Color, number][]
+  ).map(([radius, color, opacity]) => {
+    const geo = new THREE.SphereGeometry(radius, 20, 14);
+    const col = new Float32Array(geo.attributes.position.count * 3);
+    for (let i = 0; i < col.length; i += 3) col.set([color.r, color.g, color.b], i);
+    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    const m = new THREE.Mesh(
+      geo,
+      new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }),
+    );
+    m.position.set(dx, dy, SIGNATURE_Z);
+    m.renderOrder = 3;
+    m.visible = filament;
+    group.add(m);
+    return m;
+  });
+  const showDot = (p: number) => dotMeshes.forEach((m) => (m.visible = filament && p >= dotStart));
+
+  // Luminosité selon la profondeur dans le verre (z local) : les parties en retrait s'atténuent.
+  for (const m of filaments) {
+    const p = m.geometry.attributes.position;
+    const c = m.userData.color as THREE.Color;
+    const col = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) {
+      const k = THREE.MathUtils.clamp((p.getZ(i) - (SIGNATURE_Z - RELIEF)) / (2 * RELIEF), 0, 1);
+      const f = 0.55 + 0.45 * k;
+      col[i * 3] = c.r * f;
+      col[i * 3 + 1] = c.g * f;
+      col[i * 3 + 2] = c.b * f;
     }
-    for (const m of filaments) {
-      const p = m.geometry.attributes.position;
-      const c = m.userData.color as THREE.Color;
-      const col = new Float32Array(p.count * 3);
-      for (let i = 0; i < p.count; i++) {
-        v.fromBufferAttribute(p, i).applyMatrix4(m.matrixWorld);
-        const k = (v.z - zmin) / (zmax - zmin || 1);
-        const f = 0.2 + 0.8 * Math.pow(k, 1.6);
-        col[i * 3] = c.r * f;
-        col[i * 3 + 1] = c.g * f;
-        col[i * 3 + 2] = c.b * f;
-      }
-      m.geometry.setAttribute("color", new THREE.BufferAttribute(col, 3));
-    }
+    m.geometry.setAttribute("color", new THREE.BufferAttribute(col, 3));
   }
 
   // ----- taille -----
@@ -336,6 +364,7 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
     setRunning,
     setDraw: (p) => {
       uniforms.uDraw.value = Math.max(0, Math.min(1, p));
+      showDot(uniforms.uDraw.value);
       if (!running) renderer.render(scene, camera);
     },
     setPointer: (x, y) => {
@@ -350,7 +379,7 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
       glassGeo.dispose();
       glassBack.dispose();
       glassFront.dispose();
-      filaments.forEach((m) => {
+      [...filaments, ...dotMeshes].forEach((m) => {
         m.geometry.dispose();
         (m.material as THREE.Material).dispose();
       });
@@ -363,8 +392,8 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
   };
 }
 
-/** Projette le trait (pose de repos) sur l'écran : sert au SVG de l'image fixe. */
-export function projectSignature(width: number, height: number, samples = 360) {
+/** Projette la signature (pose de repos) sur l'écran : sert aux SVG de l'image fixe. */
+export function projectSignature(width: number, height: number) {
   const camera = new THREE.PerspectiveCamera(CAMERA.fov, width / height, 0.1, 50);
   camera.position.set(0, CAMERA.y, CAMERA.z);
   camera.lookAt(0, 0, 0);
@@ -372,11 +401,18 @@ export function projectSignature(width: number, height: number, samples = 360) {
   const group = new THREE.Object3D();
   group.rotation.set(POSE.x, POSE.y, POSE.z);
   group.updateMatrixWorld(true);
-  const curve = new THREE.CatmullRomCurve3(SIGNATURE.map(([x, y, z]) => new THREE.Vector3(x, y, z)), true, "centripetal", 0.5);
-  const pts: [number, number][] = [];
-  for (let i = 0; i < samples; i++) {
-    const v = curve.getPointAt(i / samples).applyMatrix4(group.matrixWorld).project(camera);
-    pts.push([((v.x + 1) / 2) * width, ((1 - v.y) / 2) * height]);
-  }
-  return pts;
+  const toScreen = (v: THREE.Vector3) => {
+    const p = v.applyMatrix4(group.matrixWorld).project(camera);
+    return [((p.x + 1) / 2) * width, ((1 - p.y) / 2) * height] as [number, number];
+  };
+  const curves = signatureCurves();
+  const lengths = curves.map((c) => c.getLength());
+  const strokes = curves.map((c, i) => {
+    const n = Math.max(12, Math.round(lengths[i] * 90));
+    return Array.from({ length: n + 1 }, (_, k) => toScreen(c.getPointAt(k / n)));
+  });
+  const [dx, dy, dr] = SIGNATURE_DOT;
+  const c = toScreen(new THREE.Vector3(dx, dy, SIGNATURE_Z));
+  const edge = toScreen(new THREE.Vector3(dx + dr, dy, SIGNATURE_Z));
+  return { strokes, lengths, dot: [c[0], c[1], Math.abs(edge[0] - c[0])] as [number, number, number] };
 }

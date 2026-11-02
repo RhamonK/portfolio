@@ -5,6 +5,7 @@ import { Parcours } from "@/components/Parcours";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { CvPill } from "@/components/CvPill";
+import { InfiniteThread } from "@/components/InfiniteThread";
 import type { Lang } from "@/i18n";
 
 export function HomePage({ lang }: { lang: Lang }) {
@@ -19,6 +20,7 @@ export function HomePage({ lang }: { lang: Lang }) {
       </main>
       <Footer />
       <CvPill lang={lang} />
+      <InfiniteThread lang={lang} />
     </>
   );
 }

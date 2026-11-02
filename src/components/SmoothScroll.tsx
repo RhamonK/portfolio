@@ -13,7 +13,11 @@ export function SmoothScroll() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    const lenis = new Lenis({ anchors: true });
+    // Ancres : animation à durée fixe. Avec l'interpolation par défaut, l'animation pouvait
+    // ne jamais se terminer (position cible décimale) et écrasait ensuite tout autre défilement.
+    const lenis = new Lenis({ anchors: { duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 3) } });
+    // positions recalculées une fois les polices chargées (les titres changent de hauteur)
+    document.fonts?.ready.then(() => ScrollTrigger.refresh());
     setLenis(lenis);
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

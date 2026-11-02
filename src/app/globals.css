@@ -209,16 +209,20 @@
 @media (prefers-reduced-motion: reduce) {
   .js .intro-hide { visibility: visible; animation: none; }
 }
-/* INFINITY CORE, niveau léger : impulsion de lumière qui parcourt le trait de l'image fixe
-   (même vitesse que la 3D : un tour en 9 s). */
+/* INFINITY CORE, niveau léger : une impulsion de lumière parcourt la signature de l'image fixe,
+   trait après trait (position pilotée en JS, même vitesse que la 3D : un tour en 9 s). */
 .core-pulse path {
   fill: none;
   stroke: color-mix(in srgb, #ffffff 55%, var(--lime));
   stroke-width: 7;
   stroke-linecap: round;
-  stroke-dasharray: 0.07 0.93;
+  stroke-dasharray: 0.08 2;
+  opacity: 0;
   filter: drop-shadow(0 0 6px var(--lime));
-  animation: core-pulse 9s linear infinite;
+}
+.core-trace circle {
+  fill: var(--lime);
+  filter: drop-shadow(0 0 6px var(--lime));
 }
 .core-trace path {
   fill: none;
@@ -228,10 +232,148 @@
   stroke-dasharray: 1 1;
   filter: drop-shadow(0 0 5px var(--lime)) drop-shadow(0 0 14px rgba(212, 255, 58, 0.45));
 }
-@keyframes core-pulse {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+/* ===== FIL INFINITE — progression dans la marge gauche ===== */
+.infinite-thread {
+  --thread-top: 80px;
+  --thread-bottom: 28px;
+  --thread-x: max(8px, calc((100vw - 1200px) / 2 - 28px));
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 0;
+  z-index: 30;
+  pointer-events: none;
 }
+.thread-track {
+  position: absolute;
+  left: var(--thread-x);
+  top: var(--thread-top);
+  bottom: var(--thread-bottom);
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.thread-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top;
+  transform: scaleY(var(--p));
+  background: linear-gradient(to bottom, rgba(212, 255, 58, 0.15), var(--lime));
+  box-shadow: 0 0 10px rgba(212, 255, 58, 0.55);
+}
+.thread-head {
+  position: absolute;
+  left: -2.5px;
+  top: calc(var(--p) * 100%);
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #ffffff 55%, var(--lime));
+  box-shadow: 0 0 10px 2px rgba(212, 255, 58, 0.7);
+}
+.thread-marks {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.thread-marks li {
+  position: absolute;
+  left: var(--thread-x);
+}
+.thread-marks a {
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  margin-top: -14px;
+  margin-left: -14px;
+  padding: 0 10px 0 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+.thread-dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: var(--bg);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.thread-num { opacity: 0.8; }
+.thread-label {
+  display: none;
+  color: var(--text);
+}
+.thread-marks a:hover,
+.thread-marks a:focus-visible {
+  background: rgba(10, 11, 10, 0.85);
+  color: var(--text);
+}
+.thread-marks a:hover .thread-label,
+.thread-marks a:focus-visible .thread-label { display: inline; }
+.thread-marks a.is-active { color: var(--lime); }
+.thread-marks a.is-active .thread-dot {
+  background: var(--lime);
+  border-color: var(--lime);
+  box-shadow: 0 0 10px rgba(212, 255, 58, 0.7);
+}
+/* Desktop : repères visibles ; libellé de la section active quand la marge le permet */
+@media (min-width: 1024px) {
+  .thread-marks { display: block; }
+}
+/* Marge large : numéros et libellés à GAUCHE du Fil, dans la marge libre (jamais sur le contenu) */
+@media (min-width: 1500px) {
+  .thread-marks a {
+    flex-direction: row-reverse;
+    margin-left: 0;
+    padding: 0 9px 0 10px;
+    transform: translateX(calc(-100% + 14px));
+  }
+}
+@media (min-width: 1500px) {
+  .thread-marks a.is-active .thread-label { display: inline; }
+}
+/* Marge étroite (< 1500 px) : seulement les points (zone de clic resserrée), libellé en infobulle au survol */
+@media (max-width: 1499px) {
+  .infinite-thread { --thread-x: max(13px, calc((100vw - 1200px) / 2 - 28px)); }
+  .thread-num { display: none; }
+  .thread-marks a { padding: 0 6px; gap: 0; margin-left: -10.5px; }
+  .thread-marks a:hover,
+  .thread-marks a:focus-visible { gap: 8px; padding-right: 10px; }
+}
+/* Mobile : ligne plus discrète, collée au bord */
+@media (max-width: 767px) {
+  .infinite-thread { --thread-top: 64px; --thread-x: 8px; }
+  .thread-track { background: rgba(255, 255, 255, 0.05); }
+  .thread-head { width: 5px; height: 5px; left: -2px; margin-top: -2.5px; }
+}
+
+/* Titres de section : mots révélés un par un, mot clé en serif italique */
+.rv-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+  vertical-align: bottom;
+}
+.rv-word { display: inline-block; }
+.rv-em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--lime);
+}
+
 /* Écran de téléphone peu haut : l'indice de défilement laisse la place aux boutons. */
 @media (max-width: 767px) and (max-height: 760px) {
   .h-hint { display: none !important; }
@@ -280,11 +422,4 @@ body::after {
   pointer-events: none;
   opacity: 0.05;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-}
-/* portail : la salle s'ouvre en cercle quand on arrive dessus */
-.room-portal {
-  clip-path: circle(var(--portal, 140%) at 50% 55%);
-}
-.st-word {
-  display: inline-block;
 }
