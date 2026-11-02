@@ -12,6 +12,16 @@
   --glass: rgba(255, 255, 255, 0.06);
   --glass-strong: rgba(255, 255, 255, 0.08);
   --glass-line: rgba(255, 255, 255, 0.12);
+
+  /* Nuances olive sombres : valeurs déjà utilisées dans les scènes 3D,
+     l'image de partage et les présentations (aucune valeur nouvelle).
+     Miroir JS pour Three.js : src/lib/palette.ts (vérifié par npm run check). */
+  --olive-900: #1c2410;
+  --olive-850: #11140d;
+  --olive-800: #10120e;
+  --olive-780: #0e100c;
+  --olive-750: #0d0f0b;
+  --panel: rgba(16, 18, 14, 0.92);
 }
 
 @theme {
@@ -22,6 +32,12 @@
   --color-on-lime: var(--on-lime);
   --color-glass: var(--glass);
   --color-glass-line: var(--glass-line);
+  --color-olive-900: var(--olive-900);
+  --color-olive-850: var(--olive-850);
+  --color-olive-800: var(--olive-800);
+  --color-olive-780: var(--olive-780);
+  --color-olive-750: var(--olive-750);
+  --color-panel: var(--panel);
 
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;

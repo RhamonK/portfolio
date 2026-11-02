@@ -5,6 +5,8 @@ import type { Lang } from "@/i18n";
 export const viewport: Viewport = {
   themeColor: "#0a0b0a",
   colorScheme: "dark",
+  // Sur iPhone, permet à la pastille CV de se placer au-dessus de la barre d'accueil.
+  viewportFit: "cover",
 };
 
 const keywords: Record<Lang, string[]> = {
