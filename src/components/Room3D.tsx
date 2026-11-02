@@ -19,7 +19,13 @@ const EYE = 1.6;
  * (0 à 1) et bande verticale libre pour l'écran (fractions de la hauteur,
  * entre le titre et la légende).
  */
-export type RoomDrive = { a: number; tunnel: number; band: { top: number; bottom: number } };
+export type RoomDrive = {
+  a: number;
+  tunnel: number;
+  band: { top: number; bottom: number };
+  /** Projets retenus par le filtre (les autres écrans sont assombris) ; absent = tous. */
+  include?: readonly number[];
+};
 
 // Écran : 2,50 m de haut, centré à 1,70 m, à 4 m du visiteur.
 const SCREEN_ANGLE = 2 * Math.atan(1.25 / 4);
@@ -113,8 +119,12 @@ function Scene({
     else current.current = target;
     const a = current.current;
     group.current.rotation.y = a * STEP;
+    const inc = drive.current.include;
     screens.forEach((mat, i) => {
-      if (mat) mat.color.setScalar(1 - Math.min(Math.abs(i - a), 1.5) * 0.5);
+      if (!mat) return;
+      const base = 1 - Math.min(Math.abs(i - a), 1.5) * 0.5;
+      // écran écarté par le filtre : presque éteint
+      mat.color.setScalar(inc && !inc.includes(i) ? Math.min(base, 0.12) : base);
     });
     // Tunnel : la caméra plonge dans l'écran de face.
     const t = drive.current.tunnel;
@@ -146,11 +156,13 @@ function Wake({ drive }: { drive: React.MutableRefObject<RoomDrive> }) {
     let raf = 0;
     let a = NaN;
     let t = NaN;
+    let inc: readonly number[] | undefined;
     const tick = () => {
       const d = drive.current;
-      if (d.a !== a || d.tunnel !== t) {
+      if (d.a !== a || d.tunnel !== t || d.include !== inc) {
         a = d.a;
         t = d.tunnel;
+        inc = d.include;
         invalidate();
       }
       raf = requestAnimationFrame(tick);

@@ -146,17 +146,86 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-/* Carrousel plat : mobile, mouvement réduit, ou navigateur sans WebGL (.is-flat). */
+/* Colonne de cartes : mobile, mouvement réduit, ou navigateur sans WebGL (.is-flat).
+   Défilement vertical natif ; seule la bande d'écrans d'une carte défile à l'horizontale. */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .room { height: auto; padding-bottom: 64px; }
   .room .room-3d { display: none !important; }
-  .room .room-flat { position: static; width: auto; height: auto; clip: auto; white-space: normal; display: flex; gap: 16px; margin-top: 32px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 24px 12px; scrollbar-width: none; }
-  .room .room-flat > li { flex: 0 0 min(85%, 560px); scroll-snap-align: center; }
+  .room .room-flat { position: static; width: 100%; max-width: 1200px; height: auto; clip: auto; white-space: normal; display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; margin: 40px auto 0; padding: 0 24px; }
 }
 .room.is-flat { height: auto; padding-bottom: 64px; }
 .room.is-flat .room-3d { display: none !important; }
-.room.is-flat .room-flat { position: static; width: auto; height: auto; clip: auto; white-space: normal; display: flex; gap: 16px; margin-top: 32px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 24px 12px; scrollbar-width: none; }
-.room.is-flat .room-flat > li { flex: 0 0 min(85%, 560px); scroll-snap-align: center; }
+.room.is-flat .room-flat { position: static; width: 100%; max-width: 1200px; height: auto; clip: auto; white-space: normal; display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; margin: 40px auto 0; padding: 0 24px; }
+@media (min-width: 768px) {
+  .room.is-flat .room-flat { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .room .room-flat { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ===== Filtre par besoin ===== */
+.pf-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.pf-chip:hover { color: var(--text); }
+.pf-chip.is-on { background: var(--lime); border-color: var(--lime); color: var(--on-lime); }
+.pf-count { font-family: var(--font-mono); font-size: 11px; opacity: 0.7; }
+
+/* ===== Carte projet ===== */
+.room-flat > li { min-width: 0; }
+.pc { min-width: 0; }
+.pc-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 255, 58, 0.35);
+  color: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.pc-gallery {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.pc-gallery::-webkit-scrollbar { display: none; }
+.pc-gallery li { flex: 0 0 auto; width: 46%; max-width: 220px; scroll-snap-align: start; }
+.pc-gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: left top;
+  border-radius: 10px;
+  border: 1px solid var(--glass-line);
+  background: var(--olive-800);
+}
+.pc-gallery span { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+/* effet focus (mobile) : seuls les visuels des cartes hors du centre sont désaturés, le texte reste net */
+.pc-media, .pc-gallery { transition: filter 0.5s ease; }
+@media (max-width: 767px) {
+  .room-flat > li:not([data-focus]) .pc-media,
+  .room-flat > li:not([data-focus]) .pc-gallery { filter: saturate(0.3) brightness(0.72); }
+}
 
 /* ===== SCÈNE D — cadres de musée ===== */
 .museum-frame {

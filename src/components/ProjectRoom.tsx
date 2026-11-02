@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/data/projects";
 import dynamic from "next/dynamic";
-import { ProjectScreen } from "@/components/ProjectScreen";
+import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectFilter, filtered, type Filter } from "@/components/ProjectFilter";
 import type { RoomDrive } from "@/components/Room3D";
 import { presentations } from "@/data/presentations";
 import { Presentation } from "@/components/presentation/Presentation";
@@ -32,7 +33,15 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   const trigger = useRef<ScrollTrigger | null>(null);
   const stage3d = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
+  // filtre par besoin : `list` = indices des projets retenus ; `active` = indice réel du projet de face
+  const [filter, setFilter] = useState<Filter>("all");
+  const list = useMemo(() => filtered(filter), [filter]);
+  const m = list.length;
   const [active, setActive] = useState(0);
+  const pos = Math.max(0, list.indexOf(active));
+  // carte au centre de l'écran (mobile) : en couleur, les autres légèrement désaturées
+  const [focused, setFocused] = useState<number | null>(null);
+  const jumpAfterFilter = useRef(false);
   const [open, setOpen] = useState<string | null>(null);
   // Desktop et mouvement normal : la liste plate n'est alors lue que par
   // les lecteurs d'écran et ne doit pas prendre le focus.
@@ -137,27 +146,43 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           scrollTrigger: { trigger: section.current, start: "top 20%", once: true },
         },
       );
-      const place = (a: number) => {
-        drive.current.a = a;
-        setActive(Math.round(a));
+      // p = position dans la liste filtrée ; la salle tourne entre les vrais écrans retenus
+      const place = (p: number) => {
+        const k = Math.max(0, Math.min(m - 1, p));
+        const k0 = Math.floor(k);
+        const k1 = Math.min(m - 1, k0 + 1);
+        drive.current.a = list[k0] + (list[k1] - list[k0]) * (k - k0);
+        setActive(list[Math.round(k)]);
       };
-      const st = ScrollTrigger.create({
-        trigger: section.current,
-        pin: true,
-        start: "top top",
-        end: () => `+=${(n - 1) * window.innerHeight * 0.8}`,
-        // aimantage doux : seulement quand on s'arrête de défiler, vers le projet le plus proche
-        snap: {
-          snapTo: 1 / (n - 1),
-          directional: false,
-          delay: 0.45,
-          duration: { min: 0.3, max: 0.8 },
-          ease: "power2.inOut",
-        },
-        invalidateOnRefresh: true,
-        onUpdate: (self) => place(self.progress * (n - 1)),
-        onRefresh: (self) => place(self.progress * (n - 1)),
-      });
+      drive.current.include = filter === "all" ? undefined : list;
+      const st =
+        m > 1
+          ? ScrollTrigger.create({
+              trigger: section.current,
+              pin: true,
+              start: "top top",
+              end: () => `+=${(m - 1) * window.innerHeight * 0.8}`,
+              // aimantage doux : seulement quand on s'arrête de défiler, vers le projet le plus proche
+              snap: {
+                snapTo: 1 / (m - 1),
+                directional: false,
+                delay: 0.45,
+                duration: { min: 0.3, max: 0.8 },
+                ease: "power2.inOut",
+              },
+              invalidateOnRefresh: true,
+              onUpdate: (self) => place(self.progress * (m - 1)),
+              onRefresh: (self) => place(self.progress * (m - 1)),
+            })
+          : // un seul projet retenu : pas d'épinglage, la salle reste face à lui
+            ScrollTrigger.create({ trigger: section.current, start: "top top", end: "+=1", onRefresh: () => place(0) });
+      place(0);
+      ScrollTrigger.refresh();
+      // après un changement de filtre depuis la salle : retour au premier projet retenu
+      if (jumpAfterFilter.current) {
+        jumpAfterFilter.current = false;
+        scrollToY(st.start);
+      }
       trigger.current = st;
       return () => {
         trigger.current = null;
@@ -166,18 +191,43 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     });
 
     return () => mm.revert();
-  }, [n, webgl]);
+  }, [webgl, list, m, filter]);
 
-  const goTo = (i: number) => {
-    const target = Math.max(0, Math.min(n - 1, i));
+  // k = position dans la liste filtrée
+  const goTo = (k: number) => {
+    const target = Math.max(0, Math.min(m - 1, k));
     const st = trigger.current;
-    if (st) {
-      scrollToY(st.start + (target / (n - 1)) * (st.end - st.start));
+    if (st && m > 1) {
+      scrollToY(st.start + (target / (m - 1)) * (st.end - st.start));
     } else {
-      flat.current[target]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-      setActive(target);
+      flat.current[list[target]]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setActive(list[target]);
     }
   };
+
+  const changeFilter = (f: Filter) => {
+    if (f === filter) return;
+    const st = trigger.current;
+    jumpAfterFilter.current = !!st && window.scrollY > st.start + 2;
+    setFilter(f);
+    const next = filtered(f);
+    if (!next.includes(active)) setActive(next[0]);
+  };
+
+  // mobile : repère la carte au centre de l'écran (effet focus)
+  useEffect(() => {
+    if (is3d && webgl) return;
+    const items = list.map((i) => flat.current[i]).filter(Boolean) as HTMLLIElement[];
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.find((e) => e.isIntersecting);
+        if (hit) setFocused(Number((hit.target as HTMLElement).dataset.index));
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [list, is3d, webgl]);
 
   // Lancer : l'écran est « aspiré », la caméra plonge dedans (0,8 s).
   const launch = (i: number) => {
@@ -205,7 +255,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
 
   const nextProject = () => {
     closePresentation();
-    setTimeout(() => goTo(active + 1), 650);
+    setTimeout(() => goTo(pos + 1), 650);
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -215,10 +265,10 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       launch(active);
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      goTo(active + 1);
+      goTo(pos + 1);
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
-      goTo(active - 1);
+      goTo(pos - 1);
     }
   };
 
@@ -243,6 +293,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         <p id="aide-projets" className="sr-only">
           {t.roomHelp}
         </p>
+        <ProjectFilter lang={lang} value={filter} onChange={changeFilter} className="mt-5 md:flex md:justify-center" />
       </div>
 
       {/* ===== salle Blender (desktop, WebGL), entre le titre et la légende ===== */}
@@ -257,7 +308,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
             WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
           }}
         >
-          <Room3D images={images} drive={drive} paused={!!open || !onScreen} onPick={(i) => (i === active ? launch(i) : goTo(i))} />
+          <Room3D images={images} drive={drive} paused={!!open || !onScreen} onPick={(i) => (i === active ? launch(i) : list.includes(i) && goTo(list.indexOf(i)))} />
         </div>
       )}
 
@@ -267,12 +318,26 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       {/* légende de l'écran de face (desktop) */}
       <div className="room-3d room-text room-caption wrap relative z-10 pb-10 text-center" aria-live="polite">
         <span className="eyebrow">
-          {pad(active + 1)} / {pad(n)}
+          {pad(pos + 1)} / {pad(m)}
+          {filter !== "all" && ` · ${t.tags[filter]}`}
         </span>
         <h3 className="mt-1 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">{current.name}</h3>
         <p className="mx-auto mt-1 max-w-[560px] text-muted">{current.pitch[lang]}</p>
+        <p className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-[13px] text-muted">
+          {current.tags.map((tag) => (
+            <span key={tag} className="pc-tag">
+              {t.tags[tag]}
+            </span>
+          ))}
+          {current.tech && <span className="ml-1">{current.tech}</span>}
+          {current.href && (
+            <a href={current.href} className="text-lime hover:underline">
+              · {current.hrefLabel?.[lang] ?? current.href} ↗
+            </a>
+          )}
+        </p>
         <div className="mt-5 flex items-center justify-center gap-3">
-          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label={t.prevProject}>
+          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(pos - 1)} disabled={pos === 0} aria-label={t.prevProject}>
             ←
           </button>
           {presentations[current.slug] ? (
@@ -284,34 +349,36 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
               {t.soon}
             </button>
           )}
-          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(active + 1)} disabled={active === n - 1} aria-label={t.nextProject}>
+          <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(pos + 1)} disabled={pos >= m - 1} aria-label={t.nextProject}>
             →
           </button>
         </div>
       </div>
 
-      {/* ===== liste plate : carrousel sur mobile, lue par les lecteurs d'écran ===== */}
+      {/* ===== cartes : colonne sur mobile (sans WebGL ou en mouvement réduit aussi), lues par les lecteurs d'écran sur desktop ===== */}
       <ol className="room-flat">
-        {projects.map((p, i) => (
-          <li
-            key={p.slug}
-            ref={(el) => {
-              flat.current[i] = el;
-            }}
-          >
-            <ProjectScreen project={p} />
-            <span className="eyebrow mt-4 block">
-              {pad(i + 1)} / {pad(n)}
-            </span>
-            <h3 className="mt-1 text-[24px] font-bold tracking-tight">{p.name}</h3>
-            <p className="mt-1 text-muted">{p.pitch[lang]}</p>
-            {presentations[p.slug] && (
-              <button type="button" className="btn btn-lime mt-4" tabIndex={is3d && webgl ? -1 : undefined} onClick={() => launch(i)}>
-                {t.launch}
-              </button>
-            )}
-          </li>
-        ))}
+        {list.map((i) => {
+          const p = projects[i];
+          return (
+            <li
+              key={p.slug}
+              data-index={i}
+              data-focus={focused === i || undefined}
+              ref={(el) => {
+                flat.current[i] = el;
+              }}
+            >
+              <ProjectCard
+                project={p}
+                index={i}
+                total={n}
+                lang={lang}
+                focusable={!(is3d && webgl)}
+                onLaunch={presentations[p.slug] ? () => launch(i) : undefined}
+              />
+            </li>
+          );
+        })}
       </ol>
 
       {open &&
@@ -322,7 +389,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           project={projects.find((p) => p.slug === open)!}
           presentation={presentations[open]}
           onClose={closePresentation}
-          onNextProject={projects.findIndex((p) => p.slug === open) < n - 1 ? nextProject : undefined}
+          onNextProject={pos < m - 1 ? nextProject : undefined}
         />,
         document.body,
       )}
