@@ -1,13 +1,12 @@
 "use client";
 
-import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import type { Lang, Slide } from "@/data/presentations";
+import { presentations, type Lang, type Slide } from "@/data/presentations";
 import type { PresenterSignals } from "@/components/presentation/signals";
-import { Figure } from "@/components/presentation/Presenter";
 import { PresenterModel, PRESENTER_URL } from "@/components/presentation/PresenterModel";
 
 // Scène C en une seule pièce : la diapo s'affiche sur le grand écran courbé
@@ -15,7 +14,6 @@ import { PresenterModel, PRESENTER_URL } from "@/components/presentation/Present
 // l'échelle humaine, éclairé par l'écran — comme quelqu'un qui expose son projet.
 
 const STEP = THREE.MathUtils.degToRad(66);
-const lerp = THREE.MathUtils.lerp;
 /** Où se tient le présentateur (mètres) : devant l'écran, côté droit. */
 const SPOT = new THREE.Vector3(1.9, 0, -2.45);
 /**
@@ -25,6 +23,7 @@ const SPOT = new THREE.Vector3(1.9, 0, -2.45);
  */
 const FACING = Math.atan2(-SPOT.x, -SPOT.z) * 0.85;
 const W = 2048;
+const SALLE_URL = "/salle/salle.glb";
 const H = 1222;
 
 type SlideView = { slide: Slide; lang: Lang; index: number; images: string[] };
@@ -112,11 +111,7 @@ function drawSlide(canvas: HTMLCanvasElement, v: SlideView, imgs: HTMLImageEleme
 }
 
 function Room({ view, projectIndex }: { view: SlideView; projectIndex: number }) {
-  const gltf = useLoader(GLTFLoader, "/salle/salle.glb", (loader) => {
-    const draco = new DRACOLoader();
-    draco.setDecoderPath("/draco/");
-    loader.setDRACOLoader(draco);
-  });
+  const gltf = useLoader(GLTFLoader, SALLE_URL, dracoSetup);
   const imgs = useLoader(THREE.ImageLoader, view.images) as HTMLImageElement[];
   const scene = useMemo(() => gltf.scene.clone(true), [gltf]);
 
@@ -172,9 +167,8 @@ function Room({ view, projectIndex }: { view: SlideView; projectIndex: number })
 }
 
 // Cadrage : l'écran entier, le présentateur en pied à sa droite.
-function Rig({ signals, usesModel }: { signals: React.MutableRefObject<PresenterSignals>; usesModel: boolean }) {
+function Rig() {
   const { camera, size } = useThree();
-  const mouth = useMemo(() => new THREE.Vector3(), []);
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const aspect = size.width / Math.max(size.height, 1);
@@ -184,94 +178,39 @@ function Rig({ signals, usesModel }: { signals: React.MutableRefObject<Presenter
     cam.lookAt(0.4, 1.3, -4);
     cam.updateProjectionMatrix();
   }, [camera, size]);
-
-  useFrame(() => {
-    if (usesModel) return; // le modèle Blender donne lui-même la position de sa bouche
-    mouth.set(SPOT.x, 1.38, SPOT.z + 0.3).project(camera);
-    signals.current.mouthX = (mouth.x + 1) / 2;
-    signals.current.mouthY = (1 - mouth.y) / 2;
-  });
   return null;
 }
 
-// Buste provisoire (statique, sans squelette) : posé sur le corps de la
-// silhouette, il suit un peu la souris et bouge légèrement en parlant.
-const BUST_HEIGHT = 0.75; // mètres, du haut du crâne au bas du buste
-const BUST_TOP = 1.76;
-
-function Bust({ scene, signals }: { scene: THREE.Object3D; signals: React.MutableRefObject<PresenterSignals> }) {
-  const pivot = useRef<THREE.Group>(null!);
-  const { camera } = useThree();
-  const mouth = useMemo(() => new THREE.Vector3(), []);
-  const fit = useMemo(() => {
-    const box = new THREE.Box3().setFromObject(scene);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-    const s = BUST_HEIGHT / (size.y || 1);
-    // le visage regarde +X dans le fichier : on le tourne vers la caméra (+Z)
-    return { s, offset: center.multiplyScalar(-1), depth: (size.x / 2) * 0.9, mouthY: size.y * 0.08 };
-  }, [scene]);
-
-  useFrame((state) => {
-    const sig = signals.current;
-    const t = state.clock.elapsedTime;
-    const move = sig.still ? 0 : 1;
-    const p = pivot.current;
-    p.rotation.y = lerp(p.rotation.y, -Math.PI / 2 + sig.mouse.x * 0.25, 0.08);
-    p.rotation.z = lerp(p.rotation.z, sig.mouse.y * 0.08 + sig.speaking * 0.035 * Math.sin(t * 7) * move, 0.2);
-    // position de la bouche à l'écran, pour les mots-clés qui tombent
-    p.localToWorld(mouth.set(fit.depth, fit.mouthY, 0).multiplyScalar(1));
-    mouth.project(camera);
-    sig.mouthX = (mouth.x + 1) / 2;
-    sig.mouthY = (1 - mouth.y) / 2;
-  });
-
-  return (
-    <group position={[SPOT.x, BUST_TOP - BUST_HEIGHT / 2, SPOT.z]} rotation={[0, FACING, 0]}>
-      <group ref={pivot} rotation={[0, -Math.PI / 2, 0]} scale={fit.s}>
-        <primitive object={scene} position={fit.offset} />
-      </group>
-    </group>
-  );
+// Tout est chargé : on compile les shaders d'un coup (pas d'à-coup à la
+// première image) et on prévient la page pour lever le fondu.
+function Ready({ onReady }: { onReady: () => void }) {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    gl.compile(scene, camera);
+    onReady();
+  }, [gl, scene, camera, onReady]);
+  return null;
 }
 
-// Modèle avec squelette → présentateur animé ; buste statique → monté sur la silhouette.
-function PresenterAuto({ signals, silhouette }: { signals: React.MutableRefObject<PresenterSignals>; silhouette: ReactNode }) {
-  const gltf = useLoader(GLTFLoader, PRESENTER_URL, (loader) => {
-    const draco = new DRACOLoader();
-    draco.setDecoderPath("/draco/");
-    loader.setDRACOLoader(draco);
-  });
-  const rigged = useMemo(() => {
-    let found = false;
-    gltf.scene.traverse((o) => {
-      if ((o as THREE.SkinnedMesh).isSkinnedMesh) found = true;
-    });
-    return found;
-  }, [gltf]);
+const dracoSetup = (loader: GLTFLoader) => {
+  const draco = new DRACOLoader();
+  draco.setDecoderPath("/draco/");
+  loader.setDRACOLoader(draco);
+};
 
-  if (rigged) {
-    return (
-      <group position={SPOT.toArray()} rotation={[0, FACING, 0]}>
-        <PresenterModel signals={signals} inRoom />
-      </group>
-    );
-  }
-  return (
-    <>
-      {silhouette}
-      <Bust scene={gltf.scene} signals={signals} />
-    </>
-  );
-}
-
-class Fallback extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
+/**
+ * Prépare la salle, le présentateur et les images de chaque diapo avant
+ * l'ouverture. Les images sont préchargées par groupe, exactement comme
+ * la diapo les demande (le cache de useLoader se fait par groupe d'URL).
+ */
+export function preloadStage(projectImage: Record<string, string>) {
+  useLoader.preload(GLTFLoader, SALLE_URL, dracoSetup);
+  useLoader.preload(GLTFLoader, PRESENTER_URL, dracoSetup);
+  for (const [slug, p] of Object.entries(presentations)) {
+    for (const sl of p.slides) {
+      const imgs = sl.shots ?? (projectImage[slug] ? [projectImage[slug]] : null);
+      if (imgs) useLoader.preload(THREE.ImageLoader, imgs);
+    }
   }
 }
 
@@ -279,38 +218,19 @@ export default function Stage3D({
   signals,
   view,
   projectIndex,
+  onReady,
 }: {
   signals: React.MutableRefObject<PresenterSignals>;
   view: SlideView;
   projectIndex: number;
+  onReady: () => void;
 }) {
-  const [hasModel, setHasModel] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(PRESENTER_URL, { method: "HEAD" })
-      .then((r) => {
-        if (!cancelled && r.ok && !(r.headers.get("content-type") ?? "").includes("text/html")) setHasModel(true);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Silhouette de la phase 1, mise à l'échelle d'une personne de 1,75 m.
-  const silhouette = (
-    <group position={[SPOT.x, 1.2, SPOT.z]} rotation={[0, FACING, 0]} scale={0.83}>
-      <Figure signals={signals} />
-    </group>
-  );
-  const body = (
-    <group position={[SPOT.x, 1.2, SPOT.z]} rotation={[0, FACING, 0]} scale={0.83}>
-      <Figure signals={signals} headless />
-    </group>
-  );
-
   return (
-    <Canvas dpr={[1, 1.25]} camera={{ position: [0, 1.5, 1.7], fov: 40, near: 0.05, far: 30 }} gl={{ antialias: true, powerPreference: "high-performance" }}>
+    <Canvas
+      dpr={[1, 1.25]}
+      camera={{ position: [0, 1.5, 1.7], fov: 40, near: 0.05, far: 30 }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+    >
       <color attach="background" args={["#0a0b0a"]} />
       <fog attach="fog" args={["#0a0b0a", 8, 14]} />
       <ambientLight intensity={0.3} />
@@ -320,19 +240,15 @@ export default function Stage3D({
       <directionalLight position={[3, 2.5, -5]} color="#d4ff3a" intensity={0.9} />
       <pointLight position={[0, 0.15, -1.5]} color="#d4ff3a" intensity={1.4} distance={5} decay={1.8} />
       <directionalLight position={[2, 3, 3]} color="#f2f3ee" intensity={0.9} />
-      <Rig signals={signals} usesModel={hasModel} />
+      <Rig />
+      {/* salle, captures et présentateur arrivent ensemble, jamais à moitié */}
       <Suspense fallback={null}>
         <Room view={view} projectIndex={projectIndex} />
+        <group position={SPOT.toArray()} rotation={[0, FACING, 0]}>
+          <PresenterModel signals={signals} />
+        </group>
+        <Ready onReady={onReady} />
       </Suspense>
-      {hasModel ? (
-        <Fallback fallback={silhouette}>
-          <Suspense fallback={silhouette}>
-            <PresenterAuto signals={signals} silhouette={body} />
-          </Suspense>
-        </Fallback>
-      ) : (
-        silhouette
-      )}
     </Canvas>
   );
 }

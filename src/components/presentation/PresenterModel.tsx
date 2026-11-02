@@ -7,7 +7,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import type { PresenterSignals } from "@/components/presentation/signals";
 
-// Présentateur — phase 2 : le personnage modélisé dans Blender
+// Le présentateur : Rhamone en 3D, modélisé dans Blender
 // (public/presenter/presenter.glb, voir docs/prompt-blender-presentateur.md).
 // Noms attendus : os `head`, formes `mouthOpen` / `blink` / `mouthSmile`,
 // actions `idle`, `talk`, `point`, `wave`.
@@ -16,17 +16,7 @@ export const PRESENTER_URL = "/presenter/presenter.glb";
 
 const lerp = THREE.MathUtils.lerp;
 
-export function PresenterModel({
-  signals,
-  inRoom = false,
-  fallback = null,
-}: {
-  signals: React.MutableRefObject<PresenterSignals>;
-  /** Affiché si le fichier n'a pas de squelette (buste statique). */
-  fallback?: React.ReactNode;
-  /** Placé dans la salle : la scène gère la caméra elle-même. */
-  inRoom?: boolean;
-}) {
+export function PresenterModel({ signals }: { signals: React.MutableRefObject<PresenterSignals> }) {
   const gltf = useLoader(GLTFLoader, PRESENTER_URL, (loader) => {
     const draco = new DRACOLoader();
     draco.setDecoderPath("/draco/");
@@ -61,19 +51,7 @@ export function PresenterModel({
     };
   }, [gltf]);
 
-  // Cadrage buste, de face ; le personnage regarde la caméra (+Z).
   useEffect(() => {
-    // pas de cadrage pour un buste statique : la silhouette garde sa caméra
-    if (!inRoom && (rig.faces.length > 0 || gltf.animations.length > 0)) {
-      const cam = camera as THREE.PerspectiveCamera;
-      const box = new THREE.Box3().setFromObject(gltf.scene);
-      const h = box.max.y - box.min.y || 1.75;
-      cam.position.set(0, h * 0.8, h * 1.35);
-      cam.fov = 30;
-      cam.lookAt(0, h * 0.78, 0);
-      cam.updateProjectionMatrix();
-    }
-
     const { idle, talk, point } = rig;
     idle?.play();
     if (talk) {
@@ -87,7 +65,7 @@ export function PresenterModel({
     return () => {
       rig.mixer.stopAllAction();
     };
-  }, [camera, gltf, rig, inRoom]);
+  }, [rig]);
 
   const state = useRef({ talk: 0, pointing: false, blinkNext: 2.5, blinkUntil: 0 });
   const tmp = useMemo(() => new THREE.Vector3(), []);
@@ -142,7 +120,5 @@ export function PresenterModel({
     }
   });
 
-  const rigged = rig.faces.length > 0 || gltf.animations.length > 0;
-  if (!rigged) return <>{fallback}</>;
   return <primitive object={gltf.scene} />;
 }

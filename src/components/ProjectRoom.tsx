@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/data/projects";
 import dynamic from "next/dynamic";
-import { ProjectScreen, ScreenContent } from "@/components/ProjectScreen";
+import { ProjectScreen } from "@/components/ProjectScreen";
 import type { RoomDrive } from "@/components/Room3D";
 import { presentations } from "@/data/presentations";
 import { Presentation } from "@/components/presentation/Presentation";
@@ -16,48 +16,30 @@ import { ui, type Lang } from "@/i18n";
 // La salle 3D (modèle Blender, WebGL) n'est chargée qu'à l'approche de la section.
 const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
 
-// Scène B — salle d'écrans. Le visiteur est au centre d'un cylindre :
-// chaque écran est courbé (découpé en fines bandes posées sur l'anneau)
-// et la molette fait tourner le cercle autour de lui, projet par projet.
-// Mobile ou mouvement réduit : carrousel horizontal plat (voir globals.css).
+// Scène B — salle d'écrans (modèle Blender, WebGL) : le visiteur est au
+// centre, la molette fait tourner les écrans autour de lui, projet par projet.
+// Mobile, mouvement réduit ou pas de WebGL : carrousel plat (voir globals.css).
 
-const SCREEN_DEG = 60; // largeur d'un écran sur l'anneau : grand arc = écran large et bien courbé
-const STEP = 66; // écart entre deux écrans
-const STRIPS = 22; // bandes par écran : plus il y en a, plus la courbe est douce
-const RATIO = 0.6; // hauteur / largeur maximale d'un écran
-const rad = (d: number) => (d * Math.PI) / 180;
 const pad = (n: number) => String(n).padStart(2, "0");
-
-// Rayon de l'anneau selon la largeur de la fenêtre ; la hauteur des écrans
-// suit la place libre entre le titre et la légende, sans les chevaucher.
-function geometryFor(w: number, stageH: number) {
-  const radius = Math.round(Math.min(Math.max(w * 0.56, 420), 1000));
-  const width = 2 * radius * Math.tan(rad(SCREEN_DEG / STRIPS) / 2) * STRIPS;
-  const height = Math.round(Math.min(width * RATIO, stageH * 0.82));
-  return { radius, height };
-}
 
 export function ProjectRoom({ lang }: { lang: Lang }) {
   const t = ui[lang];
   const section = useRef<HTMLElement>(null);
-  const cylinder = useRef<HTMLDivElement>(null);
   const flat = useRef<(HTMLLIElement | null)[]>([]);
   const trigger = useRef<ScrollTrigger | null>(null);
   const stage3d = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
-  // Salle 3D affichée (desktop, mouvement normal) : la liste plate n'est
-  // alors lue que par les lecteurs d'écran et ne doit pas prendre le focus.
+  // Desktop et mouvement normal : la liste plate n'est alors lue que par
+  // les lecteurs d'écran et ne doit pas prendre le focus.
   const [is3d, setIs3d] = useState(false);
-  // Les bandes des écrans ne sont construites qu'à l'approche de la salle,
-  // pour ne pas alourdir le chargement de la page.
+  // La salle 3D n'est chargée qu'à l'approche de la section.
   const [near, setNear] = useState(false);
   // Salle visible à l'écran : sinon la scène 3D arrête de se dessiner.
   const [onScreen, setOnScreen] = useState(false);
-  const placeRef = useRef<((a: number) => void) | null>(null);
-  // WebGL disponible : la salle Blender remplace le cylindre en bandes CSS.
-  const [webgl, setWebgl] = useState(false);
+  // WebGL indisponible (rare) : carrousel plat, même sur desktop.
+  const [webgl, setWebgl] = useState(true);
   // Bande de la scène 3D (fractions de la section) : entre le titre et la
   // légende, pour qu'aucun trait ni cadre ne passe derrière le texte.
   const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55 });
@@ -94,25 +76,19 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   }, []);
 
   useEffect(() => {
-    const st = trigger.current;
-    if (near && st) placeRef.current?.(st.progress * (projects.length - 1));
-    // le présentateur (2,6 Mo) se charge pendant qu'on regarde la salle,
-    // pour que la présentation s'ouvre sans à-coup
-    if (near && webgl) {
-      const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1200));
-      idle(() => {
-        fetch("/presenter/presenter.glb", { priority: "low" } as RequestInit).catch(() => {});
-      });
-    }
-  }, [near, webgl]);
-  const [{ radius, height: screenH }, setGeo] = useState({ radius: 800, height: 420 });
-  const radiusRef = useRef(800);
+    // Pendant qu'on regarde la salle, la scène de présentation (salle,
+    // présentateur, captures) se prépare : elle s'ouvre ensuite sans attente.
+    if (!near || !webgl || !is3d) return;
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 800));
+    const id = idle(() => {
+      import("@/components/presentation/Stage3D").then((m) => m.preloadStage(Object.fromEntries(projects.map((p, i) => [p.slug, images[i]])))).catch(() => {});
+    });
+    return () => (window.cancelIdleCallback ?? window.clearTimeout)(id);
+  }, [near, webgl, is3d]);
   const n = projects.length;
 
   useEffect(() => {
     const onResize = () => {
-      const stageH = stage3d.current?.clientHeight || window.innerHeight * 0.55;
-      const geo = geometryFor(window.innerWidth, stageH);
       // Bande libre pour l'écran de la salle 3D (fractions de la section).
       const sec = section.current?.getBoundingClientRect();
       const st = stage3d.current?.getBoundingClientRect();
@@ -125,8 +101,6 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         // bande de l'écran exprimée en fractions de la scène 3D
         drive.current.band = { top: (top + 0.02 - ctop) / h, bottom: (bottom - 0.03 - ctop) / h };
       }
-      radiusRef.current = geo.radius;
-      setGeo(geo);
     };
     onResize();
     const ro = new ResizeObserver(onResize);
@@ -139,6 +113,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   }, []);
 
   useEffect(() => {
+    if (!webgl) return;
     gsap.registerPlugin(ScrollTrigger);
     const mm = gsap.matchMedia();
 
@@ -173,22 +148,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       });
       const place = (a: number) => {
         drive.current.a = a;
-        if (cylinder.current) gsap.set(cylinder.current, { z: radiusRef.current, rotationY: a * STEP });
-        gsap.utils.toArray<HTMLElement>(".cyl-screen", cylinder.current).forEach((el, i) => {
-          const ad = Math.abs(i - a);
-          const hidden = ad * STEP > 110;
-          const strips = el.children;
-          if (!strips.length) return;
-          gsap.set(strips, {
-            opacity: hidden ? 0 : 1 - Math.min(ad, 1.5) * 0.4,
-            visibility: hidden ? "hidden" : "visible",
-          });
-        });
         setActive(Math.round(a));
       };
-
-      placeRef.current = place;
-      place(0);
       const st = ScrollTrigger.create({
         trigger: section.current,
         pin: true,
@@ -207,17 +168,12 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       trigger.current = st;
       return () => {
         trigger.current = null;
-        placeRef.current = null;
         setIs3d(false);
       };
     });
 
     return () => mm.revert();
-  }, [n]);
-
-  useEffect(() => {
-    if (trigger.current && cylinder.current) gsap.set(cylinder.current, { z: radius });
-  }, [radius]);
+  }, [n, webgl]);
 
   const goTo = (i: number) => {
     const target = Math.max(0, Math.min(n - 1, i));
@@ -237,14 +193,10 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     lastFocus.current = document.activeElement as HTMLElement;
     lockScroll(true);
     if (trigger.current) {
-      const tl = gsap.timeline({ onComplete: () => setOpen(p.slug) });
-      if (cylinder.current) {
-        tl.to(cylinder.current, { z: radiusRef.current * 1.85, duration: 0.8, ease: "power3.in" }, 0)
-          .to(stage3d.current, { filter: "blur(6px)", duration: 0.8, ease: "power2.in" }, 0);
-      } else {
-        tl.to(drive.current, { tunnel: 1, duration: 0.8, ease: "power3.in" }, 0)
-          .to(section.current!.querySelectorAll(".room-text"), { opacity: 0, duration: 0.3 }, 0);
-      }
+      gsap
+        .timeline({ onComplete: () => setOpen(p.slug) })
+        .to(drive.current, { tunnel: 1, duration: 0.8, ease: "power3.in" }, 0)
+        .to(section.current!.querySelectorAll(".room-text"), { opacity: 0, duration: 0.3 }, 0);
     } else setOpen(p.slug);
   };
 
@@ -252,13 +204,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     setOpen(null);
     lockScroll(false);
     if (trigger.current) {
-      if (cylinder.current) {
-        gsap.to(cylinder.current, { z: radiusRef.current, duration: 0.6, ease: "power3.out" });
-        gsap.to(stage3d.current, { filter: "blur(0px)", duration: 0.6, clearProps: "filter" });
-      } else {
-        gsap.to(drive.current, { tunnel: 0, duration: 0.6, ease: "power3.out" });
-        gsap.to(section.current!.querySelectorAll(".room-text"), { opacity: 1, duration: 0.4, delay: 0.3 });
-      }
+      gsap.to(drive.current, { tunnel: 0, duration: 0.6, ease: "power3.out" });
+      gsap.to(section.current!.querySelectorAll(".room-text"), { opacity: 1, duration: 0.4, delay: 0.3 });
     }
     lastFocus.current?.focus();
   };
@@ -282,10 +229,6 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     }
   };
 
-  // Géométrie d'une bande : largeur de corde, plus 1 px pour cacher les jointures.
-  const stripDeg = SCREEN_DEG / STRIPS;
-  const stripW = 2 * radius * Math.tan(rad(stripDeg) / 2);
-  const screenW = stripW * STRIPS;
   const current = projects[active];
 
   return (
@@ -297,29 +240,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       aria-describedby="aide-projets"
       tabIndex={0}
       onKeyDown={onKeyDown}
-      className="room relative flex h-[100svh] flex-col overflow-hidden pt-20"
+      className={`room relative flex h-[100svh] flex-col overflow-hidden pt-20 ${webgl ? "" : "is-flat"}`}
     >
-      {!webgl && (
-        <>
-      {/* lumière lime qui monte du sol + anneaux */}
-      <div
-        aria-hidden
-        className="room-3d pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-[radial-gradient(ellipse_at_50%_100%,rgba(212,255,58,0.18),transparent_65%)]"
-      />
-      <div aria-hidden className="room-3d pointer-events-none absolute inset-x-0 bottom-[-34vh] flex justify-center [perspective:900px]">
-        <div className="relative h-[62vh] w-[150vw] [transform:rotateX(78deg)]">
-          {[100, 74, 48].map((s) => (
-            <div
-              key={s}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-lime/25"
-              style={{ width: `${s}%`, height: `${s}%` }}
-            />
-          ))}
-        </div>
-      </div>
-        </>
-      )}
-
       <div className="room-text wrap relative z-10 md:text-center">
         <p className="eyebrow">{t.projectsEyebrow}</p>
         <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
@@ -336,8 +258,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         </p>
       </div>
 
-      {/* ===== cylindre (desktop) ===== */}
-      {/* ===== salle Blender (desktop, WebGL) : toute la section, derrière le texte ===== */}
+      {/* ===== salle Blender (desktop, WebGL), entre le titre et la légende ===== */}
       {webgl && is3d && near && (
         <div
           aria-hidden
@@ -353,49 +274,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         </div>
       )}
 
-      <div
-        ref={stage3d}
-        aria-hidden
-        className={`room-3d relative flex-1 ${webgl ? "pointer-events-none" : ""}`}
-        style={{ perspective: `${radius}px` }}
-      >
-        {!webgl && (
-        <div
-          ref={cylinder}
-          className="absolute left-1/2 top-1/2 h-0 w-0 [transform-style:preserve-3d]"
-        >
-          {projects.map((p, i) => (
-            <div key={p.slug} className="cyl-screen [transform-style:preserve-3d]" onClick={() => (i === active ? launch(i) : goTo(i))}>
-              {near && Array.from({ length: STRIPS }).map((_, j) => {
-                const angle = -(i * STEP + (j - (STRIPS - 1) / 2) * stripDeg);
-                const first = j === 0;
-                const last = j === STRIPS - 1;
-                return (
-                  <div
-                    key={j}
-                    className="absolute cursor-pointer overflow-hidden border-y border-lime/60 [backface-visibility:hidden]"
-                    style={{
-                      width: stripW + 2,
-                      height: screenH,
-                      left: -stripW / 2,
-                      top: -screenH / 2,
-                      transform: `rotateY(${angle}deg) translateZ(${-radius}px)`,
-                      borderLeft: first ? "1px solid rgba(212,255,58,0.6)" : undefined,
-                      borderRight: last ? "1px solid rgba(212,255,58,0.6)" : undefined,
-                      borderRadius: first ? "14px 0 0 14px" : last ? "0 14px 14px 0" : undefined,
-                    }}
-                  >
-                    <div className="absolute top-0" style={{ left: -j * stripW, width: screenW, height: screenH }}>
-                      <ScreenContent project={p} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-        )}
-      </div>
+      {/* place réservée à la salle : sert à mesurer la bande libre */}
+      <div ref={stage3d} aria-hidden className="room-3d pointer-events-none relative flex-1" />
 
       {/* légende de l'écran de face (desktop) */}
       <div className="room-3d room-text room-caption wrap relative z-10 pb-10 text-center" aria-live="polite">
@@ -439,7 +319,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
             <h3 className="mt-1 text-[24px] font-bold tracking-tight">{p.name}</h3>
             <p className="mt-1 text-muted">{p.pitch[lang]}</p>
             {presentations[p.slug] && (
-              <button type="button" className="btn btn-lime mt-4" tabIndex={is3d ? -1 : undefined} onClick={() => launch(i)}>
+              <button type="button" className="btn btn-lime mt-4" tabIndex={is3d && webgl ? -1 : undefined} onClick={() => launch(i)}>
                 {t.launch}
               </button>
             )}

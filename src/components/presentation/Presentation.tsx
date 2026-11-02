@@ -8,12 +8,13 @@ import type { Lang, Presentation as Pres } from "@/data/presentations";
 import { ScreenContent } from "@/components/ProjectScreen";
 import { MOUTH_Y, type PresenterSignals } from "@/components/presentation/signals";
 
-// La 3D n'est chargée qu'à l'ouverture d'une présentation.
-const Presenter = dynamic(() => import("@/components/presentation/Presenter"), { ssr: false });
-// Desktop : une seule pièce (salle Blender + diapo sur l'écran + présentateur).
+// Desktop : une seule pièce en 3D (salle Blender + diapo sur l'écran + présentateur).
+// Mobile : la diapo seule (capture, titre, texte), sans 3D.
 const Stage3D = dynamic(() => import("@/components/presentation/Stage3D"), { ssr: false });
 
 const SLIDE_S = 10; // durée d'une diapo, en secondes
+/** Pistes présentes dans public/voix (ex. "kelthen-fr"). Vide tant que la voix n'est pas générée. */
+const VOICES: string[] = [];
 const pad = (n: number) => String(n).padStart(2, "0");
 
 const ui = {
@@ -68,8 +69,11 @@ export function Presentation({
   const [muted, setMuted] = useState(true);
   const [hasVoice, setHasVoice] = useState(false);
   const [progress, setProgress] = useState(0);
+  // En 3D, la lecture attend que la salle et le présentateur soient prêts.
+  const [ready, setReady] = useState(!scene3d);
+  const onReady = useCallback(() => setReady(true), []);
   const playingRef = useRef(playing);
-  playingRef.current = playing;
+  playingRef.current = playing && ready;
   signals.current.still = reduced;
 
   const slide = slides[idx];
@@ -79,25 +83,20 @@ export function Presentation({
   // Entrée : la caméra sort du tunnel ; focus sur « Quitter ».
   useEffect(() => {
     closeBtn.current?.focus();
-    if (!reduced) gsap.fromTo(root.current, { opacity: 0, scale: 1.08, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "power2.out", clearProps: "filter,scale" });
+    if (!reduced) gsap.fromTo(root.current, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" });
   }, [reduced]);
 
-  // Voix : /public/voix/<projet>-<langue>.mp3, si le fichier existe.
+  // Voix : /public/voix/<projet>-<langue>.mp3, quand elle est listée dans VOICES.
   useEffect(() => {
-    const src = `/voix/${project.slug}-${lang}.mp3`;
-    let cancelled = false;
+    const name = `${project.slug}-${lang}`;
     setHasVoice(false);
-    fetch(src, { method: "HEAD" })
-      .then((r) => {
-        if (cancelled || !r.ok || !(r.headers.get("content-type") ?? "").includes("audio")) return;
-        const el = new Audio(src);
-        el.preload = "auto";
-        audio.current = el;
-        setHasVoice(true);
-      })
-      .catch(() => {});
+    if (VOICES.includes(name)) {
+      const el = new Audio(`/voix/${name}.mp3`);
+      el.preload = "auto";
+      audio.current = el;
+      setHasVoice(true);
+    }
     return () => {
-      cancelled = true;
       audio.current?.pause();
       audio.current = null;
       analyser.current = null;
@@ -158,7 +157,7 @@ export function Presentation({
     const ctx = gsap.context(() => {
       gsap.fromTo(".slide-card", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: reduced ? 0 : 0.5, ease: "power2.out" });
 
-      const box = presenterBox.current!.getBoundingClientRect();
+      const box = (presenterBox.current ?? stage.current!).getBoundingClientRect();
       const mouthX = box.left + box.width * (signals.current.mouthX ?? 0.5);
       const mouthY = box.top + box.height * (signals.current.mouthY ?? MOUTH_Y);
       const words = gsap.utils.toArray<HTMLElement>(".sub-word");
@@ -173,17 +172,15 @@ export function Presentation({
         },
       });
 
-      if (reduced) {
+      if (reduced || !scene3d) {
         timeline.set(words, { opacity: 1 }, 0);
       } else {
         timeline.set(words, { opacity: 0.12 }, 0);
         pills.forEach((pill, i) => {
           // en 3D, ils tombent au-dessus du présentateur, jamais sur la diapo
-          const startX = scene3d
-            ? mouthX + 50 + Math.random() * 110
-            : box.left + box.width * (0.15 + Math.random() * 0.7) - pill.offsetWidth / 2;
+          const startX = mouthX + 50 + Math.random() * 110;
           timeline
-            .fromTo(pill, { x: startX, y: box.top + (scene3d ? 12 : -30), opacity: 0, scale: 1 }, { y: box.top + box.height * 0.12, opacity: 1, duration: 0.45, ease: "power2.out" }, 0.3 + i * 0.6)
+            .fromTo(pill, { x: startX, y: box.top + 12, opacity: 0, scale: 1 }, { y: box.top + box.height * 0.12, opacity: 1, duration: 0.45, ease: "power2.out" }, 0.3 + i * 0.6)
             .to(pill, { x: mouthX - pill.offsetWidth / 2, y: mouthY - pill.offsetHeight / 2, scale: 0.15, opacity: 0, duration: 0.9, ease: "power2.in" }, ">");
         });
         timeline.call(() => { signals.current.pointing = true; }, [], 1.1);
@@ -209,16 +206,16 @@ export function Presentation({
     };
   }, [idx, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Pause / lecture.
+  // Pause / lecture (et départ dès que la scène 3D est prête).
   useEffect(() => {
-    if (playing) {
+    if (playing && ready) {
       tl.current?.play();
       if (audio.current && !muted) audio.current.play().catch(() => {});
     } else {
       tl.current?.pause();
       audio.current?.pause();
     }
-  }, [playing]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playing, ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = useCallback((i: number) => setIdx(Math.max(0, Math.min(slides.length - 1, i))), [slides.length]);
 
@@ -291,16 +288,24 @@ export function Presentation({
         className={
           scene3d
             ? "relative z-10 flex min-h-0 flex-1 flex-col"
-            : "relative z-10 grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-2 md:gap-4 px-5 md:grid-cols-[minmax(0,65fr)_minmax(0,35fr)] md:grid-rows-1 md:px-8"
+            : "relative z-10 flex min-h-0 flex-1 flex-col px-5 md:px-8"
         }
       >
         {scene3d && (
           <div ref={presenterBox} className="relative min-h-0 flex-1" aria-hidden>
-            <Stage3D
-              signals={signals}
-              projectIndex={projectIndex}
-              view={{ slide, lang, index: idx, images: slide.shots ?? [project.image ?? `/projets/${project.slug}/dessin.svg`] }}
-            />
+            {!ready && (
+              <div className="absolute inset-0 grid place-items-center">
+                <span className="h-10 w-10 animate-spin rounded-full border-2 border-lime/20 border-t-lime" />
+              </div>
+            )}
+            <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}>
+              <Stage3D
+                signals={signals}
+                projectIndex={projectIndex}
+                onReady={onReady}
+                view={{ slide, lang, index: idx, images: slide.shots ?? [project.image ?? `/projets/${project.slug}/dessin.svg`] }}
+              />
+            </div>
           </div>
         )}
         <div className={scene3d ? "relative z-10 flex flex-col items-center px-8" : "flex min-w-0 flex-col md:min-h-0"}>
@@ -310,13 +315,14 @@ export function Presentation({
               {pad(idx + 1)} · {slide.kind[lang]}
             </p>
             <h2 className="display mt-3 text-[clamp(30px,4vw,58px)]">{slide.title[lang]}</h2>
-            <div className="mt-5 grid min-h-0 flex-1 gap-6 lg:grid-cols-[1fr_1.1fr]">
-              <ul className="space-y-3 text-[clamp(16px,1.5vw,20px)] text-ink/85">
+            <div className="mt-5 flex min-h-0 flex-1">
+              {/* le détail est dit en sous-titres : à l'écran, la capture seule */}
+              <ul className="sr-only">
                 {slide.lines[lang].map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="relative order-first min-h-[180px] overflow-hidden rounded-2xl border border-glass-line bg-black/30 lg:order-none">
+              <div className="relative min-h-[180px] flex-1 overflow-hidden rounded-2xl border border-glass-line bg-black/30">
                 {slide.shots ? (
                   <div className="flex h-full gap-3 p-2">
                     {slide.shots.map((src) => (
@@ -351,9 +357,7 @@ export function Presentation({
           </article>
           {/* sous-titres */}
           <p
-            className={`mx-auto mt-4 min-h-[3.2em] max-w-[820px] text-center text-[clamp(16px,1.6vw,21px)] leading-snug ${
-              ""
-            }`}
+            className="mx-auto mt-4 min-h-[3.2em] max-w-[820px] text-center text-[clamp(16px,1.6vw,21px)] leading-snug"
           >
             {slide.speech[lang].split(" ").map((w, i) => (
               <span key={`${idx}-${lang}-${i}`} className="sub-word">
@@ -363,18 +367,13 @@ export function Presentation({
           </p>
         </div>
 
-        {!scene3d && (
-          <div ref={presenterBox} className="relative min-h-[26svh] md:h-auto" aria-hidden>
-            <Presenter signals={signals} />
-          </div>
-        )}
-
         {/* mots-clés qui tombent vers la bouche du présentateur */}
+        {scene3d && !reduced && (
         <div aria-hidden className="pointer-events-none fixed inset-0 z-20">
           {slide.keywords[lang].map((k, i) => (
             <span
               key={`${idx}-${lang}-${k}`}
-              className={`kw-pill glass absolute left-0 top-0 whitespace-nowrap rounded-full px-3 py-1.5 font-mono text-[13px] text-lime ${reduced ? "hidden" : ""}`}
+              className="kw-pill absolute left-0 top-0 whitespace-nowrap rounded-full border border-lime/30 bg-[#11140d] px-3 py-1.5 font-mono text-[13px] text-lime will-change-transform"
               style={{ opacity: 0 }}
               data-i={i}
             >
@@ -382,6 +381,7 @@ export function Presentation({
             </span>
           ))}
         </div>
+        )}
       </div>
 
       {/* progression (6 segments) + commandes */}
