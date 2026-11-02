@@ -1,4 +1,4 @@
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { site, siteCopy } from "@/data/site";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ui, type Lang } from "@/i18n";
@@ -15,6 +15,15 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-jetbrains",
+  display: "swap",
+});
+
+// Serif italique : seulement quelques mots ou expressions (une graisse, un style).
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
+  variable: "--font-instrument",
   display: "swap",
 });
 
@@ -40,7 +49,7 @@ export function RootShell({ lang, children }: { lang: Lang; children: React.Reac
   };
 
   return (
-    <html lang={lang} suppressHydrationWarning className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang={lang} suppressHydrationWarning className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}>
       <body>
         {/* classe « js » posée avant l'affichage : l'intro peut cacher le nom sans flash */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />

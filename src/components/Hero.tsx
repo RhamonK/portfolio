@@ -1,35 +1,35 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site, siteCopy } from "@/data/site";
 import { ui, type Lang } from "@/i18n";
+import { InfinityCore, type InfinityCoreHandle } from "@/components/core/InfinityCore";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Scène A — l'entrée. Au chargement : un trait lime traverse l'écran,
-// les lettres du nom jaillissent en 3D, les rôles se « décodent »,
-// les feuilles de CV arrivent du fond. En descendant : les lettres
-// explosent et les feuilles passent derrière la caméra, comme si on
-// traversait la page pour entrer dans la salle des projets.
+// Scène A — l'entrée, INFINITE — R.N.
+// Deux zones qui ne se chevauchent jamais : le noyau (en haut sur mobile, à droite
+// sur desktop) et le texte. Tout le contenu est dans le HTML dès le chargement.
+//
+// Intro (une fois par session, 3,7 s, « Passer » disponible tout de suite) :
+//   0,0–0,6 s  le noyau apparaît
+//   0,5–1,8 s  le filament trace la signature RN
+//   1,6–2,9 s  le nom jaillit lettre par lettre, les rôles se décodent
+//   2,6–3,7 s  « Infinite — R.N. », boutons, indice
+// Défiler, toucher l'écran ou appuyer sur une touche termine l'intro aussitôt.
 
-const sheets = [
-  { x: -150, y: 30, r: -9 },
-  { x: 140, y: 10, r: 7 },
-  { x: -20, y: -10, r: -2 },
-];
-
+const INTRO_KEY = "rn-intro-vue";
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/<>_";
 
 /** Texte qui se décode lettre par lettre, de gauche à droite. */
-function scramble(el: HTMLElement, duration: number, delay: number) {
+function scramble(el: HTMLElement, duration: number) {
   const final = el.dataset.text ?? el.textContent ?? "";
   const state = { p: 0 };
   return gsap.to(state, {
     p: 1,
     duration,
-    delay,
     ease: "none",
     onStart: () => {
       el.style.visibility = "visible";
@@ -52,156 +52,139 @@ export function Hero({ lang }: { lang: Lang }) {
   const t = ui[lang];
   const copy = siteCopy[lang];
   const root = useRef<HTMLElement>(null);
-  const tilt = useRef<HTMLDivElement>(null);
-  const top = useRef<HTMLDivElement>(null);
+  const core = useRef<InfinityCoreHandle>(null);
+  const finishRef = useRef<() => void>(() => {});
+  const [intro, setIntro] = useState(false);
+  const [tracing, setTracing] = useState(false);
   const words = site.name.split(" ");
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(INTRO_KEY) === "1";
+    } catch {
+      /* stockage indisponible : on joue l'intro */
+    }
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+    const ctx = gsap.context(() => {
+      if (reduced || seen) {
+        gsap.set(".intro-hide", { visibility: "visible" });
+        core.current?.setDraw(1);
+      } else {
+        try {
+          sessionStorage.setItem(INTRO_KEY, "1");
+        } catch {
+          /* rien */
+        }
+        setIntro(true);
+        setTracing(true);
+        core.current?.setDraw(0);
+
         const letters = gsap.utils.toArray<HTMLElement>(".h-letter");
         const roles = gsap.utils.toArray<HTMLElement>(".h-role");
-
-        // ---------- entrée ----------
-        const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
-        intro
-          .set(".intro-hide", { visibility: "visible" })
-          .fromTo(".h-scan", { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.7, ease: "power4.inOut" })
-          .to(".h-scan", { scaleY: 40, opacity: 0, duration: 0.5, ease: "power2.in" })
+        const trace = { d: 0 };
+        const tl = gsap.timeline({
+          defaults: { ease: "expo.out" },
+          onComplete: () => finishRef.current(),
+        });
+        tl.fromTo(".h-core", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0)
+          .to(trace, { d: 1, duration: 1.3, ease: "power2.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.5)
+          .add(() => setTracing(false), 1.8)
+          .set(".intro-hide", { visibility: "visible" }, 1.6)
           .from(
             letters,
             {
-              yPercent: 120,
-              rotateX: -95,
-              z: -200,
+              yPercent: 110,
+              rotateX: -90,
               opacity: 0,
-              filter: "blur(14px)",
-              duration: 1.3,
-              stagger: { each: 0.045, from: "center" },
+              filter: "blur(10px)",
+              duration: 1.0,
+              stagger: { each: 0.035, from: "start" },
               clearProps: "filter",
             },
-            "-=0.35",
+            1.6,
           )
-          // petit sursaut « glitch » en lime, puis tout se pose
-          .to(letters, { color: "var(--lime)", skewX: () => gsap.utils.random(-14, 14), duration: 0.06, stagger: { each: 0.012, from: "random" } }, "-=0.55")
-          .to(letters, { color: "", skewX: 0, duration: 0.25, stagger: { each: 0.012, from: "random" }, clearProps: "color,skewX" })
-          .from(".cv-sheet", { z: 900, y: 120, opacity: 0, rotate: 0, filter: "blur(10px)", duration: 1.4, stagger: 0.1, clearProps: "filter" }, "-=1.1")
-          .from(".h-line", { scaleX: 0, duration: 0.9, ease: "power3.inOut" }, "-=1.0")
-          .from(".h-cta > *", { y: 30, opacity: 0, scale: 0.9, duration: 0.8, stagger: 0.08, ease: "back.out(2)" }, "-=0.6")
-          .from(".h-hint", { opacity: 0, y: -10, duration: 0.6 }, "-=0.3");
-        roles.forEach((r, i) => intro.add(scramble(r, 0.9, 0), i === 0 ? "-=1.5" : "-=0.6"));
+          .from(".h-eyebrow", { y: 16, opacity: 0, duration: 0.7 }, 2.6)
+          .from(".h-line", { scaleX: 0, duration: 0.7, ease: "power3.inOut" }, 2.4)
+          .from(".h-cta > *", { y: 24, opacity: 0, scale: 0.94, duration: 0.7, stagger: 0.08, ease: "back.out(2)" }, 2.9)
+          .from(".h-hint", { opacity: 0, y: -8, duration: 0.5 }, 3.2);
+        roles.forEach((r, i) => tl.add(scramble(r, 0.8), 2.0 + i * 0.3));
 
-        // ---------- sortie au défilement ----------
-        const out = gsap.timeline({
-          scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.6 },
-        });
-        out
-          .to(
-            letters,
-            {
-              x: () => gsap.utils.random(-420, 420),
-              y: () => gsap.utils.random(-520, -120),
-              z: () => gsap.utils.random(-300, 500),
-              rotateX: () => gsap.utils.random(-180, 180),
-              rotateZ: () => gsap.utils.random(-120, 120),
-              opacity: 0,
-              ease: "power2.in",
-              stagger: { each: 0.01, from: "edges" },
-            },
-            0,
-          )
-          .to(".cv-sheet", { z: 1100, opacity: 0, ease: "power2.in", stagger: 0.04 }, 0)
-          .to(".h-sub", { y: -80, opacity: 0, filter: "blur(8px)", ease: "power1.in" }, 0)
-          .to(".h-glow", { scale: 2.6, opacity: 0.9, ease: "none" }, 0)
-          .to(".h-hint", { opacity: 0, duration: 0.2 }, 0);
-      });
-
-      // la scène suit la souris : inclinaison 3D + projecteur lime
-      mm.add("(prefers-reduced-motion: no-preference) and (pointer: fine)", () => {
-        const rx = gsap.quickTo(tilt.current, "rotationX", { duration: 0.8, ease: "power3" });
-        const ry = gsap.quickTo(tilt.current, "rotationY", { duration: 0.8, ease: "power3" });
-        const sx = gsap.quickTo(top.current, "rotationY", { duration: 0.6, ease: "power3" });
-        const sy = gsap.quickTo(top.current, "rotationX", { duration: 0.6, ease: "power3" });
-        const el = root.current!;
-        const onMove = (e: PointerEvent) => {
-          const nx = e.clientX / window.innerWidth - 0.5;
-          const ny = e.clientY / window.innerHeight - 0.5;
-          ry(nx * 10);
-          rx(-ny * 8);
-          sx(nx * 18);
-          sy(-ny * 14);
-          el.style.setProperty("--mx", `${e.clientX}px`);
-          el.style.setProperty("--my", `${e.clientY}px`);
+        // fin immédiate : bouton « Passer », défilement, toucher, clavier
+        finishRef.current = () => {
+          if (tl.progress() < 1) tl.progress(1);
+          core.current?.setDraw(1);
+          setTracing(false);
+          setIntro(false);
+          gsap.set(".intro-hide", { visibility: "visible" });
+          events.forEach((ev) => window.removeEventListener(ev, onUser));
         };
-        window.addEventListener("pointermove", onMove);
-        return () => window.removeEventListener("pointermove", onMove);
+        const onUser = () => finishRef.current();
+        const events = ["wheel", "touchstart", "keydown"] as const;
+        events.forEach((ev) => window.addEventListener(ev, onUser, { passive: true, once: true }));
+      }
+
+      // sortie au défilement : le noyau recule, le texte s'éloigne (scroll naturel, sans épinglage)
+      gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+        gsap
+          .timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.5 } })
+          .to(".h-core-inner", { scale: 0.9, opacity: 0.25, yPercent: -8, ease: "none" }, 0)
+          .to(".h-text", { yPercent: -12, opacity: 0.4, ease: "none" }, 0)
+          .to(".h-hint", { opacity: 0, duration: 0.15 }, 0);
       });
     }, root);
-    return () => ctx.revert();
+
+    return () => {
+      finishRef.current = () => {};
+      ctx.revert();
+    };
   }, []);
+
+  const skip = () => {
+    finishRef.current();
+    root.current?.querySelector<HTMLElement>(".h-cta a")?.focus();
+  };
 
   return (
     <section
       ref={root}
       id="accueil"
       aria-labelledby="titre-accueil"
-      className="hero relative flex min-h-[100svh] items-center overflow-hidden pt-16"
+      className="hero relative flex min-h-[100svh] items-center overflow-hidden pt-14 md:pt-16"
     >
-      {/* projecteur qui suit la souris */}
-      <div aria-hidden className="hero-spot pointer-events-none absolute inset-0" />
-      <div
-        aria-hidden
-        className="h-glow pointer-events-none absolute left-1/2 top-1/2 h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime/10 blur-[120px]"
-      />
-      {/* trait de balayage de l'intro */}
-      <div aria-hidden className="h-scan pointer-events-none absolute inset-x-0 top-1/2 h-px origin-center bg-lime opacity-0 shadow-[0_0_24px_4px_rgba(212,255,58,0.6)]" />
-
-      {/* feuilles de CV en verre */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center [perspective:1200px] [transform-style:preserve-3d]">
-        {sheets.map((s, i) => (
-          <div
-            key={i}
-            className="cv-sheet absolute"
-            style={{ transform: `translate(${s.x}px, ${s.y}px) rotate(${s.r}deg)` }}
-          >
-            <div
-              ref={i === sheets.length - 1 ? top : undefined}
-              className="glass w-[min(62vw,360px)] rounded-2xl p-6 opacity-70 [aspect-ratio:1/1.32]"
-            >
-              <div className="h-3 w-1/2 rounded-full bg-lime/50" />
-              <div className="mt-2 h-2 w-1/3 rounded-full bg-white/15" />
-              {[90, 75, 82, 60, 88, 70, 50, 80].map((w, j) => (
-                <div key={j} className="mt-4 h-1.5 rounded-full bg-white/10" style={{ width: `${w}%` }} />
-              ))}
-            </div>
+      <div className="wrap grid w-full items-center gap-4 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-10 md:py-10">
+        {/* ===== noyau ===== */}
+        <div className="h-core md:order-2">
+          <div className="h-core-inner mx-auto w-full max-w-[calc(32svh*4/3)] [@media(max-height:700px)]:max-w-[calc(26svh*4/3)] md:max-w-none md:[@media(max-height:700px)]:max-w-none">
+            <InfinityCore ref={core} tracing={tracing} defer={intro} />
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="wrap relative z-10 text-center [perspective:1000px]">
-        <div ref={tilt} className="[transform-style:preserve-3d]">
+        {/* ===== texte ===== */}
+        <div className="h-text md:order-1">
+          <p className="h-eyebrow eyebrow flex items-baseline gap-2">
+            <span className="font-serif text-[22px] italic leading-none text-ink">Infinite</span>
+            <span aria-hidden className="text-lime">—</span>
+            <span>R.N.</span>
+          </p>
           <h1
             id="titre-accueil"
             aria-label={site.name}
-            className="intro-hide display text-[clamp(52px,11vw,160px)] [text-shadow:0_8px_60px_rgba(10,11,10,0.9)] [transform-style:preserve-3d]"
+            className="intro-hide display mt-3 text-[clamp(46px,13.5vw,64px)] [perspective:900px] md:text-[clamp(64px,7.2vw,124px)]"
           >
             {words.map((w, wi) => (
-              <span key={wi} aria-hidden className="inline-block whitespace-nowrap [transform-style:preserve-3d]">
+              <span key={wi} aria-hidden className="block whitespace-nowrap [transform-style:preserve-3d]">
                 {Array.from(w).map((c, ci) => (
-                  <span key={ci} className="h-letter inline-block [transform-style:preserve-3d]">
+                  <span key={ci} className="h-letter inline-block">
                     {c}
                   </span>
                 ))}
-                {wi < words.length - 1 && <span className="inline-block w-[0.28em]" />}
               </span>
             ))}
           </h1>
-        </div>
-        <div className="h-sub">
-          <div aria-hidden className="h-line mx-auto mt-6 h-px w-40 bg-gradient-to-r from-transparent via-lime to-transparent" />
-          <p className="mx-auto mt-6 max-w-[720px] font-mono text-[clamp(14px,1.6vw,18px)] uppercase tracking-[0.12em] text-ink/80">
+          <div aria-hidden className="h-line mt-5 h-px w-32 origin-left bg-gradient-to-r from-lime to-transparent" />
+          <p className="mt-4 max-w-[560px] font-mono text-[13px] uppercase leading-relaxed tracking-[0.12em] text-ink/80 md:text-[15px]">
             <span className="h-role intro-hide" data-text={copy.role}>
               {copy.role}
             </span>
@@ -210,7 +193,7 @@ export function Hero({ lang }: { lang: Lang }) {
               {copy.position}
             </span>
           </p>
-          <div className="h-cta mt-10 flex flex-wrap justify-center gap-3">
+          <div className="h-cta mt-7 flex flex-wrap gap-3">
             <a href="#projets" className="btn btn-lime">
               {t.seeProjects}
             </a>
@@ -221,12 +204,22 @@ export function Hero({ lang }: { lang: Lang }) {
         </div>
       </div>
 
-      <p className="h-hint eyebrow absolute inset-x-0 bottom-8 flex flex-col items-center gap-3 text-center !text-ink/70">
+      <p className="h-hint eyebrow pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-3 text-center !text-ink/70">
         <span aria-hidden className="scroll-mouse hidden md:block" />
         {/* mobile : pas de molette ni de salle 3D (carrousel plat) */}
         <span className="md:hidden">{t.hintTouch}</span>
         <span className="hidden md:inline">{t.hint}</span>
       </p>
+
+      {intro && (
+        <button
+          type="button"
+          onClick={skip}
+          className="btn btn-glass absolute right-4 top-[calc(3.5rem+12px)] z-20 !min-h-10 !px-4 text-[14px] md:right-6 md:top-[calc(4rem+16px)]"
+        >
+          {t.skipIntro} →
+        </button>
+      )}
     </section>
   );
 }

@@ -8,6 +8,7 @@
     "start": "npx --yes serve@14.2.4 out",
     "lint": "next lint",
     "art": "tsx --tsconfig scripts/tsconfig.json scripts/export-art.tsx",
+    "core": "node scripts/render-core.mjs",
     "check": "node scripts/check-palette.mjs && tsc --noEmit && next build"
   },
   "dependencies": {
