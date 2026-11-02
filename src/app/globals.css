@@ -41,6 +41,8 @@
 
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  /* serif italique : réservée à quelques mots ou expressions */
+  --font-serif: var(--font-instrument), Georgia, serif;
 }
 
 @layer base {
@@ -207,8 +209,32 @@
 @media (prefers-reduced-motion: reduce) {
   .js .intro-hide { visibility: visible; animation: none; }
 }
-.hero-spot {
-  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 45%), rgba(212, 255, 58, 0.09), transparent 60%);
+/* INFINITY CORE, niveau léger : impulsion de lumière qui parcourt le trait de l'image fixe
+   (même vitesse que la 3D : un tour en 9 s). */
+.core-pulse path {
+  fill: none;
+  stroke: color-mix(in srgb, #ffffff 55%, var(--lime));
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 0.07 0.93;
+  filter: drop-shadow(0 0 6px var(--lime));
+  animation: core-pulse 9s linear infinite;
+}
+.core-trace path {
+  fill: none;
+  stroke: var(--lime);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  filter: drop-shadow(0 0 5px var(--lime)) drop-shadow(0 0 14px rgba(212, 255, 58, 0.45));
+}
+@keyframes core-pulse {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+/* Écran de téléphone peu haut : l'indice de défilement laisse la place aux boutons. */
+@media (max-width: 767px) and (max-height: 760px) {
+  .h-hint { display: none !important; }
 }
 .h-letter {
   transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
