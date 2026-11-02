@@ -9,6 +9,13 @@ import type { Lang } from "@/i18n";
 
 type T = Record<Lang, string>;
 
+/** Besoins couverts, tirés des descriptions réelles (filtre de la section Projets). */
+export type Tag = "web" | "mobile" | "automation" | "ai" | "3d";
+export const TAGS: Tag[] = ["web", "mobile", "automation", "ai", "3d"];
+
+/** Un vrai écran du projet (public/projets/<slug>/…), avec ce qu'on y voit. */
+export type Shot = { src: string; label: T };
+
 export type Project = {
   slug: string;
   name: string;
@@ -25,7 +32,15 @@ export type Project = {
   image?: string;
   /** Cadrage de la capture (CSS object-position) ; par défaut en haut à gauche. */
   imagePosition?: string;
+  tags: Tag[];
+  /** Vrais écrans, dans l'ordre d'un parcours ; vide = rien à montrer de plus. */
+  gallery: Shot[];
 };
+
+const shot = (slug: string, file: string, fr: string, en: string): Shot => ({
+  src: `/projets/${slug}/${file}.webp`,
+  label: { fr, en },
+});
 
 export const projects: Project[] = [
   {
@@ -44,6 +59,8 @@ export const projects: Project[] = [
     hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
     image: "/projets/mamashop/connexion.webp",
     imagePosition: "center",
+    tags: ["mobile"],
+    gallery: [shot("mamashop", "connexion", "Écran de connexion", "Sign-in screen")],
   },
   {
     slug: "abo",
@@ -58,6 +75,8 @@ export const projects: Project[] = [
     },
     tech: "Next.js, PostgreSQL",
     href: null,
+    tags: ["web"],
+    gallery: [],
   },
   {
     slug: "studio-nala",
@@ -73,6 +92,15 @@ export const projects: Project[] = [
     tech: "Next.js, Supabase, n8n",
     href: null,
     image: "/projets/studio-nala/reservation.webp",
+    tags: ["web", "automation", "ai"],
+    gallery: [
+      shot("studio-nala", "slides/site", "Page d'accueil du salon", "Salon home page"),
+      shot("studio-nala", "slides/styles", "Les styles de tresses", "Braiding styles"),
+      shot("studio-nala", "slides/services", "Choix de la prestation", "Choosing a service"),
+      shot("studio-nala", "slides/date", "Choix de la date", "Choosing a date"),
+      shot("studio-nala", "slides/creneau", "Choix du créneau", "Choosing a time slot"),
+      shot("studio-nala", "slides/coordonnees", "Coordonnées et photo de référence", "Contact details and reference photo"),
+    ],
   },
   {
     slug: "kelthen",
@@ -89,6 +117,17 @@ export const projects: Project[] = [
     href: "https://kelthen.com",
     hrefLabel: { fr: "kelthen.com", en: "kelthen.com" },
     image: "/projets/kelthen/accueil.webp",
+    tags: ["web", "automation", "ai"],
+    gallery: [
+      shot("kelthen", "slides/accueil", "Page d'accueil", "Home page"),
+      shot("kelthen", "slides/probleme", "L'approche de l'agence", "The agency's approach"),
+      shot("kelthen", "slides/services", "Réservations automatisées", "Automated bookings"),
+      shot("kelthen", "slides/nuit", "Assistante IA à 22 h 30", "AI assistant at 10:30 pm"),
+      shot("kelthen", "slides/hub", "Le hub Kelthen", "The Kelthen hub"),
+      shot("kelthen", "slides/etapes", "Trois étapes", "Three steps"),
+      shot("kelthen", "slides/prix", "Offre pilote", "Pilot offer"),
+      shot("kelthen", "slides/realisations", "Réalisations", "Projects"),
+    ],
   },
   {
     slug: "fraul",
@@ -105,5 +144,16 @@ export const projects: Project[] = [
     href: null,
     image: "/projets/fraul/walk.webp",
     imagePosition: "center",
+    tags: ["web", "3d"],
+    gallery: [
+      shot("fraul", "slides/accueil", "Page d'accueil", "Home page"),
+      shot("fraul", "slides/mall", "Le mall (Fraul Walk)", "The mall (Fraul Walk)"),
+      shot("fraul", "slides/marques", "Toutes les marques", "All brands"),
+      shot("fraul", "slides/boutique", "Boutique d'une marque", "A brand's shop"),
+      shot("fraul", "slides/produit", "Fiche produit", "Product page"),
+      shot("fraul", "slides/tenue", "Crée ta tenue", "Build your outfit"),
+      shot("fraul", "slides/sur-demande", "Sur demande", "On request"),
+      shot("fraul", "slides/mobile", "Le mall sur mobile", "The mall on mobile"),
+    ],
   },
 ];
