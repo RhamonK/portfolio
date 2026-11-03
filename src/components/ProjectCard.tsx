@@ -34,7 +34,16 @@ export function ProjectCard({
           {project.gallery.map((s) => (
             <li key={s.src}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt={s.label[lang]} loading="lazy" decoding="async" width={320} height={200} />
+              <img
+                src={s.src.replace(/\.webp$/, "-360.webp")}
+                srcSet={`${s.src.replace(/\.webp$/, "-360.webp")} 360w, ${s.src} 1280w`}
+                sizes="(min-width: 768px) 220px, 46vw"
+                alt={s.label[lang]}
+                loading="lazy"
+                decoding="async"
+                width={360}
+                height={225}
+              />
               <span aria-hidden>{s.label[lang]}</span>
             </li>
           ))}
@@ -57,7 +66,7 @@ export function ProjectCard({
           {project.tech}
           {project.tech && project.href && " · "}
           {project.href && (
-            <a href={project.href} tabIndex={tab} className="text-lime hover:underline">
+            <a href={project.href} tabIndex={tab} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               {project.hrefLabel?.[lang] ?? project.href} ↗
             </a>
           )}

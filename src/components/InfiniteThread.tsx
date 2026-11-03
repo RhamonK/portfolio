@@ -102,6 +102,7 @@ export function InfiniteThread({ lang }: { lang: Lang }) {
               <a
                 href={`#${m.id}`}
                 onClick={go(m.top)}
+                aria-label={`0${i + 1} ${labels[m.id as keyof typeof labels]}`}
                 aria-current={i === active ? "location" : undefined}
                 className={i === active ? "is-active" : undefined}
               >
