@@ -1,3 +1,4 @@
+import type { PresentedSlug } from "@/data/presented";
 // ============================================================
 // Présentations de 60 s (6 diapos d'environ 10 s), FR et EN.
 // Écrites à partir des sources réelles (README des repos, site
@@ -595,13 +596,15 @@ const fraul: Presentation = {
   ],
 };
 
-export const presentations: Record<string, Presentation> = {
+// Les clés doivent correspondre exactement à src/data/presented.ts (clé manquante ou en trop = erreur TypeScript).
+const bySlug = {
   mamashop,
   abo,
   "studio-nala": studioNala,
   kelthen,
   fraul,
-};
+} satisfies Record<PresentedSlug, Presentation>;
+export const presentations: Record<string, Presentation> = bySlug;
 
 // Captures par diapo : ce qu'on voit à l'écran colle à ce qui est dit.
 // Faites sur les sites lancés en local (Studio Nala : nom anonymisé, photos

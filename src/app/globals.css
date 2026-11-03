@@ -274,9 +274,13 @@
 /* Avant que l'intro démarre, le nom et les rôles restent cachés (pas de flash).
    Filet de sécurité : s'ils n'ont pas été animés, ils réapparaissent seuls. */
 @keyframes intro-safety { to { visibility: visible; } }
-.js .intro-hide { visibility: hidden; animation: intro-safety 0s 3.5s forwards; }
+.intro .intro-hide { visibility: hidden; animation: intro-safety 0s 3.5s forwards; }
+/* noyau pendant l'intro : verre seul (le tracé est dessiné par-dessus), image complète ensuite */
+.core-glass { opacity: 0; }
+.intro .core-glass { opacity: 1; }
+.intro .core-full { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .js .intro-hide { visibility: visible; animation: none; }
+  .intro .intro-hide { visibility: visible; animation: none; }
 }
 /* INFINITY CORE, niveau léger : une impulsion de lumière parcourt la signature de l'image fixe,
    trait après trait (position pilotée en JS, même vitesse que la 3D : un tour en 9 s). */
@@ -287,20 +291,18 @@
   stroke-linecap: round;
   stroke-dasharray: 0.08 2;
   opacity: 0;
-  filter: drop-shadow(0 0 6px var(--lime));
 }
-.core-trace circle {
-  fill: var(--lime);
-  filter: drop-shadow(0 0 6px var(--lime));
-}
+/* halo sans filtre (un drop-shadow recalculé à chaque image coûte cher sur les téléphones modestes) */
+.core-pulse path.glow { stroke: var(--lime); stroke-width: 26; stroke-opacity: 0.22; }
+.core-trace circle { fill: var(--lime); }
 .core-trace path {
   fill: none;
   stroke: var(--lime);
   stroke-width: 6;
   stroke-linecap: round;
   stroke-dasharray: 1 1;
-  filter: drop-shadow(0 0 5px var(--lime)) drop-shadow(0 0 14px rgba(212, 255, 58, 0.45));
 }
+.core-trace path.glow { stroke-width: 24; stroke-opacity: 0.2; }
 /* ===== FIL INFINITE — progression dans la marge gauche ===== */
 .infinite-thread {
   --thread-top: 80px;

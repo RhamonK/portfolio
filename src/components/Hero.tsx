@@ -68,7 +68,9 @@ export function Hero({ lang }: { lang: Lang }) {
     }
 
     const ctx = gsap.context(() => {
+      const endIntroClass = () => document.documentElement.classList.remove("intro");
       if (reduced || seen) {
+        endIntroClass();
         gsap.set(".intro-hide", { visibility: "visible" });
         core.current?.setDraw(1);
       } else {
@@ -90,9 +92,14 @@ export function Hero({ lang }: { lang: Lang }) {
         });
         // fromTo partout : valeurs d'arrivée explicites. Un from() relit l'état courant,
         // que la transition CSS de survol des lettres fausse (lettres figées à -90°).
-        tl.fromTo(".h-core", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out", clearProps: "transform,opacity" }, 0)
+        // le noyau reste visible dès le premier affichage (c'est l'image principale de la page) :
+        // l'intro le fait seulement « respirer » par une légère mise à l'échelle
+        tl.fromTo(".h-core", { scale: 0.96 }, { scale: 1, duration: 0.8, ease: "power2.out", clearProps: "transform" }, 0)
           .to(trace, { d: 1, duration: 1.3, ease: "power2.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.5)
-          .add(() => setTracing(false), 1.8)
+          .add(() => {
+            setTracing(false);
+            endIntroClass();
+          }, 1.8)
           .set(".intro-hide", { visibility: "visible" }, 1.6)
           .fromTo(
             letters,
@@ -134,6 +141,7 @@ export function Hero({ lang }: { lang: Lang }) {
           core.current?.setDraw(1);
           setTracing(false);
           setIntro(false);
+          endIntroClass();
           gsap.set(".intro-hide", { visibility: "visible" });
           events.forEach((ev) => window.removeEventListener(ev, onUser));
         };

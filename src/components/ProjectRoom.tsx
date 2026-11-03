@@ -9,8 +9,7 @@ import dynamic from "next/dynamic";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ProjectFilter, filtered, type Filter } from "@/components/ProjectFilter";
 import type { RoomDrive } from "@/components/Room3D";
-import { presentations } from "@/data/presentations";
-import { Presentation } from "@/components/presentation/Presentation";
+import { hasPresentation } from "@/data/presented";
 import { lockScroll, scrollToY } from "@/lib/scroll";
 import { ui, type Lang } from "@/i18n";
 import { SplitTitle } from "@/components/SplitTitle";
@@ -18,6 +17,8 @@ import { useReveal } from "@/lib/reveal";
 
 // La salle 3D (modèle Blender, WebGL) n'est chargée qu'à l'approche de la section.
 const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
+// La présentation de 60 s (composant + textes) n'est chargée qu'au clic.
+const PresentationHost = dynamic(() => import("@/components/presentation/PresentationHost"), { ssr: false });
 
 // Scène B — salle d'écrans (modèle Blender, WebGL) : le visiteur est au
 // centre, la molette fait tourner les écrans autour de lui, projet par projet.
@@ -94,6 +95,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     if (!near || !webgl || !is3d) return;
     const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 800));
     const id = idle(() => {
+      import("@/components/presentation/PresentationHost").catch(() => {});
       import("@/components/presentation/Stage3D").then((m) => m.preloadStage(Object.fromEntries(projects.map((p, i) => [p.slug, images[i]])))).catch(() => {});
     });
     return () => (window.cancelIdleCallback ?? window.clearTimeout)(id);
@@ -259,7 +261,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   // Lancer : l'écran est « aspiré », la caméra plonge dedans (0,8 s).
   const launch = (i: number) => {
     const p = projects[i];
-    if (!presentations[p.slug] || open) return;
+    if (!hasPresentation(p.slug) || open) return;
     lastFocus.current = document.activeElement as HTMLElement;
     lockScroll(true);
     if (trigger.current) {
@@ -360,7 +362,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           ))}
           {current.tech && <span className="ml-1">{current.tech}</span>}
           {current.href && (
-            <a href={current.href} className="text-lime hover:underline">
+            <a href={current.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               · {current.hrefLabel?.[lang] ?? current.href} ↗
             </a>
           )}
@@ -369,7 +371,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           <button type="button" className="btn btn-glass !min-h-10 !w-10 justify-center !px-0" onClick={() => goTo(pos - 1)} disabled={pos === 0} aria-label={t.prevProject}>
             ←
           </button>
-          {presentations[current.slug] ? (
+          {hasPresentation(current.slug) ? (
             <button type="button" className="btn btn-lime" onClick={() => launch(active)}>
               {t.launch}
             </button>
@@ -403,7 +405,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
                 total={n}
                 lang={lang}
                 focusable={!(is3d && webgl)}
-                onLaunch={presentations[p.slug] ? () => launch(i) : undefined}
+                onLaunch={hasPresentation(p.slug) ? () => launch(i) : undefined}
               />
             </li>
           );
@@ -412,11 +414,11 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
 
       {open &&
         createPortal(
-        <Presentation
+        <PresentationHost
+          slug={open}
           initialLang={lang}
           projectIndex={projects.findIndex((p) => p.slug === open)}
           project={projects.find((p) => p.slug === open)!}
-          presentation={presentations[open]}
           onClose={closePresentation}
           onNextProject={pos < m - 1 ? nextProject : undefined}
         />,

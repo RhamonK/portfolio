@@ -51,8 +51,15 @@ export function RootShell({ lang, children }: { lang: Lang; children: React.Reac
   return (
     <html lang={lang} suppressHydrationWarning className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}>
       <body>
-        {/* classe « js » posée avant l'affichage : l'intro peut cacher le nom sans flash */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* classe « js » posée avant l'affichage ; classe « intro » si l'intro va jouer (première visite
+            de la session, mouvement normal) : le verre du noyau et le masquage du nom sont décidés dès le
+            premier affichage, sans attendre le JavaScript de la page. Même règle que Hero.tsx. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){var d=document.documentElement;d.classList.add('js');try{if(!sessionStorage.getItem('rn-intro-vue')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('intro')}catch(e){}})()",
+          }}
+        />
         <a href="#contenu" className="sr-only-focusable btn btn-lime fixed left-4 top-4 z-[100]">
           {ui[lang].skip}
         </a>

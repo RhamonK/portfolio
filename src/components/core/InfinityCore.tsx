@@ -18,7 +18,7 @@ import { POSTER_DOT, POSTER_STROKES, POSTER_VIEWBOX } from "./poster-path";
 function applyTrace(svg: SVGSVGElement | null, p: number) {
   if (!svg) return;
   svg.querySelectorAll("path").forEach((path, i) => {
-    const s = POSTER_STROKES[i];
+    const s = POSTER_STROKES[i % POSTER_STROKES.length];
     const local = Math.max(0, Math.min(1, (p - s.start) / s.len));
     path.style.strokeDashoffset = String(1 - local);
     path.style.opacity = local > 0 ? "1" : "0";
@@ -91,7 +91,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       last = now;
       const g = ((now - t0) % PULSE_PERIOD) / PULSE_PERIOD;
       paths.forEach((path, i) => {
-        const s = POSTER_STROKES[i];
+        const s = POSTER_STROKES[i % POSTER_STROKES.length];
         const local = (g - s.start) / s.len;
         const on = local >= -PULSE_DASH && local <= 1;
         path.style.opacity = on ? "1" : "0";
@@ -192,19 +192,18 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
 
   return (
     <div ref={box} aria-hidden data-core={mode} className={`relative aspect-[4/3] touch-pan-y select-none ${className}`}>
-      {showTrace && (
-        <img
-          src="/core/verre-1040.webp"
-          srcSet="/core/verre-640.webp 640w, /core/verre-1040.webp 1040w, /core/verre-1600.webp 1600w"
-          sizes="(min-width: 768px) 50vw, 100vw"
-          width={1600}
-          height={1200}
-          alt=""
-          decoding="async"
-          draggable={false}
-          className="absolute inset-0 h-full w-full object-contain"
-        />
-      )}
+      {/* verre seul : visible pendant l'intro (classe « intro » posée avant l'affichage, puis état du tracé) */}
+      <img
+        src="/core/verre-1040.webp"
+        srcSet="/core/verre-640.webp 640w, /core/verre-1040.webp 1040w, /core/verre-1600.webp 1600w"
+        sizes="(min-width: 768px) 50vw, 100vw"
+        width={1600}
+        height={1200}
+        alt=""
+        decoding="async"
+        draggable={false}
+        className={`core-glass absolute inset-0 h-full w-full object-contain ${showTrace ? "!opacity-100" : ""}`}
+      />
       <img
         src="/core/signature-1040.webp"
         srcSet="/core/signature-640.webp 640w, /core/signature-1040.webp 1040w, /core/signature-1600.webp 1600w"
@@ -215,21 +214,22 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
         {...{ fetchpriority: "high" }}
         decoding="async"
         draggable={false}
-        className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${tracing ? "opacity-0" : "opacity-100"}`}
+        className={`core-full absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${tracing ? "!opacity-0" : ""}`}
       />
       {showTrace && (
         <svg ref={(el) => { traceSvg.current = el; applyTrace(el, draw.current); }} viewBox={POSTER_VIEWBOX} className="core-trace absolute inset-0 h-full w-full">
-          {POSTER_STROKES.map((s, i) => (
-            <path key={i} d={s.d} pathLength={1} />
+          {/* halo (trait large et transparent) puis trait principal : pas de filtre coûteux */}
+          {[...POSTER_STROKES, ...POSTER_STROKES].map((s, i) => (
+            <path key={i} d={s.d} pathLength={1} className={i < POSTER_STROKES.length ? "glow" : undefined} />
           ))}
           <circle cx={POSTER_DOT.cx} cy={POSTER_DOT.cy} r={POSTER_DOT.r} />
         </svg>
       )}
       {tier === 1 && !showTrace && (
         <svg ref={pulseSvg} viewBox={POSTER_VIEWBOX} className="core-pulse absolute inset-0 h-full w-full">
-          {POSTER_STROKES.map((s, i) => (
-            // une seule impulsion parcourt la signature, trait après trait
-            <path key={i} d={s.d} pathLength={1} />
+          {/* une seule impulsion parcourt la signature, trait après trait (halo + trait principal) */}
+          {[...POSTER_STROKES, ...POSTER_STROKES].map((s, i) => (
+            <path key={i} d={s.d} pathLength={1} className={i < POSTER_STROKES.length ? "glow" : undefined} />
           ))}
         </svg>
       )}

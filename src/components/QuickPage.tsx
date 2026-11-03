@@ -33,7 +33,7 @@ export function QuickPage({ lang }: { lang: Lang }) {
                 {p.tech}
                 {p.tech && p.href && " · "}
                 {p.href && (
-                  <a href={p.href} className="text-lime hover:underline">
+                  <a href={p.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
                     {p.hrefLabel?.[lang] ?? p.href}
                   </a>
                 )}
@@ -67,7 +67,7 @@ export function QuickPage({ lang }: { lang: Lang }) {
               {item.action.kind === "link" && (
                 <>
                   {" · "}
-                  <a href={item.action.href} className="text-lime hover:underline">
+                  <a href={item.action.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
                     {item.action.label[lang]}
                   </a>
                 </>
@@ -95,7 +95,7 @@ export function QuickPage({ lang }: { lang: Lang }) {
       <h2 className="mt-14 text-[28px] font-bold">{t.contact}</h2>
       <ul className="mt-4 space-y-1">
         <li>
-          <a href={`mailto:${site.email}`} className="text-lime hover:underline">
+          <a href={`mailto:${site.email}`} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
             {site.email}
           </a>
         </li>

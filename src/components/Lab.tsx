@@ -41,7 +41,17 @@ function LabCard({ item, lang }: { item: LabItem; lang: Lang }) {
     <article className="glass flex h-full flex-col overflow-hidden rounded-2xl">
       {item.image && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.image} alt="" loading="lazy" decoding="async" width={1040} height={650} className="aspect-[16/10] w-full object-cover" />
+        <img
+          src={item.image}
+          srcSet={item.image.startsWith("/labo/") ? `${item.image.replace(/\.webp$/, "-520.webp")} 520w, ${item.image} 1040w` : undefined}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={1040}
+          height={650}
+          className="aspect-[16/10] w-full object-cover"
+        />
       )}
       <div className="flex flex-1 flex-col p-6 md:p-7">
         <p className="eyebrow">{item.year}</p>

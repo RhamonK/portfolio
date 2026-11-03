@@ -8,7 +8,9 @@ export function ScreenContent({ project }: { project: Project }) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={project.image}
+        src={project.image.replace(/\.webp$/, "-720.webp")}
+        srcSet={`${project.image.replace(/\.webp$/, "-720.webp")} 720w, ${project.image} 1280w`}
+        sizes="(min-width: 768px) 50vw, 100vw"
         alt=""
         loading="lazy"
         decoding="async"
