@@ -8,7 +8,6 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { CvPill } from "@/components/CvPill";
 import { InfiniteThread } from "@/components/InfiniteThread";
-import { Passage } from "@/components/motion/Passage";
 import type { Lang } from "@/i18n";
 
 export function HomePage({ lang }: { lang: Lang }) {
@@ -17,7 +16,6 @@ export function HomePage({ lang }: { lang: Lang }) {
       <Header lang={lang} />
       <main id="contenu">
         <Hero lang={lang} />
-        <Passage lang={lang} />
         <ProjectRoom lang={lang} />
         <Expertise lang={lang} />
         <Lab lang={lang} />
