@@ -20,8 +20,8 @@ export const parcours: Step[] = [
     title: { fr: "Directeur exécutif", en: "Executive Director" },
     org: "Kelthen Inc.",
     text: {
-      fr: "Agence web, automatisation et intégration IA ; référent du développement des sites.",
-      en: "Web agency, automation and AI integration; lead for website development.",
+      fr: "Entreprise de sites web, d'automatisation et d'intégration IA ; référent du développement des sites.",
+      en: "Web, automation and AI integration company; lead for website development.",
     },
     href: "https://kelthen.com",
   },

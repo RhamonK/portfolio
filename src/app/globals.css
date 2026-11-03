@@ -605,6 +605,7 @@ body::after {
 .ribbon path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
 .ribbon-core { stroke: var(--lime); stroke-width: 3; }
 .ribbon-glow { stroke: var(--lime); stroke-width: 16; stroke-opacity: 0.12; }
+.ribbon-head { fill: #f4ffd0; opacity: 0; filter: drop-shadow(0 0 8px var(--lime)) drop-shadow(0 0 18px var(--lime)); }
 @media (min-width: 768px) { .ribbon-core { stroke-width: 4; } .ribbon-glow { stroke-width: 22; } }
 
 /* ===== ACTE 5 — la signature se redessine en boucle (cycle de 7 s) ===== */
@@ -628,3 +629,20 @@ body::after {
   92%, 100% { opacity: 0; }
 }
 .sig-dot { transform-box: fill-box; transform-origin: center; }
+
+/* ===== LE PASSAGE — couloir de lumière vers l'écran qui devient la salle =====
+   Hauteur nulle sans JavaScript et en mouvement réduit : rien ne s'intercale. */
+.passage { position: relative; height: 0; }
+.js .passage { height: 250svh; margin-bottom: -45svh; }
+@media (max-width: 767px) { .js .passage { height: 220svh; margin-bottom: -40svh; } }
+@media (prefers-reduced-motion: reduce) { .js .passage { height: 0; margin: 0; display: none; } }
+.passage-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+/* mobile : à l'arrivée dans la salle, les cartes viennent de la profondeur */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .room .room-flat:not(.is-in) > li { opacity: 0; }
+  .room .room-flat.is-in > li { animation: pc-arrive 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; animation-delay: calc(var(--i, 0) * 0.09s); }
+}
+@keyframes pc-arrive {
+  from { translate: 0 30px -320px; opacity: 0; }
+}

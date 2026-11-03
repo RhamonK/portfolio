@@ -394,21 +394,21 @@ const kelthen: Presentation = {
     },
     {
       kind: kinds[1],
-      title: { fr: "Mon agence", en: "My agency" },
+      title: { fr: "Où je travaille", en: "Where I work" },
       lines: {
         fr: [
           "Kelthen Inc., au Canada : sites, applications et automatisations sur mesure.",
-          "Je la dirige et je pilote le développement des sites.",
+          "J'y travaille et je conçois les sites.",
         ],
         en: [
           "Kelthen Inc., in Canada: custom websites, apps and automations.",
-          "I run it and lead website development.",
+          "I work there and build the websites.",
         ],
       },
       keywords: { fr: ["Kelthen", "sur mesure", "directeur"], en: ["Kelthen", "custom", "director"] },
       speech: {
-        fr: "Kelthen, c'est mon agence au Canada : sites, applications et automatisations sur mesure. Je la dirige.",
-        en: "Kelthen is my agency in Canada: custom websites, apps and automations. I run it.",
+        fr: "Kelthen, c'est l'entreprise où je travaille, au Canada : sites, applications et automatisations sur mesure. J'y conçois les sites.",
+        en: "Kelthen is the company I work at, in Canada: custom websites, apps and automations. I build the websites.",
       },
     },
     {
@@ -434,7 +434,7 @@ const kelthen: Presentation = {
     },
     {
       kind: kinds[3],
-      title: { fr: "Une agence automatisée", en: "An automated agency" },
+      title: { fr: "Une entreprise automatisée", en: "An automated company" },
       lines: {
         fr: [
           "1. La prospection repère les commerces qui ont besoin d'aide.",
@@ -449,8 +449,8 @@ const kelthen: Presentation = {
       },
       keywords: { fr: ["prospection", "relances", "automatique"], en: ["prospecting", "follow-ups", "automatic"] },
       speech: {
-        fr: "J'ai aussi automatisé l'agence : la prospection, les courriels, les relances, le suivi des réponses et les publications.",
-        en: "I also automated the agency itself: prospecting, emails, follow-ups, reply tracking and social posts.",
+        fr: "J'ai aussi automatisé l'entreprise : la prospection, les courriels, les relances, le suivi des réponses et les publications.",
+        en: "I also automated the company itself: prospecting, emails, follow-ups, reply tracking and social posts.",
       },
     },
     {
@@ -474,12 +474,12 @@ const kelthen: Presentation = {
     },
     {
       kind: kinds[5],
-      title: { fr: "Voir l'agence", en: "See the agency" },
-      lines: { fr: ["Le site de l'agence : kelthen.com."], en: ["The agency's website: kelthen.com."] },
+      title: { fr: "Voir Kelthen", en: "See Kelthen" },
+      lines: { fr: ["Le site de Kelthen : kelthen.com."], en: ["Kelthen's website: kelthen.com."] },
       keywords: { fr: ["kelthen.com"], en: ["kelthen.com"] },
       speech: {
-        fr: "Tu peux découvrir l'agence sur kelthen.com, ou passer au projet suivant.",
-        en: "You can discover the agency at kelthen.com, or move on to the next project.",
+        fr: "Tu peux découvrir Kelthen sur kelthen.com, ou passer au projet suivant.",
+        en: "You can discover Kelthen at kelthen.com, or move on to the next project.",
       },
     },
   ],
