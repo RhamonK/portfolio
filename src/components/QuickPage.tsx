@@ -3,6 +3,8 @@ import { CvButtons } from "@/components/CvButtons";
 import { site, siteCopy } from "@/data/site";
 import { projects } from "@/data/projects";
 import { parcours } from "@/data/parcours";
+import { pillars } from "@/data/expertise";
+import { lab } from "@/data/lab";
 import { base, ui, type Lang } from "@/i18n";
 
 // Mode rapide : tout l'essentiel, sans animation ni 3D.
@@ -37,6 +39,40 @@ export function QuickPage({ lang }: { lang: Lang }) {
                 )}
               </p>
             )}
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="mt-14 text-[28px] font-bold">{t.nav.expertise}</h2>
+      <ul className="mt-4 space-y-4">
+        {pillars.map((p) => (
+          <li key={p.tag}>
+            <h3 className="text-[18px] font-bold">{p.title[lang]}</h3>
+            <p className="text-muted">{p.text[lang]}</p>
+            <p className="mt-1 font-mono text-[13px] text-muted">{p.tools.join(", ")}</p>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="mt-14 text-[28px] font-bold">{t.labNav}</h2>
+      <ul className="mt-4 space-y-4">
+        {lab.map((item) => (
+          <li key={item.id}>
+            <h3 className="text-[18px] font-bold">
+              {item.name[lang]} <span className="font-mono text-[13px] font-normal text-muted">· {item.year}</span>
+            </h3>
+            <p className="text-muted">{item.text[lang]}</p>
+            <p className="mt-1 font-mono text-[13px] text-muted">
+              {item.tech.join(" · ")}
+              {item.action.kind === "link" && (
+                <>
+                  {" · "}
+                  <a href={item.action.href} className="text-lime hover:underline">
+                    {item.action.label[lang]}
+                  </a>
+                </>
+              )}
+            </p>
           </li>
         ))}
       </ul>

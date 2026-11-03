@@ -214,6 +214,33 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     if (!next.includes(active)) setActive(next[0]);
   };
 
+  // demandes venues d'autres sections : afficher les projets d'un besoin, lancer une présentation
+  const latest = useRef({ changeFilter: (_f: Filter) => {}, launch: (_i: number) => {} });
+  useEffect(() => {
+    const onFilter = (e: Event) => {
+      latest.current.changeFilter((e as CustomEvent<Filter>).detail);
+      // après la reconstruction de la salle, on amène le visiteur au premier projet retenu.
+      // Pendant l'épinglage, la section est toujours en haut de l'écran : on vise donc
+      // le début réel de la zone figée, pas la position de la section à l'écran.
+      window.setTimeout(() => {
+        const st = trigger.current;
+        const el = section.current;
+        if (st) scrollToY(st.start);
+        else if (el) scrollToY(el.getBoundingClientRect().top + window.scrollY);
+      }, 80);
+    };
+    const onLaunch = (e: Event) => {
+      const i = projects.findIndex((p) => p.slug === (e as CustomEvent<string>).detail);
+      if (i >= 0) latest.current.launch(i);
+    };
+    window.addEventListener("rn:filter", onFilter);
+    window.addEventListener("rn:launch", onLaunch);
+    return () => {
+      window.removeEventListener("rn:filter", onFilter);
+      window.removeEventListener("rn:launch", onLaunch);
+    };
+  }, []);
+
   // mobile : repère la carte au centre de l'écran (effet focus)
   useEffect(() => {
     if (is3d && webgl) return;
@@ -242,6 +269,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         .to(section.current!.querySelectorAll(".room-text"), { opacity: 0, duration: 0.3 }, 0);
     } else setOpen(p.slug);
   };
+
+  latest.current = { changeFilter, launch };
 
   const closePresentation = () => {
     setOpen(null);

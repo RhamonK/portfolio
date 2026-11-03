@@ -36,6 +36,8 @@ npm start        # sert out/ en local
   appareils légers. Pour régénérer après un changement de signature :
   `pdftoppm -r 300 -png -gray docs/logo/rn-logo-v2.pdf /tmp/rn && python3 scripts/trace-logo.py /tmp/rn-1.png && npm run core`.
 - Palette : `src/app/globals.css` (`:root`) et son miroir JS `src/lib/palette.ts`, vérifiés par `npm run check`.
+- Expertise (`src/data/expertise.ts`) et Labo (`src/data/lab.ts`) : uniquement du contenu réel. Images du labo
+  rendues depuis les vrais modèles 3D : `npm run labo`.
 - Fil INFINITE (`src/components/InfiniteThread.tsx`) : progression dans la marge, repères de sections cliquables.
 - Ce qui manque encore : voir `ASSETS_MANQUANTS.md`.
 

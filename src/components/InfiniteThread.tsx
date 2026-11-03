@@ -7,17 +7,19 @@ import { ui, type Lang } from "@/i18n";
 
 // Le Fil INFINITE : le trait lumineux du noyau se prolonge dans la marge gauche
 // et se remplit au défilement. Il indique où l'on est dans la page.
-// - Desktop (≥ 1024 px) : repères 01-04 cliquables, libellé au survol / sur la section active.
+// - Desktop (≥ 1024 px) : repères 01-06 cliquables, libellé au survol / sur la section active.
 // - Mobile : une ligne fine dans la gouttière, sans repères (rien ne masque le contenu).
 // Calcul quasi nul : une variable CSS mise à jour au défilement (un rAF au plus par image).
 
-const SECTIONS = ["accueil", "projets", "parcours", "contact"] as const;
+const SECTIONS = ["accueil", "projets", "expertise", "labo", "parcours", "contact"] as const;
 
 export function InfiniteThread({ lang }: { lang: Lang }) {
   const t = ui[lang];
   const labels: Record<(typeof SECTIONS)[number], string> = {
     accueil: t.threadHome,
     projets: t.nav.projects,
+    expertise: t.nav.expertise,
+    labo: t.labNav,
     parcours: t.nav.path,
     contact: t.nav.contact,
   };
