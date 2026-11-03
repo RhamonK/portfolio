@@ -13,11 +13,11 @@ gsap.registerPlugin(ScrollTrigger);
 // Deux zones qui ne se chevauchent jamais : le noyau (en haut sur mobile, à droite
 // sur desktop) et le texte. Tout le contenu est dans le HTML dès le chargement.
 //
-// Intro (une fois par session, 3,7 s, « Passer » disponible tout de suite) :
-//   0,0–0,6 s  le noyau apparaît
-//   0,5–1,8 s  le filament trace la signature RN
-//   1,6–2,9 s  le nom jaillit lettre par lettre, les rôles se décodent
-//   2,6–3,7 s  « Infinite — R.N. », boutons, indice
+// Intro (une fois par session, 3,5 s, « Passer » disponible tout de suite) :
+//   0,0–0,7 s  un point de lumière respire ; la scène, vue de biais, entame un lent quart de tour
+//   0,6–2,2 s  une pointe de lumière écrit la signature RN (étincelles)
+//   1,1–2,7 s  le verre se forme autour du trait
+//   1,8–3,5 s  le nom se révèle, rôles, « Infinite — R.N. », boutons, indice
 // Défiler, toucher l'écran ou appuyer sur une touche termine l'intro aussitôt.
 
 const INTRO_KEY = "rn-intro-vue";
@@ -87,46 +87,55 @@ export function Hero({ lang }: { lang: Lang }) {
         const roles = gsap.utils.toArray<HTMLElement>(".h-role");
         const trace = { d: 0 };
         const tl = gsap.timeline({
-          defaults: { ease: "expo.out" },
+          defaults: { ease: "power3.out" },
           onComplete: () => finishRef.current(),
         });
-        // fromTo partout : valeurs d'arrivée explicites. Un from() relit l'état courant,
-        // que la transition CSS de survol des lettres fausse (lettres figées à -90°).
-        // le noyau reste visible dès le premier affichage (c'est l'image principale de la page) :
-        // l'intro le fait seulement « respirer » par une légère mise à l'échelle
-        tl.fromTo(".h-core", { scale: 0.96 }, { scale: 1, duration: 0.8, ease: "power2.out", clearProps: "transform" }, 0)
-          .to(trace, { d: 1, duration: 1.3, ease: "power2.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.5)
+        // fromTo partout : valeurs d'arrivée explicites (un from() relit l'état courant,
+        // que la transition CSS de survol des lettres fausse).
+        // 1. un point de lumière respire (CSS), la scène est vue de biais et fait un lent quart de tour
+        tl.fromTo(".h-turn", { rotateY: -26, rotateX: 7, scale: 0.94 }, { rotateY: 0, rotateX: 0, scale: 1, duration: 3.0, ease: "power2.inOut", clearProps: "transform" }, 0)
+          .fromTo(".h-stage-ui", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out", immediateRender: true, clearProps: "opacity" }, 0.3)
+          // 2. une pointe de lumière écrit la signature
+          .to(trace, { d: 1, duration: 1.6, ease: "power1.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.6)
+          // 3. le verre se forme autour du trait
+          .fromTo(
+            ".core-glass",
+            { opacity: 0.06, filter: "blur(14px)", scale: 1.08 },
+            { opacity: 1, filter: "blur(0px)", scale: 1, duration: 1.6, ease: "power2.out", immediateRender: true, clearProps: "filter,transform" },
+            1.1,
+          )
           .add(() => {
             setTracing(false);
             endIntroClass();
-          }, 1.8)
-          .set(".intro-hide", { visibility: "visible" }, 1.6)
+          }, 2.25)
+          // 4. le nom se révèle, posément
+          .set(".intro-hide", { visibility: "visible" }, 1.8)
           .fromTo(
             letters,
-            { yPercent: 110, rotateX: -90, opacity: 0, filter: "blur(10px)", transition: "none" },
+            { yPercent: 55, opacity: 0, filter: "blur(8px)", transition: "none" },
             {
               yPercent: 0,
-              rotateX: 0,
               opacity: 1,
               filter: "blur(0px)",
-              duration: 1.0,
-              stagger: { each: 0.035, from: "start" },
+              duration: 1.1,
+              stagger: { each: 0.04, from: "start" },
               immediateRender: true,
               // on rend la main au CSS (effet de survol des lettres)
               clearProps: "transform,opacity,filter,transition",
             },
-            1.6,
+            1.8,
           )
-          .fromTo(".h-eyebrow", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, immediateRender: true, clearProps: "transform,opacity" }, 2.6)
-          .fromTo(".h-line", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.inOut", immediateRender: true, clearProps: "transform" }, 2.4)
+          .fromTo(".h-eyebrow", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, immediateRender: true, clearProps: "transform,opacity" }, 2.05)
+          .fromTo(".h-line", { scaleX: 0 }, { scaleX: 1, duration: 1, ease: "power3.inOut", immediateRender: true, clearProps: "transform" }, 2.2)
+          .fromTo(".h-roles", { opacity: 0 }, { opacity: 1, duration: 0.4, immediateRender: true, clearProps: "opacity" }, 2.3)
           .fromTo(
             ".h-cta > *",
-            { y: 24, opacity: 0, scale: 0.94 },
-            { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.08, ease: "back.out(2)", immediateRender: true, clearProps: "transform,opacity" },
-            2.9,
+            { y: 18, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.9, stagger: 0.1, immediateRender: true, clearProps: "transform,opacity" },
+            2.6,
           )
-          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.5, immediateRender: true, clearProps: "transform,opacity" }, 3.2);
-        roles.forEach((r, i) => tl.add(scramble(r, 0.8), 2.0 + i * 0.3));
+          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.6, immediateRender: true, clearProps: "transform,opacity" }, 2.9);
+        roles.forEach((r, i) => tl.add(scramble(r, 0.7), 2.3 + i * 0.25));
 
         // fin immédiate : bouton « Passer », défilement, toucher, clavier
         finishRef.current = () => {
@@ -143,6 +152,7 @@ export function Hero({ lang }: { lang: Lang }) {
           setIntro(false);
           endIntroClass();
           gsap.set(".intro-hide", { visibility: "visible" });
+          gsap.set(".core-glass, .h-turn, .h-stage-ui, .h-text > *", { clearProps: "filter,transform,opacity" });
           events.forEach((ev) => window.removeEventListener(ev, onUser));
         };
         const onUser = () => finishRef.current();
@@ -154,7 +164,7 @@ export function Hero({ lang }: { lang: Lang }) {
       gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
         gsap
           .timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.5 } })
-          .to(".h-core-inner", { scale: 0.9, opacity: 0.25, yPercent: -8, ease: "none" }, 0)
+          .to(".h-core-inner", { scale: 0.86, opacity: 0.2, yPercent: -10, ease: "none" }, 0)
           .to(".h-text", { yPercent: -12, opacity: 0.4, ease: "none" }, 0)
           .to(".h-hint", { opacity: 0, duration: 0.15 }, 0);
       });
@@ -181,8 +191,21 @@ export function Hero({ lang }: { lang: Lang }) {
       <div className="wrap grid w-full items-center gap-4 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-10 md:py-10">
         {/* ===== noyau ===== */}
         <div className="h-core md:order-2">
-          <div className="h-core-inner mx-auto w-full max-w-[calc(32svh*4/3)] [@media(max-height:700px)]:max-w-[calc(26svh*4/3)] md:max-w-none md:[@media(max-height:700px)]:max-w-none">
-            <InfinityCore ref={core} tracing={tracing} defer={intro} />
+          <div className="h-core-inner mx-auto w-full max-w-[calc(34svh*4/3)] [@media(max-height:700px)]:max-w-[calc(27svh*4/3)] md:max-w-none md:[@media(max-height:700px)]:max-w-none">
+            {/* la scène : une carte cadrée où l'objet vit */}
+            <div className="h-stage [perspective:1100px]">
+              <div className="h-turn">
+                <InfinityCore ref={core} tracing={tracing} defer={intro} />
+              </div>
+              <div aria-hidden className="h-stage-ui">
+                <span className="h-stage-tag left-4 top-3">INFINITY CORE</span>
+                <span className="h-stage-tag right-4 top-3">R.N. / ∞</span>
+                <span className="h-stage-tag bottom-3 left-4 text-lime/80">
+                  <span className="md:hidden">{t.coreHintTouch}</span>
+                  <span className="hidden md:inline">{t.coreHintMouse}</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -209,7 +232,7 @@ export function Hero({ lang }: { lang: Lang }) {
             ))}
           </h1>
           <div aria-hidden className="h-line mt-5 h-px w-32 origin-left bg-gradient-to-r from-lime to-transparent" />
-          <p className="mt-4 max-w-[560px] font-mono text-[13px] uppercase leading-relaxed tracking-[0.12em] text-ink/80 md:text-[15px]">
+          <p className="h-roles mt-4 max-w-[560px] font-mono text-[13px] uppercase leading-relaxed tracking-[0.12em] text-ink/80 md:text-[15px]">
             <span className="h-role intro-hide" data-text={copy.role}>
               {copy.role}
             </span>

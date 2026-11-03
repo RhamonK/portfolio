@@ -14,6 +14,7 @@ import { lockScroll, scrollToY } from "@/lib/scroll";
 import { ui, type Lang } from "@/i18n";
 import { SplitTitle } from "@/components/SplitTitle";
 import { useReveal } from "@/lib/reveal";
+import { Ribbon } from "@/components/motion/Ribbon";
 
 // La salle 3D (modèle Blender, WebGL) n'est chargée qu'à l'approche de la section.
 const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
@@ -243,19 +244,59 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     };
   }, []);
 
-  // mobile : repère la carte au centre de l'écran (effet focus)
+  // mobile : carrousel horizontal en perspective. La carte au centre est nette et
+  // éclairée (son écran « s'allume »), ses voisines reculent et pivotent légèrement.
+  // Mouvement réduit ou desktop sans WebGL : colonne / grille, repère vertical.
   useEffect(() => {
     if (is3d && webgl) return;
     const items = list.map((i) => flat.current[i]).filter(Boolean) as HTMLLIElement[];
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.find((e) => e.isIntersecting);
-        if (hit) setFocused(Number((hit.target as HTMLElement).dataset.index));
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const rail = items[0]?.parentElement;
+    const carousel = rail && getComputedStyle(rail).display === "flex";
+    if (!carousel || !rail) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          const hit = entries.find((e) => e.isIntersecting);
+          if (hit) setFocused(Number((hit.target as HTMLElement).dataset.index));
+        },
+        { rootMargin: "-45% 0px -45% 0px" },
+      );
+      items.forEach((el) => io.observe(el));
+      return () => io.disconnect();
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const mid = rail.scrollLeft + rail.clientWidth / 2;
+      let best = items[0];
+      let bestD = Infinity;
+      for (const li of items) {
+        const c = li.offsetLeft + li.offsetWidth / 2;
+        const d = Math.max(-1, Math.min(1, (c - mid) / li.offsetWidth));
+        li.style.setProperty("--d", d.toFixed(3));
+        li.style.setProperty("--a", Math.abs(d).toFixed(3));
+        if (Math.abs(d) < bestD) {
+          bestD = Math.abs(d);
+          best = li;
+        }
+      }
+      setFocused(Number(best.dataset.index));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    rail.scrollLeft = 0;
+    update();
+    rail.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      rail.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      items.forEach((li) => {
+        li.style.removeProperty("--d");
+        li.style.removeProperty("--a");
+      });
+    };
   }, [list, is3d, webgl]);
 
   // Lancer : l'écran est « aspiré », la caméra plonge dedans (0,8 s).
@@ -316,7 +357,8 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       onKeyDown={onKeyDown}
       className={`room relative flex h-[100svh] flex-col overflow-hidden pt-20 ${webgl ? "" : "is-flat"}`}
     >
-      <div className="room-text wrap relative z-10 md:text-center">
+      <div className="room-text wrap relative z-10 isolate md:text-center">
+        <Ribbon target="#titre-projets" />
         <p className="eyebrow">{t.projectsEyebrow}</p>
         <h2 id="titre-projets" data-reveal-title className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
           <SplitTitle parts={[{ t: t.projectsTitle[0] }, { t: t.projectsTitle[1], em: true }, { t: t.projectsTitle[2] }]} />
@@ -411,6 +453,11 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           );
         })}
       </ol>
+      <div aria-hidden className="room-dots">
+        {list.map((i) => (
+          <span key={i} className={focused === i ? "on" : undefined} />
+        ))}
+      </div>
 
       {open &&
         createPortal(

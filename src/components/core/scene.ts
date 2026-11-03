@@ -20,6 +20,12 @@ export type CoreScene = {
   setDraw: (p: number) => void;
   /** Position normalisée du pointeur, de -1 à 1. */
   setPointer: (x: number, y: number) => void;
+  /** Glisser : ajoute une vitesse de rotation (radians / s), qui s'amortit avec inertie. */
+  spin: (velocity: number) => void;
+  /** Onde de lumière qui parcourt toute la signature (toucher, clic). */
+  wave: () => void;
+  /** Pointeur actif (souris dans la page, doigt sur le noyau) : les éclats s'écartent. */
+  setPointerActive: (on: boolean) => void;
   /** Rend une image à la demande (utile quand la boucle est arrêtée). */
   renderOnce: () => void;
   dispose: () => void;
@@ -50,6 +56,7 @@ const FILAMENT_UNIFORMS = /* glsl */ `
   uniform float uPulse;
   uniform float uStart;
   uniform float uLen;
+  uniform float uWave;
   varying float vU;
 `;
 const FILAMENT_COLOR = /* glsl */ `
@@ -62,7 +69,9 @@ const FILAMENT_COLOR = /* glsl */ `
   float g = uStart + vU * uLen;
   float d = fract(g - uTime * 0.11);
   float pulse = uPulse * (smoothstep(0.07, 0.0, d) + smoothstep(0.93, 1.0, d) * 0.35) * 1.6;
-  diffuseColor.rgb *= 1.0 + head + pulse;
+  // onde déclenchée au toucher : un front de lumière large qui parcourt toute la signature
+  float wave = uWave > 0.0 ? smoothstep(0.12, 0.0, abs(g - uWave)) * 2.2 : 0.0;
+  diffuseColor.rgb *= 1.0 + head + pulse + wave;
 `;
 
 function glassGeometry(widthSegments: number, heightSegments: number) {
@@ -192,6 +201,7 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
     uTime: { value: 0 },
     uDraw: { value: 1 },
     uPulse: { value: motion ? 1 : 0 },
+    uWave: { value: 0 },
   };
   const lime = new THREE.Color(palette.lime);
   const hot = new THREE.Color("#ffffff").lerp(lime, 0.4);
@@ -222,6 +232,7 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
         shader.uniforms.uTime = uniforms.uTime;
         shader.uniforms.uDraw = uniforms.uDraw;
         shader.uniforms.uPulse = uniforms.uPulse;
+        shader.uniforms.uWave = uniforms.uWave;
         shader.uniforms.uStart = stroke.uStart;
         shader.uniforms.uLen = stroke.uLen;
         shader.vertexShader = "varying float vU;\n" + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n  vU = uv.x;");
@@ -261,6 +272,77 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
     group.add(m);
     return m;
   });
+  // ----- éclats de verre en orbite (et quelques étincelles lime) -----
+  // Dans la scène, pas dans le groupe : ils gravitent autour de l'objet sans tourner avec lui.
+  const shardCount = still ? 0 : high ? 26 : 14;
+  const moteCount = still ? 0 : high ? 16 : 9;
+  const shardMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(palette.olive750),
+    metalness: 0.35,
+    roughness: 0.12,
+    envMapIntensity: 2.2,
+    transparent: true,
+    opacity: 0.85,
+    flatShading: true,
+  });
+  const shardGeo = new THREE.OctahedronGeometry(1, 0);
+  const shards = new THREE.InstancedMesh(shardGeo, shardMat, Math.max(1, shardCount));
+  shards.count = shardCount;
+  const moteGeo = new THREE.IcosahedronGeometry(1, 0);
+  const moteMat = new THREE.MeshBasicMaterial({ color: lime, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+  const motes = new THREE.InstancedMesh(moteGeo, moteMat, Math.max(1, moteCount));
+  motes.count = moteCount;
+  shards.renderOrder = 0;
+  motes.renderOrder = 4;
+  scene.add(shards, motes);
+  type Orbiter = { a: number; speed: number; rx: number; ry: number; z: number; size: number; spin: THREE.Vector3; pos: THREE.Vector3; rot: THREE.Euler };
+  const rand = (a: number, b: number) => a + Math.random() * (b - a);
+  const makeOrbiters = (n: number, small: boolean): Orbiter[] =>
+    Array.from({ length: n }, (_, i) => ({
+      a: (i / n) * Math.PI * 2 + rand(-0.3, 0.3),
+      speed: rand(0.05, 0.11) * (Math.random() < 0.5 ? 1 : -1) * (small ? 1.4 : 1),
+      rx: rand(1.95, 2.3),
+      ry: rand(1.25, 1.6),
+      z: rand(-0.9, 0.9),
+      size: small ? rand(0.012, 0.024) : rand(0.045, 0.11),
+      spin: new THREE.Vector3(rand(-0.6, 0.6), rand(-0.6, 0.6), rand(-0.6, 0.6)),
+      pos: new THREE.Vector3(),
+      rot: new THREE.Euler(rand(0, 6), rand(0, 6), rand(0, 6)),
+    }));
+  const shardOrbit = makeOrbiters(shardCount, false);
+  const moteOrbit = makeOrbiters(moteCount, true);
+  const dummy = new THREE.Object3D();
+  const pointerWorld = new THREE.Vector2(99, 99);
+  const viewHalf = { w: 2.37, h: 1.78 };
+  const updateOrbiters = (list: Orbiter[], mesh: THREE.InstancedMesh, t: number, dt: number) => {
+    list.forEach((o, i) => {
+      const ang = o.a + t * o.speed;
+      const tx = Math.cos(ang) * o.rx;
+      const ty = Math.sin(ang) * o.ry + Math.sin(t * 0.7 + i) * 0.04;
+      // le pointeur écarte doucement les éclats, qui reviennent ensuite sur leur orbite
+      const dx = tx - pointerWorld.x;
+      const dy = ty - pointerWorld.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const push = Math.max(0, 1 - d / 1.1) * 0.55;
+      const k = 1 - Math.pow(0.0025, dt); // lissage indépendant de la fréquence d'images
+      o.pos.x += (tx + (dx / d) * push - o.pos.x) * k;
+      o.pos.y += (ty + (dy / d) * push - o.pos.y) * k;
+      o.pos.z += (o.z - o.pos.z) * k;
+      o.rot.x += o.spin.x * dt;
+      o.rot.y += o.spin.y * dt;
+      o.rot.z += o.spin.z * dt;
+      dummy.position.copy(o.pos);
+      dummy.rotation.copy(o.rot);
+      dummy.scale.setScalar(o.size * reveal);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+  };
+  // apparition des éclats quand la 3D prend le relais (ils sortent du verre)
+  let reveal = 0;
+  [shardOrbit, moteOrbit].forEach((list) => list.forEach((o) => o.pos.set(o.rx * 0.3 * Math.cos(o.a), o.ry * 0.3 * Math.sin(o.a), 0)));
+
   const showDot = (p: number) => dotMeshes.forEach((m) => (m.visible = filament && p >= dotStart));
 
   // Luminosité selon la profondeur dans le verre (z local) : les parties en retrait s'atténuent.
@@ -295,7 +377,11 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
 
   // ----- boucle -----
   const pointer = { x: 0, y: 0 };
+  let pointerOn = false;
   const target: { x: number; y: number } = { x: POSE.x, y: POSE.y };
+  let spinVel = 0; // vitesse de rotation donnée au glisser
+  let spinOff = 0; // décalage de rotation accumulé (revient doucement à la pose lisible)
+  let waveStart = -1;
   let running = false;
   let raf = 0;
   let last = 0;
@@ -319,14 +405,35 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
       }
     }
 
-    t += Math.min(dt, 50) / 1000;
+    const s = Math.min(dt, 50) / 1000;
+    t += s;
     uniforms.uTime.value = t;
+    // inertie du glisser, puis retour lent vers la pose où la signature se lit
+    spinOff += spinVel * s;
+    spinVel *= Math.pow(0.06, s);
+    spinOff += (0 - spinOff) * (1 - Math.pow(0.35, s));
     if (motion) {
-      target.y = POSE.y + Math.sin(t * 0.25) * 0.16 + pointer.x * 0.32;
-      target.x = POSE.x + Math.sin(t * 0.2) * 0.04 - pointer.y * 0.16;
+      // rotation lente et posée (aller-retour ample sur ~25 s), légère lévitation
+      target.y = POSE.y + Math.sin(t * 0.25) * 0.42 + pointer.x * 0.35 + spinOff;
+      target.x = POSE.x + Math.sin(t * 0.17) * 0.07 - pointer.y * 0.2;
+      group.position.y = Math.sin(t * 0.55) * 0.045;
+    } else target.y = POSE.y + spinOff;
+    const ease = 1 - Math.pow(0.02, s);
+    group.rotation.y += (target.y - group.rotation.y) * ease;
+    group.rotation.x += (target.x - group.rotation.x) * ease;
+    // onde de lumière : parcourt la signature en 1,1 s
+    if (waveStart >= 0) {
+      const w = (t - waveStart) / 1.1;
+      uniforms.uWave.value = w <= 1.15 ? w * 1.15 : 0;
+      if (w > 1.15) waveStart = -1;
     }
-    group.rotation.y += (target.y - group.rotation.y) * 0.06;
-    group.rotation.x += (target.x - group.rotation.x) * 0.06;
+    if (shardCount) {
+      reveal = Math.min(1, reveal + s / 1.6);
+      const pw = pointerOn ? { x: pointer.x * viewHalf.w, y: -pointer.y * viewHalf.h } : { x: 99, y: 99 };
+      pointerWorld.set(pw.x, pw.y);
+      updateOrbiters(shardOrbit, shards, t, s);
+      updateOrbiters(moteOrbit, motes, t, s);
+    }
     renderer.render(scene, camera);
     if (!readySent) {
       readySent = true;
@@ -371,6 +478,15 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
       pointer.x = x;
       pointer.y = y;
     },
+    spin: (v) => {
+      spinVel = Math.max(-6, Math.min(6, spinVel + v));
+    },
+    wave: () => {
+      waveStart = t;
+    },
+    setPointerActive: (on) => {
+      pointerOn = on;
+    },
     renderOnce,
     dispose: () => {
       setRunning(false);
@@ -383,6 +499,12 @@ export function createCoreScene({ canvas, quality, motion, onSlow, onReady, stil
         m.geometry.dispose();
         (m.material as THREE.Material).dispose();
       });
+      shardGeo.dispose();
+      shardMat.dispose();
+      moteGeo.dispose();
+      moteMat.dispose();
+      shards.dispose();
+      motes.dispose();
       scene.environment?.dispose();
       halo.geometry.dispose();
       (halo.material as THREE.Material).dispose();

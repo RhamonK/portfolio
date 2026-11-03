@@ -9,8 +9,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 // - [data-reveal]       : fondu montant léger.
 // Mouvement réduit : rien n'est caché ni animé.
 export const REVEAL = {
-  words: { duration: 1, stagger: 0.06, ease: "expo.out" },
-  items: { duration: 0.9, ease: "power3.out", y: 28 },
+  words: { duration: 1.3, stagger: 0.07, ease: "power3.out" },
+  items: { duration: 1.1, ease: "power2.out", y: 32 },
 } as const;
 
 export function useReveal(root: RefObject<HTMLElement | null>) {
@@ -23,13 +23,15 @@ export function useReveal(root: RefObject<HTMLElement | null>) {
         el.querySelectorAll<HTMLElement>("[data-reveal-title]").forEach((title) => {
           gsap.fromTo(
             title.querySelectorAll(".rv-word"),
-            { yPercent: 110, rotate: 4 },
+            // le mot monte de son masque et sort d'un léger flou : posé, sans rebond
+            { yPercent: 100, opacity: 0, filter: "blur(6px)" },
             {
               yPercent: 0,
-              rotate: 0,
+              opacity: 1,
+              filter: "blur(0px)",
               ...REVEAL.words,
               immediateRender: true,
-              clearProps: "transform",
+              clearProps: "transform,opacity,filter",
               scrollTrigger: { trigger: title, start: "top 88%", once: true },
             },
           );
