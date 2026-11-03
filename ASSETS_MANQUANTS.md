@@ -25,6 +25,9 @@ Une capture par projet dans `public/projets/<slug>/`, et une capture par diapo d
 ## Présentateur 3D
 - [x] `public/presenter/presenter.glb` — personnage animé (50 os, idle / talk / point / wave / nod, mouthOpen / blink…), 1,75 m, 34 k triangles, 2,6 Mo
 
+## Expérimentations (section Labo)
+- [ ] Automatisations (LinkedIn, n8n…) : à publier sur GitHub, puis à ajouter dans `src/data/lab.ts` avec leur lien
+
 ## Voix
 - [ ] `public/voix/<projet>-fr.mp3` et `public/voix/<projet>-en.mp3` (pistes de 60 s, voir `docs/prompt-voix.md`), puis les ajouter à `VOICES` dans `Presentation.tsx`
 
