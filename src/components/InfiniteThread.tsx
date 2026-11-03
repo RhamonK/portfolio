@@ -82,9 +82,15 @@ export function InfiniteThread({ lang }: { lang: Lang }) {
     };
   }, []);
 
-  const go = (top: number) => (e: React.MouseEvent) => {
+  // position calculée au moment du clic (la page change de hauteur : orbite de l'Expertise,
+  // zones figées) ; pour Projets, le point d'arrivée après l'entrée
+  const go = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
-    scrollToY(top);
+    const s = document.getElementById(id);
+    if (!s) return;
+    const entry = Number(s.dataset.entry);
+    const pinned = s.closest(".pin-spacer") ?? s;
+    scrollToY(entry || pinned.getBoundingClientRect().top + window.scrollY);
   };
 
   return (
@@ -101,7 +107,7 @@ export function InfiniteThread({ lang }: { lang: Lang }) {
             <li key={m.id} style={{ top: `calc(var(--thread-top) + (100% - var(--thread-top) - var(--thread-bottom)) * ${m.at})` }}>
               <a
                 href={`#${m.id}`}
-                onClick={go(m.top)}
+                onClick={go(m.id)}
                 aria-label={`0${i + 1} ${labels[m.id as keyof typeof labels]}`}
                 aria-current={i === active ? "location" : undefined}
                 className={i === active ? "is-active" : undefined}

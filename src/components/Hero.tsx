@@ -13,11 +13,11 @@ gsap.registerPlugin(ScrollTrigger);
 // Deux zones qui ne se chevauchent jamais : le noyau (en haut sur mobile, à droite
 // sur desktop) et le texte. Tout le contenu est dans le HTML dès le chargement.
 //
-// Intro (une fois par session, 3,5 s, « Passer » disponible tout de suite) :
-//   0,0–0,7 s  un point de lumière respire ; la scène, vue de biais, entame un lent quart de tour
-//   0,6–2,2 s  une pointe de lumière écrit la signature RN (étincelles)
-//   1,1–2,7 s  le verre se forme autour du trait
-//   1,8–3,5 s  le nom se révèle, rôles, « Infinite — R.N. », boutons, indice
+// Intro (une fois par session, 5,5 s, posée ; « Passer » disponible tout de suite) :
+//   0,0–1,0 s  un point de lumière respire ; la scène, vue de biais, entame un lent quart de tour
+//   1,0–3,6 s  une pointe de lumière écrit la signature RN (étincelles)
+//   1,8–4,0 s  le verre se forme autour du trait
+//   3,2–5,5 s  le nom se révèle, rôles, « Infinite — R.N. », boutons, indice
 // Défiler, toucher l'écran ou appuyer sur une touche termine l'intro aussitôt.
 
 const INTRO_KEY = "rn-intro-vue";
@@ -93,23 +93,22 @@ export function Hero({ lang }: { lang: Lang }) {
         // fromTo partout : valeurs d'arrivée explicites (un from() relit l'état courant,
         // que la transition CSS de survol des lettres fausse).
         // 1. un point de lumière respire (CSS), la scène est vue de biais et fait un lent quart de tour
-        tl.fromTo(".h-turn", { rotateY: -26, rotateX: 7, scale: 0.94 }, { rotateY: 0, rotateX: 0, scale: 1, duration: 3.0, ease: "power2.inOut", clearProps: "transform" }, 0)
-          .fromTo(".h-stage-ui", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out", immediateRender: true, clearProps: "opacity" }, 0.3)
+        tl.fromTo(".h-turn", { rotateY: -26, rotateX: 7, scale: 0.94 }, { rotateY: 0, rotateX: 0, scale: 1, duration: 4.4, ease: "sine.inOut", clearProps: "transform" }, 0)
           // 2. une pointe de lumière écrit la signature
-          .to(trace, { d: 1, duration: 1.6, ease: "power1.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 0.6)
+          .to(trace, { d: 1, duration: 2.6, ease: "sine.inOut", onUpdate: () => core.current?.setDraw(trace.d) }, 1.0)
           // 3. le verre se forme autour du trait
           .fromTo(
             ".core-glass",
             { opacity: 0.06, filter: "blur(14px)", scale: 1.08 },
-            { opacity: 1, filter: "blur(0px)", scale: 1, duration: 1.6, ease: "power2.out", immediateRender: true, clearProps: "filter,transform" },
-            1.1,
+            { opacity: 1, filter: "blur(0px)", scale: 1, duration: 2.2, ease: "power2.out", immediateRender: true, clearProps: "filter,transform" },
+            1.8,
           )
           .add(() => {
             setTracing(false);
             endIntroClass();
-          }, 2.25)
+          }, 3.75)
           // 4. le nom se révèle, posément
-          .set(".intro-hide", { visibility: "visible" }, 1.8)
+          .set(".intro-hide", { visibility: "visible" }, 3.2)
           .fromTo(
             letters,
             { yPercent: 55, opacity: 0, filter: "blur(8px)", transition: "none" },
@@ -117,25 +116,25 @@ export function Hero({ lang }: { lang: Lang }) {
               yPercent: 0,
               opacity: 1,
               filter: "blur(0px)",
-              duration: 1.1,
-              stagger: { each: 0.04, from: "start" },
+              duration: 1.3,
+              stagger: { each: 0.05, from: "start" },
               immediateRender: true,
               // on rend la main au CSS (effet de survol des lettres)
               clearProps: "transform,opacity,filter,transition",
             },
-            1.8,
+            3.2,
           )
-          .fromTo(".h-eyebrow", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, immediateRender: true, clearProps: "transform,opacity" }, 2.05)
-          .fromTo(".h-line", { scaleX: 0 }, { scaleX: 1, duration: 1, ease: "power3.inOut", immediateRender: true, clearProps: "transform" }, 2.2)
-          .fromTo(".h-roles", { opacity: 0 }, { opacity: 1, duration: 0.4, immediateRender: true, clearProps: "opacity" }, 2.3)
+          .fromTo(".h-eyebrow", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, immediateRender: true, clearProps: "transform,opacity" }, 3.6)
+          .fromTo(".h-line", { scaleX: 0 }, { scaleX: 1, duration: 1, ease: "power3.inOut", immediateRender: true, clearProps: "transform" }, 3.8)
+          .fromTo(".h-roles", { opacity: 0 }, { opacity: 1, duration: 0.4, immediateRender: true, clearProps: "opacity" }, 3.9)
           .fromTo(
             ".h-cta > *",
             { y: 18, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.9, stagger: 0.1, immediateRender: true, clearProps: "transform,opacity" },
-            2.6,
+            4.4,
           )
-          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.6, immediateRender: true, clearProps: "transform,opacity" }, 2.9);
-        roles.forEach((r, i) => tl.add(scramble(r, 0.7), 2.3 + i * 0.25));
+          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.7, immediateRender: true, clearProps: "transform,opacity" }, 4.8);
+        roles.forEach((r, i) => tl.add(scramble(r, 0.8), 3.9 + i * 0.3));
 
         // fin immédiate : bouton « Passer », défilement, toucher, clavier
         finishRef.current = () => {
@@ -152,7 +151,7 @@ export function Hero({ lang }: { lang: Lang }) {
           setIntro(false);
           endIntroClass();
           gsap.set(".intro-hide", { visibility: "visible" });
-          gsap.set(".core-glass, .h-turn, .h-stage-ui, .h-text > *", { clearProps: "filter,transform,opacity" });
+          gsap.set(".core-glass, .h-turn, .h-text > *", { clearProps: "filter,transform,opacity" });
           events.forEach((ev) => window.removeEventListener(ev, onUser));
         };
         const onUser = () => finishRef.current();
@@ -196,14 +195,6 @@ export function Hero({ lang }: { lang: Lang }) {
             <div className="h-stage [perspective:1100px]">
               <div className="h-turn">
                 <InfinityCore ref={core} tracing={tracing} defer={intro} />
-              </div>
-              <div aria-hidden className="h-stage-ui">
-                <span className="h-stage-tag left-4 top-3">INFINITY CORE</span>
-                <span className="h-stage-tag right-4 top-3">R.N. / ∞</span>
-                <span className="h-stage-tag bottom-3 left-4 text-lime/80">
-                  <span className="md:hidden">{t.coreHintTouch}</span>
-                  <span className="hidden md:inline">{t.coreHintMouse}</span>
-                </span>
               </div>
             </div>
           </div>
