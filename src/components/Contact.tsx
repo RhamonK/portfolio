@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { CvButtons } from "@/components/CvButtons";
 import { SplitTitle } from "@/components/SplitTitle";
 import { useReveal } from "@/lib/reveal";
+import { SignatureLoop } from "@/components/motion/SignatureLoop";
 import { site, siteCopy } from "@/data/site";
 import { ui, type Lang } from "@/i18n";
 
@@ -19,9 +20,12 @@ export function Contact({ lang }: { lang: Lang }) {
         <p className="eyebrow" data-reveal>
           <span className="text-lime">●</span> {siteCopy[lang].availability}
         </p>
-        <h2 id="titre-contact" data-reveal-title className="display mt-3 text-[clamp(40px,6vw,80px)]">
-          <SplitTitle parts={[{ t: t.togetherTitle[0] }, { t: t.togetherTitle[1], em: true }, { t: t.togetherTitle[2] }]} />
-        </h2>
+        <div className="mt-3 flex items-center justify-between gap-6">
+          <h2 id="titre-contact" data-reveal-title className="display text-[clamp(40px,6vw,80px)]">
+            <SplitTitle parts={[{ t: t.togetherTitle[0] }, { t: t.togetherTitle[1], em: true }, { t: t.togetherTitle[2] }]} />
+          </h2>
+          <SignatureLoop className="w-[30%] max-w-[260px] shrink-0" />
+        </div>
 
         <ul className="mt-14 grid gap-4 md:grid-cols-3">
           <li data-reveal className="glass flex flex-col rounded-2xl p-6 md:p-7">
