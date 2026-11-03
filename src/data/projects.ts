@@ -44,65 +44,6 @@ const shot = (slug: string, file: string, fr: string, en: string): Shot => ({
 
 export const projects: Project[] = [
   {
-    slug: "mamashop",
-    name: "MamaShop",
-    pitch: {
-      fr: "La gestion d'une boutique dans la poche, même sans réseau.",
-      en: "Running a shop from your pocket, even without a network.",
-    },
-    description: {
-      fr: "Application mobile de gestion pour les petits commerces d'Afrique de l'Ouest, en français et en FCFA. Trois espaces : le gérant (tableau de bord, finances, marges, stock, fournisseurs, employés), l'agent de terrain (ventes, arrivages, crédits clients) et la diaspora (vue en lecture seule pour la famille qui soutient le commerce). Les ventes s'enregistrent même hors ligne et se synchronisent au retour du réseau.",
-      en: "A shop-management mobile app for small businesses in West Africa, in French and CFA francs. Three spaces: the manager (dashboard, finances, margins, stock, suppliers, staff), the field agent (sales, deliveries, customer credit) and the diaspora (a read-only view for family abroad who support the business). Sales are recorded even offline and sync when the network returns.",
-    },
-    tech: "React Native, Supabase",
-    href: "https://github.com/RhamonK/bizup-africa",
-    hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
-    image: "/projets/mamashop/connexion.webp",
-    imagePosition: "center",
-    tags: ["mobile"],
-    gallery: [shot("mamashop", "connexion", "Écran de connexion", "Sign-in screen")],
-  },
-  {
-    slug: "abo",
-    name: "ABO",
-    pitch: {
-      fr: "Trouver un artisan de confiance, vérifié, près de chez soi.",
-      en: "Find a trusted, verified tradesperson near you.",
-    },
-    description: {
-      fr: "Place de marché à Lomé qui met en relation des clients et des artisans vérifiés : badge « Vérifié ABO » après vérification d'identité, documents protégés, recherche par métier et par quartier, avis liés à une vraie demande, devis puis échange sur WhatsApp.",
-      en: "A marketplace in Lomé connecting clients with verified tradespeople: a “Vérifié ABO” badge after an identity check, protected documents, search by trade and neighbourhood, reviews tied to a real request, then a quote and a WhatsApp conversation.",
-    },
-    tech: "Next.js, PostgreSQL",
-    href: null,
-    tags: ["web"],
-    gallery: [],
-  },
-  {
-    slug: "studio-nala",
-    name: "Studio Nala",
-    pitch: {
-      fr: "Un salon qui prend ses rendez-vous tout seul, sur tous les canaux.",
-      en: "A salon that books its own appointments, on every channel.",
-    },
-    description: {
-      fr: "Site et système de réservation pour un salon de tresses. Les clientes réservent en ligne (prestation, date, créneau, photo de référence) ou avec une assistante IA sur le site, Telegram, WhatsApp, Messenger ou Instagram. La propriétaire valide chaque demande d'un tap sur Telegram ; la cliente reçoit sa confirmation par SMS et courriel, l'agenda se met à jour, et des rappels partent 24 h et 2 h avant.",
-      en: "A website and booking system for a braiding salon. Clients book online (service, date, time slot, reference photo) or through an AI assistant on the site, Telegram, WhatsApp, Messenger or Instagram. The owner approves each request with one tap on Telegram; the client gets confirmation by SMS and email, the calendar updates, and reminders go out 24 h and 2 h before.",
-    },
-    tech: "Next.js, Supabase, n8n",
-    href: null,
-    image: "/projets/studio-nala/reservation.webp",
-    tags: ["web", "automation", "ai"],
-    gallery: [
-      shot("studio-nala", "slides/site", "Page d'accueil du salon", "Salon home page"),
-      shot("studio-nala", "slides/styles", "Les styles de tresses", "Braiding styles"),
-      shot("studio-nala", "slides/services", "Choix de la prestation", "Choosing a service"),
-      shot("studio-nala", "slides/date", "Choix de la date", "Choosing a date"),
-      shot("studio-nala", "slides/creneau", "Choix du créneau", "Choosing a time slot"),
-      shot("studio-nala", "slides/coordonnees", "Coordonnées et photo de référence", "Contact details and reference photo"),
-    ],
-  },
-  {
     slug: "kelthen",
     name: "Kelthen Inc.",
     pitch: {
@@ -155,5 +96,64 @@ export const projects: Project[] = [
       shot("fraul", "slides/sur-demande", "Sur demande", "On request"),
       shot("fraul", "slides/mobile", "Le mall sur mobile", "The mall on mobile"),
     ],
+  },
+  {
+    slug: "studio-nala",
+    name: "Studio Nala",
+    pitch: {
+      fr: "Un salon qui prend ses rendez-vous tout seul, sur tous les canaux.",
+      en: "A salon that books its own appointments, on every channel.",
+    },
+    description: {
+      fr: "Site et système de réservation pour un salon de tresses. Les clientes réservent en ligne (prestation, date, créneau, photo de référence) ou avec une assistante IA sur le site, Telegram, WhatsApp, Messenger ou Instagram. La propriétaire valide chaque demande d'un tap sur Telegram ; la cliente reçoit sa confirmation par SMS et courriel, l'agenda se met à jour, et des rappels partent 24 h et 2 h avant.",
+      en: "A website and booking system for a braiding salon. Clients book online (service, date, time slot, reference photo) or through an AI assistant on the site, Telegram, WhatsApp, Messenger or Instagram. The owner approves each request with one tap on Telegram; the client gets confirmation by SMS and email, the calendar updates, and reminders go out 24 h and 2 h before.",
+    },
+    tech: "Next.js, Supabase, n8n",
+    href: null,
+    image: "/projets/studio-nala/reservation.webp",
+    tags: ["web", "automation", "ai"],
+    gallery: [
+      shot("studio-nala", "slides/site", "Page d'accueil du salon", "Salon home page"),
+      shot("studio-nala", "slides/styles", "Les styles de tresses", "Braiding styles"),
+      shot("studio-nala", "slides/services", "Choix de la prestation", "Choosing a service"),
+      shot("studio-nala", "slides/date", "Choix de la date", "Choosing a date"),
+      shot("studio-nala", "slides/creneau", "Choix du créneau", "Choosing a time slot"),
+      shot("studio-nala", "slides/coordonnees", "Coordonnées et photo de référence", "Contact details and reference photo"),
+    ],
+  },
+  {
+    slug: "mamashop",
+    name: "MamaShop",
+    pitch: {
+      fr: "La gestion d'une boutique dans la poche, même sans réseau.",
+      en: "Running a shop from your pocket, even without a network.",
+    },
+    description: {
+      fr: "Application mobile de gestion pour les petits commerces d'Afrique de l'Ouest, en français et en FCFA. Trois espaces : le gérant (tableau de bord, finances, marges, stock, fournisseurs, employés), l'agent de terrain (ventes, arrivages, crédits clients) et la diaspora (vue en lecture seule pour la famille qui soutient le commerce). Les ventes s'enregistrent même hors ligne et se synchronisent au retour du réseau.",
+      en: "A shop-management mobile app for small businesses in West Africa, in French and CFA francs. Three spaces: the manager (dashboard, finances, margins, stock, suppliers, staff), the field agent (sales, deliveries, customer credit) and the diaspora (a read-only view for family abroad who support the business). Sales are recorded even offline and sync when the network returns.",
+    },
+    tech: "React Native, Supabase",
+    href: "https://github.com/RhamonK/bizup-africa",
+    hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
+    image: "/projets/mamashop/connexion.webp",
+    imagePosition: "center",
+    tags: ["mobile"],
+    gallery: [shot("mamashop", "connexion", "Écran de connexion", "Sign-in screen")],
+  },
+  {
+    slug: "abo",
+    name: "ABO",
+    pitch: {
+      fr: "Trouver un artisan de confiance, vérifié, près de chez soi.",
+      en: "Find a trusted, verified tradesperson near you.",
+    },
+    description: {
+      fr: "Place de marché à Lomé qui met en relation des clients et des artisans vérifiés : badge « Vérifié ABO » après vérification d'identité, documents protégés, recherche par métier et par quartier, avis liés à une vraie demande, devis puis échange sur WhatsApp.",
+      en: "A marketplace in Lomé connecting clients with verified tradespeople: a “Vérifié ABO” badge after an identity check, protected documents, search by trade and neighbourhood, reviews tied to a real request, then a quote and a WhatsApp conversation.",
+    },
+    tech: "Next.js, PostgreSQL",
+    href: null,
+    tags: ["web"],
+    gallery: [],
   },
 ];

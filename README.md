@@ -39,6 +39,13 @@ npm start        # sert out/ en local
 - Expertise (`src/data/expertise.ts`) et Labo (`src/data/lab.ts`) : uniquement du contenu réel. Images du labo
   rendues depuis les vrais modèles 3D : `npm run labo`.
 - Fil INFINITE (`src/components/InfiniteThread.tsx`) : progression dans la marge, repères de sections cliquables.
+- Mouvement (le récit « un seul fil, de la signature au contact ») :
+  - Intro du Hero (3,5 s, `src/components/Hero.tsx`) : une pointe de lumière écrit le RN, le verre se forme.
+  - Noyau vivant : rotation lente, éclats en orbite, inertie ; souris sur desktop, doigt + gyroscope sur mobile.
+  - Entrée des projets (`src/components/motion/screenIntro.ts`) : le fil dessine un écran d'où sort la vraie
+    section Projets, puis file jusqu'au premier écran de projet. Ordre des projets : les plus illustrés d'abord.
+  - Contact : la signature se redessine en boucle (`src/components/motion/SignatureLoop.tsx`).
+  - Chaque boucle d'animation s'arrête quand rien ne bouge ou que l'élément est hors de l'écran.
 - Ce qui manque encore : voir `ASSETS_MANQUANTS.md`.
 
 ## Règles

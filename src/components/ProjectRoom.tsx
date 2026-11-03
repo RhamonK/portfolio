@@ -485,7 +485,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {filter !== "all" && ` · ${t.tags[filter]}`}
         </span>
         <h3 className="mt-1 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">{current.name}</h3>
-        <p className="mx-auto mt-1 max-w-[560px] text-muted">{current.pitch[lang]}</p>
+        <p className="mx-auto mt-1 max-w-[760px] text-muted">{current.pitch[lang]}</p>
         <p className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-[13px] text-muted">
           {current.tags.map((tag) => (
             <span key={tag} className="pc-tag">

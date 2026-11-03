@@ -187,6 +187,9 @@ export default function Room3D({
 }) {
   return (
     <Canvas
+      // taille mesurée sans les transformations CSS : pendant l'entrée, la section est
+      // affichée en réduction (scale) — sinon la scène serait calculée trop petite et déformée
+      resize={{ offsetSize: true }}
       frameloop={paused ? "never" : "demand"}
       dpr={[1, 1.25]}
       camera={{ position: [0, EYE, 0], fov: 40, near: 0.05, far: 30 }}

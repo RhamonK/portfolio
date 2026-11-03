@@ -49,6 +49,7 @@ export function createScreenIntro({
   let a = 0;
   let q = 0;
   let landed = false;
+  let drawn = ""; // dernier état rendu : rien n'est réécrit tant que rien ne change
 
   const fit = () => {
     W = canvas.clientWidth;
@@ -101,7 +102,10 @@ export function createScreenIntro({
     return out;
   };
 
-  const render = () => {
+  const render = (force = false) => {
+    const key = `${a.toFixed(4)}|${q.toFixed(4)}`;
+    if (!force && key === drawn) return;
+    drawn = key;
     // ----- la section réelle, dans l'écran -----
     const grow = ease(seg(q, 0.36, 0.84));
     const k = k0 + (1 - k0) * grow;
@@ -185,7 +189,7 @@ export function createScreenIntro({
 
   const onResize = () => {
     fit();
-    render();
+    render(true);
   };
   window.addEventListener("resize", onResize);
   render();
