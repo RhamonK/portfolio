@@ -13,8 +13,7 @@ import { hasPresentation } from "@/data/presented";
 import { lockScroll, scrollToY } from "@/lib/scroll";
 import { ui, type Lang } from "@/i18n";
 import { SplitTitle } from "@/components/SplitTitle";
-import { useReveal } from "@/lib/reveal";
-import { Ribbon } from "@/components/motion/Ribbon";
+import { createScreenIntro, type ScreenIntro } from "@/components/motion/screenIntro";
 
 // La salle 3D (modèle Blender, WebGL) n'est chargée qu'à l'approche de la section.
 const Room3D = dynamic(() => import("@/components/Room3D"), { ssr: false });
@@ -24,7 +23,8 @@ const PresentationHost = dynamic(() => import("@/components/presentation/Present
 // Scène B — salle d'écrans (modèle Blender, WebGL) : le visiteur est au
 // centre, la molette fait tourner les écrans autour de lui, projet par projet.
 // Mobile, mouvement réduit ou pas de WebGL : carrousel plat (voir globals.css).
-// L'ancien portail circulaire d'entrée est retiré : le Fil INFINITE fait le lien entre sections.
+// Entrée : la section « sort d'un écran » que le fil dessine (motion/screenIntro.ts) —
+// une seule apparition ; le fil termine sa course sur le premier écran de projet.
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -34,6 +34,11 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   const flat = useRef<(HTMLLIElement | null)[]>([]);
   const trigger = useRef<ScrollTrigger | null>(null);
   const stage3d = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const introCanvas = useRef<HTMLCanvasElement>(null);
+  // longueur de défilement de l'entrée (la section sort de l'écran), et point d'arrivée
+  const introLen = () => Math.round(window.innerHeight * 1.4);
+  const entryY = useRef<() => number | null>(() => null);
   const lastFocus = useRef<HTMLElement | null>(null);
   // filtre par besoin : `list` = indices des projets retenus ; `active` = indice réel du projet de face
   const [filter, setFilter] = useState<Filter>("all");
@@ -58,7 +63,6 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   // légende, pour qu'aucun trait ni cadre ne passe derrière le texte.
   const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55 });
   const drive = useRef<RoomDrive>({ a: 0, tunnel: 0, band: { top: 0.2, bottom: 0.7 } });
-  useReveal(section);
   const images = projects.map((p) => p.image ?? `/projets/${p.slug}/dessin.svg`);
 
   useEffect(() => {
@@ -135,20 +139,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
 
     mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       setIs3d(true);
-      // Légende de l'écran de face : apparaît une seule fois (même langage que les autres sections).
-      gsap.fromTo(
-        ".room-caption",
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.9,
-          ease: "power3.out",
-          immediateRender: true,
-          clearProps: "transform,opacity",
-          scrollTrigger: { trigger: section.current, start: "top 20%", once: true },
-        },
-      );
+      // (la légende fait partie de la section qui sort de l'écran : pas d'apparition séparée)
       // p = position dans la liste filtrée ; la salle tourne entre les vrais écrans retenus
       const place = (p: number) => {
         const k = Math.max(0, Math.min(m - 1, p));
@@ -158,50 +149,145 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         setActive(list[Math.round(k)]);
       };
       drive.current.include = filter === "all" ? undefined : list;
-      const st =
-        m > 1
-          ? ScrollTrigger.create({
-              trigger: section.current,
-              pin: true,
-              start: "top top",
-              end: () => `+=${(m - 1) * window.innerHeight * 0.8}`,
-              // aimantage doux : seulement quand on s'arrête de défiler, vers le projet le plus proche
-              snap: {
-                snapTo: 1 / (m - 1),
+      // une seule zone figée : d'abord l'entrée (la section sort de l'écran), puis la salle tourne
+      const intro = makeIntro(false, () => stage3d.current?.getBoundingClientRect() ?? null);
+      const roomLen = () => (m > 1 ? (m - 1) * window.innerHeight * 0.8 : 1);
+      const total = () => (intro ? introLen() : 0) + roomLen();
+      const split = (self: ScrollTrigger) => {
+        const y = self.scroll() - self.start;
+        const L = intro ? introLen() : 0;
+        return { q: L ? y / L : 1, p: Math.max(0, Math.min(1, (y - L) / roomLen())) };
+      };
+      const st = ScrollTrigger.create({
+        trigger: section.current,
+        pin: true,
+        start: "top top",
+        end: () => `+=${total()}`,
+        // aimantage doux, seulement dans la salle : quand on s'arrête de défiler, vers le projet le plus proche
+        snap:
+          m > 1
+            ? {
+                snapTo: (v: number) => {
+                  const T = total();
+                  const L = intro ? introLen() : 0;
+                  const y = v * T;
+                  if (y < L) return v;
+                  const step = roomLen() / (m - 1);
+                  return (L + Math.round((y - L) / step) * step) / T;
+                },
                 directional: false,
                 delay: 0.45,
                 duration: { min: 0.3, max: 0.8 },
                 ease: "power2.inOut",
-              },
-              invalidateOnRefresh: true,
-              onUpdate: (self) => place(self.progress * (m - 1)),
-              onRefresh: (self) => place(self.progress * (m - 1)),
-            })
-          : // un seul projet retenu : pas d'épinglage, la salle reste face à lui
-            ScrollTrigger.create({ trigger: section.current, start: "top top", end: "+=1", onRefresh: () => place(0) });
+              }
+            : undefined,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const { q, p } = split(self);
+          intro?.progress(q);
+          place(p * (m - 1));
+        },
+        onRefresh: (self) => {
+          const { q, p } = split(self);
+          intro?.progress(q);
+          place(p * (m - 1));
+        },
+      });
+      // approche : la section monte, le fil descend
+      const approach = intro
+        ? ScrollTrigger.create({ trigger: section.current, start: "top bottom", end: "top top", onUpdate: (self) => intro.approach(self.progress) })
+        : null;
+      entryY.current = () => st.start + (intro ? introLen() : 0);
       place(0);
       ScrollTrigger.refresh();
       // après un changement de filtre depuis la salle : retour au premier projet retenu
       if (jumpAfterFilter.current) {
         jumpAfterFilter.current = false;
-        scrollToY(st.start);
+        scrollToY(entryY.current() ?? st.start);
       }
       trigger.current = st;
       return () => {
         trigger.current = null;
+        entryY.current = () => null;
+        approach?.kill();
+        intro?.dispose();
         setIs3d(false);
+      };
+    });
+
+    // mobile : l'entrée a sa propre zone figée ; le carrousel reste en défilement libre ensuite
+    mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
+      const firstCard = () => flat.current[list[0]]?.querySelector(".pc-media")?.getBoundingClientRect() ?? null;
+      const intro = makeIntro(true, firstCard);
+      if (!intro) return;
+      const st = ScrollTrigger.create({
+        trigger: section.current,
+        pin: true,
+        start: "top top",
+        end: () => `+=${introLen()}`,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => intro.progress(self.progress),
+        onRefresh: (self) => intro.progress(self.progress),
+      });
+      const approach = ScrollTrigger.create({ trigger: section.current, start: "top bottom", end: "top top", onUpdate: (self) => intro.approach(self.progress) });
+      entryY.current = () => st.end;
+      ScrollTrigger.refresh();
+      return () => {
+        entryY.current = () => null;
+        approach.kill();
+        st.kill();
+        intro.dispose();
       };
     });
 
     return () => mm.revert();
   }, [webgl, list, m, filter]);
 
+  function makeIntro(narrow: boolean, target: () => DOMRect | null): ScreenIntro | null {
+    if (!inner.current || !introCanvas.current) return null;
+    return createScreenIntro({
+      inner: inner.current,
+      canvas: introCanvas.current,
+      narrow,
+      target,
+      onLanded: (on) => section.current?.classList.toggle("is-landed", on),
+    });
+  }
+
+  // Liens vers #projets (accueil, en-tête) et repères du fil : on arrive directement dans
+  // la salle, après l'entrée (sinon on tomberait au début de l'animation, écran vide).
+  useEffect(() => {
+    const sync = () => {
+      const y = entryY.current();
+      if (section.current) {
+        if (y == null) delete section.current.dataset.entry;
+        else section.current.dataset.entry = String(Math.round(y));
+      }
+    };
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement).closest?.("a[href$='#projets']");
+      const y = entryY.current();
+      if (!a || y == null || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      scrollToY(y);
+    };
+    sync();
+    ScrollTrigger.addEventListener("refresh", sync);
+    window.addEventListener("click", onClick, true);
+    return () => {
+      ScrollTrigger.removeEventListener("refresh", sync);
+      window.removeEventListener("click", onClick, true);
+    };
+  }, []);
+
   // k = position dans la liste filtrée
   const goTo = (k: number) => {
     const target = Math.max(0, Math.min(m - 1, k));
     const st = trigger.current;
+    const L = entryY.current() != null && st ? (entryY.current() as number) - st.start : 0;
     if (st && m > 1) {
-      scrollToY(st.start + (target / (m - 1)) * (st.end - st.start));
+      scrollToY(st.start + L + (target / (m - 1)) * (st.end - st.start - L));
     } else {
       flat.current[list[target]]?.scrollIntoView({ behavior: "smooth", block: "center" });
       setActive(list[target]);
@@ -226,9 +312,9 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       // Pendant l'épinglage, la section est toujours en haut de l'écran : on vise donc
       // le début réel de la zone figée, pas la position de la section à l'écran.
       window.setTimeout(() => {
-        const st = trigger.current;
         const el = section.current;
-        if (st) scrollToY(st.start);
+        const y = entryY.current();
+        if (y != null) scrollToY(y);
         else if (el) scrollToY(el.getBoundingClientRect().top + window.scrollY);
       }, 80);
     };
@@ -286,19 +372,11 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     };
     rail.scrollLeft = 0;
     update();
-    items.forEach((li, k) => li.style.setProperty("--i", String(k)));
-    const arrive = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        rail.classList.add("is-in");
-        arrive.disconnect();
-      }
-    }, { threshold: 0.25 });
-    arrive.observe(rail);
+
     rail.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(raf);
-      arrive.disconnect();
       rail.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       items.forEach((li) => {
@@ -364,12 +442,15 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
       aria-describedby="aide-projets"
       tabIndex={0}
       onKeyDown={onKeyDown}
-      className={`room relative flex h-[100svh] flex-col overflow-hidden pt-20 ${webgl ? "" : "is-flat"}`}
+      className={`room relative flex h-[100svh] flex-col overflow-hidden ${webgl ? "" : "is-flat"}`}
     >
-      <div className="room-text wrap relative z-10 isolate md:text-center">
-        <Ribbon target="#titre-projets" />
+      {/* le fil de l'entrée (dessiné par-dessus, décoratif) */}
+      <canvas ref={introCanvas} aria-hidden className="room-intro pointer-events-none absolute inset-x-0 top-0 z-30 h-[100svh] w-full" />
+      {/* tout le contenu de la salle : c'est lui qui « sort de l'écran » */}
+      <div ref={inner} className="room-inner relative flex flex-1 flex-col pt-20">
+      <div className="room-text wrap relative z-10 md:text-center">
         <p className="eyebrow">{t.projectsEyebrow}</p>
-        <h2 id="titre-projets" data-reveal-title className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
+        <h2 id="titre-projets" className="display mt-2 text-[clamp(34px,4.5vw,60px)]">
           <SplitTitle parts={[{ t: t.projectsTitle[0] }, { t: t.projectsTitle[1], em: true }, { t: t.projectsTitle[2] }]} />
         </h2>
         <p id="aide-projets" className="sr-only">
@@ -466,6 +547,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
         {list.map((i) => (
           <span key={i} className={focused === i ? "on" : undefined} />
         ))}
+      </div>
       </div>
 
       {open &&
