@@ -215,14 +215,25 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     const cur = { x: 0, y: 0 };
     const goal = { x: 0, y: 0 };
     let raf = 0;
+    let onView = true;
+    // boucle de lissage : tourne seulement tant que l'inclinaison n'a pas rejoint sa cible
     const loop = () => {
-      raf = requestAnimationFrame(loop);
+      raf = 0;
       cur.x += (goal.x - cur.x) * 0.08;
       cur.y += (goal.y - cur.y) * 0.08;
       scene.current?.setPointer(cur.x, cur.y);
       if (tilt.current && !scene.current) tilt.current.style.transform = `rotateY(${cur.x * 9}deg) rotateX(${-cur.y * 7}deg)`;
+      if (Math.abs(goal.x - cur.x) + Math.abs(goal.y - cur.y) > 0.002) kick();
     };
-    raf = requestAnimationFrame(loop);
+    const kick = () => {
+      if (!raf && onView) raf = requestAnimationFrame(loop);
+    };
+    const seen = new IntersectionObserver(([e]) => {
+      onView = e.isIntersecting;
+      el.toggleAttribute("data-off", !onView);
+      kick();
+    });
+    seen.observe(el);
 
     const wave = () => {
       scene.current?.wave();
@@ -245,6 +256,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
         const r = el.getBoundingClientRect();
         goal.x = ((e.clientX - r.left) / r.width) * 2 - 1;
         goal.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+        kick();
       }
       drag.x = e.clientX;
       drag.t = e.timeStamp;
@@ -257,6 +269,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       if (!fine) {
         scene.current?.setPointerActive(false);
         if (!gyro) goal.x = goal.y = 0;
+        kick();
       }
     };
 
@@ -267,6 +280,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       goal.x = Math.max(-1, Math.min(1, ((e.clientX - (r.left + r.width / 2)) / r.width) * 2));
       goal.y = Math.max(-1, Math.min(1, ((e.clientY - (r.top + r.height / 2)) / r.height) * 2));
       scene.current?.setPointerActive(e.clientY > r.top - 80 && e.clientY < r.bottom + 80);
+      kick();
     };
 
     // mobile : gyroscope (sur iPhone, l'autorisation est demandée au premier toucher du noyau)
@@ -276,6 +290,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       gyro = true;
       goal.x = Math.max(-1, Math.min(1, e.gamma / 25));
       goal.y = Math.max(-1, Math.min(1, (e.beta - 50) / 25));
+      kick();
     };
     type IOSOrientation = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
     const DOE = (typeof DeviceOrientationEvent !== "undefined" ? DeviceOrientationEvent : undefined) as IOSOrientation | undefined;
@@ -298,6 +313,8 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
 
     return () => {
       cancelAnimationFrame(raf);
+      seen.disconnect();
+      el.removeAttribute("data-off");
       el.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMoveDrag);
       window.removeEventListener("pointerup", onUp);

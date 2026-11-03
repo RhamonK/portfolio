@@ -373,6 +373,7 @@
 /* niveau léger : l'objet flotte doucement */
 .core-tilt { transform-style: preserve-3d; will-change: transform; }
 .core-float { animation: core-float 9s ease-in-out infinite; }
+.core-box[data-off] .core-float { animation-play-state: paused; }
 @keyframes core-float {
   0%, 100% { translate: 0 0; rotate: 0deg; }
   50% { translate: 0 -2.5%; rotate: -1.2deg; }
@@ -612,6 +613,8 @@ body::after {
   92%, 100% { opacity: 0; }
 }
 .sig-dot { transform-box: fill-box; transform-origin: center; }
+/* hors de l'écran : la boucle se met en pause */
+.sig-loop:not(.is-on) path, .sig-loop:not(.is-on) .sig-dot { animation-play-state: paused; }
 
 /* ===== ENTRÉE DE LA SALLE — la section sort de l'écran (motion/screenIntro.ts) =====
    Le fil termine sa course sur le premier écran de projet, qui s'allume. */
