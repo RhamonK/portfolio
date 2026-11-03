@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Acte 3 — le fil sort : un ruban lime arrive par le haut de la section, balaie
-// l'écran et vient souligner le titre. Tracé lié au défilement (scrub), recalculé
+// l'écran, souligne le titre puis s'efface (il passe, il ne reste pas). Joué une fois, recalculé
 // d'après la position réelle du titre. Décoratif, derrière le texte, jamais cliquable.
 export function Ribbon({ target }: { target: string }) {
   const svg = useRef<SVGSVGElement>(null);
@@ -43,23 +43,42 @@ export function Ribbon({ target }: { target: string }) {
     document.fonts?.ready.then(build);
     window.addEventListener("resize", build);
 
+    // tracé joué une fois, en 1,6 s, quand le titre arrive à l'écran : on le voit toujours se dessiner,
+    // même avec un défilement rapide (lié au défilement, il passait en une fraction de seconde)
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const st = reduced
+    const dot = el.querySelector<SVGCircleElement>("circle");
+    const main = paths[paths.length - 1];
+    let tween: gsap.core.Timeline | null = null;
+    // le ruban passe, il ne reste pas : la pointe dessine la courbe et souligne le titre,
+    // puis la queue rattrape la pointe et tout s'efface au bout du soulignement
+    const play = () => {
+      const st = { head: 0, tail: 0 };
+      const render = () => {
+        const len = Math.max(0.0001, st.head - st.tail);
+        paths.forEach((p) => {
+          p.style.strokeDasharray = `${len} 2`;
+          p.style.strokeDashoffset = String(-st.tail);
+        });
+        if (dot && main.getAttribute("d")) {
+          const pt = main.getPointAtLength(st.head * main.getTotalLength());
+          dot.setAttribute("cx", String(pt.x));
+          dot.setAttribute("cy", String(pt.y));
+          dot.style.opacity = st.tail < 0.995 ? "1" : "0";
+        }
+      };
+      tween = gsap
+        .timeline({ onUpdate: render, onComplete: render })
+        .to(st, { head: 1, duration: 1.6, ease: "power2.inOut" }, 0)
+        .to(st, { tail: 1, duration: 1.5, ease: "power2.inOut" }, 1.9);
+    };
+    const trig = reduced
       ? null
-      : gsap.fromTo(
-          paths,
-          { strokeDashoffset: 1 },
-          {
-            strokeDashoffset: 0,
-            ease: "none",
-            scrollTrigger: { trigger: section, start: "top 85%", end: "top 12%", scrub: 0.9 },
-          },
-        );
-    if (reduced) paths.forEach((p) => (p.style.strokeDashoffset = "0"));
+      : ScrollTrigger.create({ trigger: section.querySelector(target) ?? section, start: "top 80%", once: true, onEnter: play });
+    // mouvement réduit : pas de ruban (il ne ferait que figer un trait autour du titre)
     return () => {
       window.removeEventListener("resize", build);
-      st?.scrollTrigger?.kill();
-      st?.kill();
+      trig?.kill();
+      tween?.kill();
     };
   }, [target]);
 
@@ -67,6 +86,7 @@ export function Ribbon({ target }: { target: string }) {
     <svg ref={svg} aria-hidden className="ribbon" preserveAspectRatio="none">
       <path className="ribbon-glow" pathLength={1} />
       <path className="ribbon-core" pathLength={1} />
+      <circle className="ribbon-head" r={7} cx={-20} cy={-20} />
     </svg>
   );
 }

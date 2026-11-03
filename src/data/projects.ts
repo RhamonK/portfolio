@@ -106,12 +106,12 @@ export const projects: Project[] = [
     slug: "kelthen",
     name: "Kelthen Inc.",
     pitch: {
-      fr: "Mon agence : sites, applications et automatisations sur mesure.",
-      en: "My agency: custom websites, apps and automations.",
+      fr: "L'entreprise où je travaille : j'y conçois sites, applications et automatisations.",
+      en: "The company I work at: I build its websites, apps and automations.",
     },
     description: {
-      fr: "Agence au Canada qui construit des sites, des applications et des automatisations pour les entrepreneurs et les commerces de proximité : site qui attire des clients, réservation en ligne, secrétaire virtuelle par IA, rappels SMS et courriel, visibilité Google et avis clients. En interne, j'ai automatisé la prospection, les relances et la publication sur les réseaux.",
-      en: "An agency in Canada building websites, apps and automations for entrepreneurs and local businesses: websites that bring clients, online booking, an AI virtual receptionist, SMS and email reminders, Google visibility and customer reviews. Internally, I automated prospecting, follow-ups and social media publishing.",
+      fr: "Entreprise au Canada où je travaille, qui construit des sites, des applications et des automatisations pour les entrepreneurs et les commerces de proximité : site qui attire des clients, réservation en ligne, secrétaire virtuelle par IA, rappels SMS et courriel, visibilité Google et avis clients. En interne, j'ai automatisé la prospection, les relances et la publication sur les réseaux.",
+      en: "A company in Canada where I work, building websites, apps and automations for entrepreneurs and local businesses: websites that bring clients, online booking, an AI virtual receptionist, SMS and email reminders, Google visibility and customer reviews. Internally, I automated prospecting, follow-ups and social media publishing.",
     },
     tech: "n8n, Supabase",
     href: "https://kelthen.com",
@@ -120,7 +120,7 @@ export const projects: Project[] = [
     tags: ["web", "automation", "ai"],
     gallery: [
       shot("kelthen", "slides/accueil", "Page d'accueil", "Home page"),
-      shot("kelthen", "slides/probleme", "L'approche de l'agence", "The agency's approach"),
+      shot("kelthen", "slides/probleme", "L'approche de Kelthen", "Kelthen's approach"),
       shot("kelthen", "slides/services", "Réservations automatisées", "Automated bookings"),
       shot("kelthen", "slides/nuit", "Assistante IA à 22 h 30", "AI assistant at 10:30 pm"),
       shot("kelthen", "slides/hub", "Le hub Kelthen", "The Kelthen hub"),

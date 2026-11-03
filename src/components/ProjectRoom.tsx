@@ -286,10 +286,19 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
     };
     rail.scrollLeft = 0;
     update();
+    items.forEach((li, k) => li.style.setProperty("--i", String(k)));
+    const arrive = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        rail.classList.add("is-in");
+        arrive.disconnect();
+      }
+    }, { threshold: 0.25 });
+    arrive.observe(rail);
     rail.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(raf);
+      arrive.disconnect();
       rail.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       items.forEach((li) => {
