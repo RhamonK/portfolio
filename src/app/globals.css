@@ -320,13 +320,13 @@
 /* Avant que l'intro démarre, le nom et les rôles restent cachés (pas de flash).
    Filet de sécurité : s'ils n'ont pas été animés, ils réapparaissent seuls. */
 @keyframes intro-safety { to { visibility: visible; } }
-.intro .intro-hide { visibility: hidden; animation: intro-safety 0s 3.5s forwards; }
+.intro .intro-hide { visibility: hidden; animation: intro-safety 0s 6s forwards; }
 /* noyau pendant l'intro : le verre « se forme » (flou, presque transparent, puis net — animé
    par Hero.tsx), le tracé est dessiné par-dessus, l'image complète prend le relais ensuite */
 .core-glass { opacity: 0; }
 .intro .core-glass { opacity: 0.06; filter: blur(14px); transform: scale(1.08); }
 .intro .core-full { opacity: 0; }
-.intro .h-text > *:not(h1), .intro .h-stage-ui, .intro .h-hint { opacity: 0; animation: intro-safety-o 0s 4.2s forwards; }
+.intro .h-text > *:not(h1), .intro .h-hint { opacity: 0; animation: intro-safety-o 0s 6s forwards; }
 @keyframes intro-safety-o { to { opacity: 1; } }
 /* la scène du noyau : carte cadrée, coins repérés, comme une vitrine */
 .h-stage {
@@ -338,16 +338,7 @@
   box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(242, 243, 238, 0.05);
 }
 .h-turn { transform-style: preserve-3d; }
-.h-stage-ui { position: absolute; inset: 0; pointer-events: none; }
-.h-stage-tag {
-  position: absolute;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(242, 243, 238, 0.55);
-}
-@media (min-width: 768px) { .h-stage { border-radius: 36px; } .h-stage-tag { font-size: 11px; } }
+@media (min-width: 768px) { .h-stage { border-radius: 36px; } }
 @media (prefers-reduced-motion: reduce) {
   .intro .intro-hide { visibility: visible; animation: none; }
 }
@@ -620,4 +611,67 @@ body::after {
    Le fil termine sa course sur le premier écran de projet, qui s'allume. */
 @media (prefers-reduced-motion: no-preference) {
   .room.is-landed .room-flat > li[data-focus] .pc-media::after { animation: pc-boot 1.1s cubic-bezier(0.3, 0.1, 0.2, 1); }
+}
+
+/* ===== EXPERTISE — orbite autour de la signature (Expertise.tsx) ===== */
+.xp-track { position: relative; height: calc(5 * 70svh + 100svh); }
+.xp-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 48px;
+  padding-top: 64px;
+}
+.xp-orbit { width: min(100%, 70svh); aspect-ratio: 1; justify-self: center; }
+.xp-panel { position: relative; }
+.xp-cards { display: grid; }
+.xp-cards > li {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.xp-cards > li[data-active] { opacity: 1; transform: none; pointer-events: auto; transition-delay: 0.12s; }
+.xp-ring { fill: none; stroke: rgba(242, 243, 238, 0.16); stroke-width: 1.2; }
+.xp-ring-outer { fill: none; stroke: rgba(212, 255, 58, 0.28); stroke-width: 1; stroke-dasharray: 2 9; }
+.xp-tick { stroke: rgba(242, 243, 238, 0.14); stroke-width: 1; }
+.xp-tick-major { stroke: rgba(212, 255, 58, 0.45); }
+.xp-node { fill: var(--bg); stroke: var(--lime); stroke-width: 2; }
+.xp-sig path { fill: none; stroke: var(--lime); stroke-linecap: round; stroke-linejoin: round; }
+.xp-sig-line { stroke-width: 7; }
+.xp-sig-glow { stroke-width: 28; stroke-opacity: 0.14; }
+.xp-sig-dot { fill: var(--lime); }
+.xp-focus-dot { fill: var(--lime); }
+.xp-focus-halo { fill: var(--lime); fill-opacity: 0.18; transform-box: fill-box; transform-origin: center; }
+.xp-focus-line { fill: none; stroke: var(--lime); stroke-width: 1.5; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.xp-label { cursor: pointer; }
+.xp-label text {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--muted);
+  transition: fill 0.4s, font-size 0.4s;
+}
+.xp-label.is-on text { fill: var(--lime); font-size: 19px; font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) {
+  .xp-focus-halo { animation: xp-pulse 2.4s ease-in-out infinite; }
+  .xp-focus-line { animation: xp-draw 0.8s cubic-bezier(0.3, 0.1, 0.2, 1) both; }
+  .xp-sig { animation: xp-breathe 5s ease-in-out infinite; }
+}
+@keyframes xp-pulse { 0%, 100% { transform: scale(0.8); fill-opacity: 0.12; } 50% { transform: scale(1.5); fill-opacity: 0.24; } }
+@keyframes xp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes xp-breathe { 0%, 100% { opacity: 0.82; } 50% { opacity: 1; } }
+@media (max-width: 767px) {
+  .xp-track { height: calc(5 * 65svh + 100svh); }
+  .xp-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: start; gap: 18px; padding-top: 72px; padding-bottom: 16px; }
+  .xp-orbit { width: min(64vw, 34svh); }
+  .xp-label text { font-size: 24px; }
+  .xp-label.is-on text { font-size: 30px; }
+  .xp-cards > li { padding: 18px; }
+  .xp-cards h3 { font-size: 22px; }
 }
