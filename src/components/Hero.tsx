@@ -13,7 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
 // Deux zones qui ne se chevauchent jamais : le noyau (en haut sur mobile, à droite
 // sur desktop) et le texte. Tout le contenu est dans le HTML dès le chargement.
 //
-// Intro (une fois par session, 5,5 s, posée ; « Passer » disponible tout de suite) :
+// Intro (une fois par session, 5,5 s, posée ; pas de bouton « Passer » — défiler,
+// toucher l'écran ou appuyer sur une touche la termine aussitôt) :
 //   0,0–1,0 s  un point de lumière respire ; la scène, vue de biais, entame un lent quart de tour
 //   1,0–3,6 s  une pointe de lumière écrit la signature RN (étincelles)
 //   1,8–4,0 s  le verre se forme autour du trait
@@ -136,7 +137,7 @@ export function Hero({ lang }: { lang: Lang }) {
           .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.7, immediateRender: true, clearProps: "transform,opacity" }, 4.8);
         roles.forEach((r, i) => tl.add(scramble(r, 0.8), 3.9 + i * 0.3));
 
-        // fin immédiate : bouton « Passer », défilement, toucher, clavier
+        // fin immédiate : défilement, toucher, clavier
         finishRef.current = () => {
           if (tl.progress() < 1) tl.progress(1);
           // lettres posées net : sans quoi la transition CSS de survol les ferait rebondir depuis -90°
@@ -175,15 +176,11 @@ export function Hero({ lang }: { lang: Lang }) {
     };
   }, []);
 
-  const skip = () => {
-    finishRef.current();
-    root.current?.querySelector<HTMLElement>(".h-cta a")?.focus();
-  };
-
   return (
     <section
       ref={root}
       id="accueil"
+      data-intro={intro || undefined}
       aria-labelledby="titre-accueil"
       className="hero relative flex min-h-[100svh] items-center overflow-hidden pt-14 md:pt-16"
     >
@@ -250,15 +247,6 @@ export function Hero({ lang }: { lang: Lang }) {
         <span className="hidden md:inline">{t.hint}</span>
       </p>
 
-      {intro && (
-        <button
-          type="button"
-          onClick={skip}
-          className="btn btn-glass absolute right-4 top-[calc(3.5rem+12px)] z-20 !min-h-10 !px-4 text-[14px] md:right-6 md:top-[calc(4rem+16px)]"
-        >
-          {t.skipIntro} →
-        </button>
-      )}
     </section>
   );
 }
