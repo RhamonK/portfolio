@@ -288,7 +288,8 @@ export function Presentation({
         className={
           scene3d
             ? "relative z-10 flex min-h-0 flex-1 flex-col"
-            : "relative z-10 flex min-h-0 flex-1 flex-col px-5 md:px-8"
+            : // sur petit écran, la diapo défile dans sa zone : elle ne déborde jamais sur les commandes
+              "relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-3 md:px-8"
         }
       >
         {scene3d && (
@@ -322,7 +323,7 @@ export function Presentation({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="relative min-h-[180px] flex-1 overflow-hidden rounded-2xl border border-glass-line bg-black/30">
+              <div className="relative min-h-[130px] flex-1 overflow-hidden rounded-2xl border border-glass-line bg-black/30 md:min-h-[180px]">
                 {slide.shots ? (
                   <div className="flex h-full gap-3 p-2">
                     {slide.shots.map((src) => (
@@ -357,7 +358,7 @@ export function Presentation({
           </article>
           {/* sous-titres */}
           <p
-            className="mx-auto mt-4 min-h-[3.2em] max-w-[820px] text-center text-[clamp(16px,1.6vw,21px)] leading-snug"
+            className="mx-auto mt-4 max-w-[820px] shrink-0 text-center text-[15px] leading-snug md:min-h-[3.2em] md:text-[clamp(16px,1.6vw,21px)]"
           >
             {slide.speech[lang].split(" ").map((w, i) => (
               <span key={`${idx}-${lang}-${i}`} className="sub-word">
@@ -385,7 +386,7 @@ export function Presentation({
       </div>
 
       {/* progression (6 segments) + commandes */}
-      <div className="relative z-10 px-5 pb-5 pt-3 md:px-8">
+      <div className="relative z-10 shrink-0 border-t border-glass-line bg-bg px-5 pb-5 pt-3 md:border-0 md:bg-transparent md:px-8">
         <div className="flex gap-1.5" aria-hidden>
           {slides.map((_, i) => (
             <div key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
