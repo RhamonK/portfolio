@@ -26,9 +26,16 @@ export function ProjectCard({
   const tab = focusable ? undefined : -1;
   return (
     <article className="pc">
-      <div className="pc-media">
-        <ProjectScreen project={project} />
-      </div>
+      {/* toucher la capture lance aussi la présentation de 60 s (quand elle existe) */}
+      {onLaunch ? (
+        <button type="button" className="pc-media block w-full cursor-pointer text-left" tabIndex={tab} onClick={onLaunch} aria-label={`${t.launch} — ${project.name}`}>
+          <ProjectScreen project={project} />
+        </button>
+      ) : (
+        <div className="pc-media">
+          <ProjectScreen project={project} />
+        </div>
+      )}
       {project.gallery.length > 1 && (
         <ul className="pc-gallery" aria-label={t.screensLabel(project.name)} tabIndex={tab ?? 0}>
           {project.gallery.map((s) => (
