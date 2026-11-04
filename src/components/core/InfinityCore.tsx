@@ -290,7 +290,9 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     // mobile : gyroscope (sur iPhone, l'autorisation est demandée au premier toucher de la page)
     let gyro = false;
     const onOrient = (e: DeviceOrientationEvent) => {
-      if (e.gamma == null || e.beta == null || drag) return;
+      // le gyroscope pilote toujours l'inclinaison : la fenêtre d'autorisation d'iPhone interrompt
+      // le toucher en cours (pas de « pointerup »), et un glisser resté ouvert bloquait tout
+      if (e.gamma == null || e.beta == null) return;
       gyro = true;
       goal.x = Math.max(-1, Math.min(1, e.gamma / 25));
       goal.y = Math.max(-1, Math.min(1, (e.beta - 50) / 25));
@@ -308,6 +310,8 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
         .then((s) => {
           if (s !== "granted") return;
           gyroGranted = true;
+          drag = null;
+          scene.current?.setPointerActive(false);
           window.addEventListener("deviceorientation", onOrient);
         })
         .catch(() => {
