@@ -78,6 +78,9 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
   const tip = useRef<[number, number] | null>(null);
   const [tier, setTier] = useState<CoreTier | null>(null);
   const [live, setLive] = useState(false);
+  // 3D réellement affichée (et pas seulement créée) : sinon c'est l'image qui doit s'incliner
+  const liveRef = useRef(false);
+  liveRef.current = live;
   const [waveKey, setWaveKey] = useState(0);
   // après le tracé : le SVG reste par-dessus le temps que l'image complète apparaisse (fondu sans creux)
   const [hold, setHold] = useState(false);
@@ -226,7 +229,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       cur.x += (goal.x - cur.x) * 0.08;
       cur.y += (goal.y - cur.y) * 0.08;
       scene.current?.setPointer(cur.x, cur.y);
-      if (tilt.current && !scene.current) tilt.current.style.transform = `rotateY(${cur.x * 16}deg) rotateX(${-cur.y * 12}deg) translate3d(${cur.x * 3}%, ${cur.y * 2}%, 0)`;
+      if (tilt.current && !liveRef.current) tilt.current.style.transform = `rotateY(${cur.x * 16}deg) rotateX(${-cur.y * 12}deg) translate3d(${cur.x * 3}%, ${cur.y * 2}%, 0)`;
       if (Math.abs(goal.x - cur.x) + Math.abs(goal.y - cur.y) > 0.002) kick();
     };
     const kick = () => {
@@ -380,6 +383,14 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
           },
         });
         scene.current.setDraw(draw.current);
+        // filet de sécurité : si la 3D ne s'affiche pas en 4 s (certains téléphones), on garde
+        // l'image animée, qui réagit au doigt et au gyroscope
+        window.setTimeout(() => {
+          if (disposed || liveRef.current || !scene.current) return;
+          scene.current.dispose();
+          scene.current = null;
+          setTier(1);
+        }, 4000);
         io.observe(el);
         update();
       });
