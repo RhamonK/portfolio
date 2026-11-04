@@ -45,6 +45,10 @@ function applyTrace(svg: SVGSVGElement | null, p: number): [number, number] | nu
   return tip;
 }
 
+/** Autorisation du gyroscope déjà accordée (iPhone) : gardée pour toute la page, car le noyau
+ *  peut se reconstruire (passage 3D → image fixe) et ne doit pas redemander un toucher. */
+let gyroGranted = false;
+
 /** Impulsion SVG (niveau léger) : une seule impulsion parcourt la signature, même vitesse que la 3D. */
 const PULSE_PERIOD = 9000;
 const PULSE_DASH = 0.08;
@@ -222,7 +226,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       cur.x += (goal.x - cur.x) * 0.08;
       cur.y += (goal.y - cur.y) * 0.08;
       scene.current?.setPointer(cur.x, cur.y);
-      if (tilt.current && !scene.current) tilt.current.style.transform = `rotateY(${cur.x * 9}deg) rotateX(${-cur.y * 7}deg)`;
+      if (tilt.current && !scene.current) tilt.current.style.transform = `rotateY(${cur.x * 16}deg) rotateX(${-cur.y * 12}deg) translate3d(${cur.x * 3}%, ${cur.y * 2}%, 0)`;
       if (Math.abs(goal.x - cur.x) + Math.abs(goal.y - cur.y) > 0.002) kick();
     };
     const kick = () => {
@@ -298,17 +302,19 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     // iPhone : la demande n'est acceptée que sur un vrai toucher (« click »), pas sur un geste de
     // défilement ; si elle est refusée faute de geste valable, on réessaie au toucher suivant
     const askGyro = () => {
-      if (asked || !DOE?.requestPermission) return;
+      if (asked || gyroGranted || !DOE?.requestPermission) return;
       asked = true;
       DOE.requestPermission()
         .then((s) => {
-          if (s === "granted") window.addEventListener("deviceorientation", onOrient);
+          if (s !== "granted") return;
+          gyroGranted = true;
+          window.addEventListener("deviceorientation", onOrient);
         })
         .catch(() => {
           asked = false;
         });
     };
-    if (!fine && DOE && !DOE.requestPermission) window.addEventListener("deviceorientation", onOrient);
+    if (!fine && DOE && (!DOE.requestPermission || gyroGranted)) window.addEventListener("deviceorientation", onOrient);
 
     el.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointermove", onMoveDrag, { passive: true });

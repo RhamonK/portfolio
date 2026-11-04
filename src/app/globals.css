@@ -362,6 +362,8 @@
   50% { r: 13px; fill-opacity: 1; }
 }
 /* niveau léger : l'objet flotte doucement */
+/* perspective sur la boîte : sans elle, l'inclinaison (souris, gyroscope) serait presque invisible */
+.core-box { perspective: 900px; }
 .core-tilt { transform-style: preserve-3d; will-change: transform; }
 .core-float { animation: core-float 9s ease-in-out infinite; }
 .core-box[data-off] .core-float { animation-play-state: paused; }
