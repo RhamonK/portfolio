@@ -295,12 +295,18 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     type IOSOrientation = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
     const DOE = (typeof DeviceOrientationEvent !== "undefined" ? DeviceOrientationEvent : undefined) as IOSOrientation | undefined;
     let asked = false;
+    // iPhone : la demande n'est acceptée que sur un vrai toucher (« click »), pas sur un geste de
+    // défilement ; si elle est refusée faute de geste valable, on réessaie au toucher suivant
     const askGyro = () => {
       if (asked || !DOE?.requestPermission) return;
       asked = true;
       DOE.requestPermission()
-        .then((s) => s === "granted" && window.addEventListener("deviceorientation", onOrient))
-        .catch(() => {});
+        .then((s) => {
+          if (s === "granted") window.addEventListener("deviceorientation", onOrient);
+        })
+        .catch(() => {
+          asked = false;
+        });
     };
     if (!fine && DOE && !DOE.requestPermission) window.addEventListener("deviceorientation", onOrient);
 
@@ -309,8 +315,11 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     window.addEventListener("pointerup", onUp, { passive: true });
     window.addEventListener("pointercancel", onUp, { passive: true });
     if (fine) window.addEventListener("pointermove", onMouse, { passive: true });
-    // iPhone : l'autorisation du gyroscope demande un geste ; le premier toucher, n'importe où
-    else window.addEventListener("touchend", askGyro, { passive: true });
+    // iPhone : l'autorisation du gyroscope est demandée au premier toucher (n'importe où)
+    else {
+      window.addEventListener("click", askGyro);
+      window.addEventListener("touchend", askGyro, { passive: true });
+    }
 
     return () => {
       cancelAnimationFrame(raf);
@@ -322,6 +331,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       window.removeEventListener("pointercancel", onUp);
       window.removeEventListener("pointermove", onMouse);
       window.removeEventListener("touchend", askGyro);
+      window.removeEventListener("click", askGyro);
       window.removeEventListener("deviceorientation", onOrient);
       if (tilt.current) tilt.current.style.transform = "";
     };
