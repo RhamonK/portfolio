@@ -367,6 +367,28 @@
 .core-tilt { transform-style: preserve-3d; will-change: transform; }
 .core-float { animation: core-float 9s ease-in-out infinite; }
 .core-box[data-off] .core-float { animation-play-state: paused; }
+/* étincelles en orbite (image fixe) : en avant de l'image (relief quand on incline), ellipse aplatie */
+.core-sparks { position: absolute; inset: 0; pointer-events: none; container-type: size; transform: translateZ(60px) scaleY(0.72); }
+.core-sparks i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2);
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 6px var(--lime), 0 0 14px rgba(212, 255, 58, 0.5);
+  animation: core-spark var(--t) linear infinite;
+  animation-delay: var(--d);
+}
+@keyframes core-spark {
+  from { transform: rotate(0deg) translateX(calc(var(--r) * 1cqw)) rotate(0deg); opacity: 0.9; }
+  50% { opacity: 0.35; }
+  to { transform: rotate(360deg) translateX(calc(var(--r) * 1cqw)) rotate(-360deg); opacity: 0.9; }
+}
+.core-box[data-off] .core-sparks i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .core-sparks { display: none; } }
 @keyframes core-float {
   0%, 100% { translate: 0 0; rotate: 0deg; }
   50% { translate: 0 -2.5%; rotate: -1.2deg; }
