@@ -45,6 +45,12 @@ function applyTrace(svg: SVGSVGElement | null, p: number): [number, number] | nu
   return tip;
 }
 
+/** Étincelles CSS : rayon, taille, durée et départ de chaque orbite (valeurs fixes, pas d'aléatoire au rendu). */
+const SPARKS = [
+  [44, 4, 18, 0], [47, 3, 24, -6], [41, 5, 21, -11], [49, 3, 28, -3], [45, 4, 16, -9],
+  [43, 3, 26, -15], [48, 4, 20, -4], [46, 3, 30, -20], [42, 4, 23, -13], [50, 3, 19, -7],
+].map(([r, sz, t, d]) => ({ ["--r" as string]: String(r), ["--s" as string]: `${sz}px`, ["--t" as string]: `${t}s`, ["--d" as string]: `${d}s` }));
+
 /** Autorisation du gyroscope déjà accordée (iPhone) : gardée pour toute la page, car le noyau
  *  peut se reconstruire (passage 3D → image fixe) et ne doit pas redemander un toucher. */
 let gyroGranted = false;
@@ -229,7 +235,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       cur.x += (goal.x - cur.x) * 0.08;
       cur.y += (goal.y - cur.y) * 0.08;
       scene.current?.setPointer(cur.x, cur.y);
-      if (tilt.current && !liveRef.current) tilt.current.style.transform = `rotateY(${cur.x * 16}deg) rotateX(${-cur.y * 12}deg) translate3d(${cur.x * 3}%, ${cur.y * 2}%, 0)`;
+      if (tilt.current && !liveRef.current) tilt.current.style.transform = `rotateY(${cur.x * 24}deg) rotateX(${-cur.y * 18}deg) translate3d(${cur.x * 4}%, ${cur.y * 3}%, 0)`;
       if (Math.abs(goal.x - cur.x) + Math.abs(goal.y - cur.y) > 0.002) kick();
     };
     const kick = () => {
@@ -292,13 +298,16 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
 
     // mobile : gyroscope (sur iPhone, l'autorisation est demandée au premier toucher de la page)
     let gyro = false;
+    let baseBeta: number | null = null;
     const onOrient = (e: DeviceOrientationEvent) => {
       // le gyroscope pilote toujours l'inclinaison : la fenêtre d'autorisation d'iPhone interrompt
       // le toucher en cours (pas de « pointerup »), et un glisser resté ouvert bloquait tout
       if (e.gamma == null || e.beta == null) return;
       gyro = true;
-      goal.x = Math.max(-1, Math.min(1, e.gamma / 25));
-      goal.y = Math.max(-1, Math.min(1, (e.beta - 50) / 25));
+      // la position où l'on tient le téléphone devient le « neutre » ; quelques degrés suffisent
+      if (baseBeta === null) baseBeta = e.beta;
+      goal.x = Math.max(-1, Math.min(1, e.gamma / 14));
+      goal.y = Math.max(-1, Math.min(1, (e.beta - baseBeta) / 14));
       kick();
     };
     type IOSOrientation = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
@@ -465,6 +474,14 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
               <path key={i} d={s.d} pathLength={1} className={i < POSTER_STROKES.length ? "glow" : undefined} />
             ))}
           </svg>
+        )}
+        {/* étincelles en orbite autour de l'image (quand la 3D n'est pas affichée) : CSS seul */}
+        {!live && tier !== null && tier > 0 && !showTrace && (
+          <div aria-hidden className="core-sparks">
+            {SPARKS.map((k, i) => (
+              <i key={i} style={k} />
+            ))}
+          </div>
         )}
         {/* onde au toucher (image fixe) : la signature s'illumine d'un coup */}
         {!live && waveKey > 0 && (
