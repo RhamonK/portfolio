@@ -29,7 +29,9 @@ export function detectCoreTier(): CoreTier {
 
   const memory = nav.deviceMemory ?? 4;
   const cores = nav.hardwareConcurrency ?? 4;
-  if (memory <= 2 || cores <= 2) return 1;
+  // iPhone / Safari plafonne le nombre de cœurs annoncé (souvent 2) : ce chiffre n'exclut donc
+  // pas un téléphone. La sonde d'images / s (scene.ts) repasse en niveau 1 s'il ne suit pas.
+  if (memory <= 2) return 1;
 
   const desktop = window.matchMedia("(pointer: fine) and (min-width: 768px)").matches;
   return desktop && cores >= 4 ? 3 : 2;

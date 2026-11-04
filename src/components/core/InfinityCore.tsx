@@ -283,7 +283,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       kick();
     };
 
-    // mobile : gyroscope (sur iPhone, l'autorisation est demandée au premier toucher du noyau)
+    // mobile : gyroscope (sur iPhone, l'autorisation est demandée au premier toucher de la page)
     let gyro = false;
     const onOrient = (e: DeviceOrientationEvent) => {
       if (e.gamma == null || e.beta == null || drag) return;
@@ -309,7 +309,8 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
     window.addEventListener("pointerup", onUp, { passive: true });
     window.addEventListener("pointercancel", onUp, { passive: true });
     if (fine) window.addEventListener("pointermove", onMouse, { passive: true });
-    else el.addEventListener("touchend", askGyro, { passive: true });
+    // iPhone : l'autorisation du gyroscope demande un geste ; le premier toucher, n'importe où
+    else window.addEventListener("touchend", askGyro, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
@@ -320,7 +321,7 @@ export const InfinityCore = forwardRef<InfinityCoreHandle, Props>(function Infin
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       window.removeEventListener("pointermove", onMouse);
-      el.removeEventListener("touchend", askGyro);
+      window.removeEventListener("touchend", askGyro);
       window.removeEventListener("deviceorientation", onOrient);
       if (tilt.current) tilt.current.style.transform = "";
     };
