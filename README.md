@@ -28,9 +28,9 @@ npm start        # sert out/ en local
 - Captures et dessins des projets : `public/projets/<slug>/`. Les dessins (`dessin.svg`) sont générés
   depuis `src/components/ProjectArt.tsx` avec `npm run art`.
 - Présentations de 60 s (FR / EN) : `src/data/presentations.ts`.
-- Salle d'écrans 3D : modèle Blender `public/salle/salle.glb` (prompt : `docs/prompt-blender-salle.md`),
+- Salle d'écrans 3D : modèle Blender `public/salle/salle.glb`,
   affiché par `src/components/Room3D.tsx` (WebGL, desktop). Décodeur Draco dans `public/draco/`.
-  Sans WebGL, sur mobile ou en mouvement réduit : écrans en CSS / carrousel plat.
+  Sans WebGL, sur mobile ou en mouvement réduit : carrousel plat.
 - INFINITY CORE (noyau du Hero) : la signature manuscrite `docs/logo/rn-logo-v2.pdf` dans un bloc de verre.
   Scène Three.js `src/components/core/scene.ts`, chargée après l'intro ; image fixe et tracés SVG pour les
   appareils légers. Pour régénérer après un changement de signature :
@@ -46,7 +46,6 @@ npm start        # sert out/ en local
     section Projets, puis file jusqu'au premier écran de projet. Ordre des projets : les plus illustrés d'abord.
   - Contact : la signature se redessine en boucle (`src/components/motion/SignatureLoop.tsx`).
   - Chaque boucle d'animation s'arrête quand rien ne bouge ou que l'élément est hors de l'écran.
-- Ce qui manque encore : voir `ASSETS_MANQUANTS.md`.
 
 ## Règles
 - Tout le texte reste du vrai HTML ; la 3D ne cache jamais le contenu.
