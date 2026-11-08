@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   // Site 100 % statique (dossier out/) : aucun serveur Next en production,
-  // donc aucune surface d'attaque côté serveur.
+  // sans serveur Next exposé en production.
   output: "export",
   trailingSlash: false,
   poweredByHeader: false,
