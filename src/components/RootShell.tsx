@@ -54,16 +54,11 @@ export function RootShell({ lang, children }: { lang: Lang; children: React.Reac
         {/* classe « js » posée avant l'affichage ; classe « intro » si l'intro va jouer (première visite
             de la session, mouvement normal) : le verre du noyau et le masquage du nom sont décidés dès le
             premier affichage, sans attendre le JavaScript de la page. Même règle que Hero.tsx. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){var d=document.documentElement;d.classList.add('js');try{if(!sessionStorage.getItem('rn-intro-vue')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('intro')}catch(e){}})()",
-          }}
-        />
+        <script src="/init.js" />
         <a href="#contenu" className="sr-only-focusable btn btn-lime fixed left-4 top-4 z-[100]">
           {ui[lang].skip}
         </a>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         <SmoothScroll />
         {children}
       </body>

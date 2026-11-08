@@ -1,13 +1,13 @@
 # Portfolio — Rhamone Nyavedji (rhamonenyavedji.com)
 
-Portfolio immersif construit en **Next.js 14 (App Router)** + **TypeScript** + **Tailwind CSS v4**,
+Portfolio immersif construit en **Next.js 16 (App Router)** + **React 19**, **TypeScript** et **Tailwind CSS v4**,
 avec **GSAP / ScrollTrigger** et **Lenis** pour le défilement, et **React Three Fiber** pour le présentateur 3D
 (chargé seulement à l'ouverture d'une présentation).
 
 ## Démarrer
 
 ```bash
-npm install
+npm ci          # Node.js >= 20.9
 npm run dev      # http://localhost:3000
 npm run build    # site statique dans out/
 npm start        # sert out/ en local
@@ -56,8 +56,18 @@ npm start        # sert out/ en local
 ## Sécurité
 - Site 100 % statique (`output: "export"`) : aucun serveur Next en production, donc pas d'API,
   pas de formulaire côté serveur, aucune donnée stockée.
-- En-têtes de sécurité dans `vercel.json` : Content-Security-Policy stricte, HSTS, anti-iframe,
-  `nosniff`, Referrer-Policy, Permissions-Policy.
+- En-têtes de sécurité dans `vercel.json` : HSTS, anti-iframe, `nosniff`, Referrer-Policy,
+  Permissions-Policy et CSP de base (`frame-ancestors`, `object-src`, `base-uri`).
+- `npm run build` exécute aussi `scripts/secure-export.mjs` : chaque page HTML dans `out/`
+  reçoit une CSP en première position du `<head>`, avec les empreintes SHA-256 de ses scripts
+  inline générés par Next. Aucun `unsafe-inline` pour JavaScript, ni nonce fixe. Les styles
+  inline restent nécessaires pour GSAP/Three.js. Le WebAssembly local reste autorisé pour Draco.
+  La politique HTTP et la politique HTML s'appliquent ensemble. Ne pas publier un export issu
+  de `next build` seul et ne pas modifier les scripts HTML après calcul des empreintes.
+- `npm run test:security` vérifie les empreintes, les pages imbriquées et les erreurs d'export.
+  `npm run check` vérifie la palette, TypeScript, ces tests et le build sécurisé.
+  `npm audit` contrôle les dépendances ; Dependabot propose les mises à jour chaque semaine.
+- `.env` et `.env.*` sont ignorés, sauf `.env.example` qui doit rester sans secret.
 - Liens externes en `rel="noreferrer"` ; aucune clé ni secret dans le code.
 
 ## Déploiement
