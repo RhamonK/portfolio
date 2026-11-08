@@ -6,8 +6,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
-// Salle d'écrans modélisée dans Blender (public/salle/salle.glb, voir
-// docs/prompt-blender-salle.md). Le visiteur est au centre, à 1,60 m ;
+// Salle d'écrans modélisée dans Blender (public/salle/salle.glb).
+// Le visiteur est au centre, à 1,60 m ;
 // l'écran 0X reçoit la capture du projet X et le cercle tourne de 66°
 // par projet. Chargé seulement sur desktop, à l'approche de la salle.
 

@@ -8,7 +8,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import type { PresenterSignals } from "@/components/presentation/signals";
 
 // Le présentateur : Rhamone en 3D, modélisé dans Blender
-// (public/presenter/presenter.glb, voir docs/prompt-blender-presentateur.md).
+// (public/presenter/presenter.glb).
 // Noms attendus : os `head`, formes `mouthOpen` / `blink` / `mouthSmile`,
 // actions `idle`, `talk`, `point`, `wave`.
 
