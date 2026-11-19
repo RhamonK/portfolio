@@ -810,3 +810,17 @@ body::after {
 .paper .xp-ring-outer { stroke: rgba(76, 43, 155, 0.35); }
 .paper .xp-tick-major { stroke: rgba(76, 43, 155, 0.5); }
 .paper .pc-tag { border-color: rgba(76, 43, 155, 0.35); }
+
+/* initiales d'un projet sans logo fourni */
+.pc-logo {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 22%;
+  background: var(--olive-850);
+  border: 1px solid var(--glass-line);
+  color: var(--lime);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}

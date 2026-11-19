@@ -39,8 +39,8 @@ export type Project = {
   status?: T;
   /** Ce que Rhamone a fait lui-même, seulement si c'est confirmé. */
   role?: T;
-  /** Deuxième lien utile (une démo), s'il existe. */
-  demo?: { href: string; label: T };
+  /** Vrai logo du projet dans /public/projets/<slug>/ ; sinon ses initiales. */
+  logo?: string;
   /** Une réplique courte, facultative. */
   aside?: T;
 };
@@ -66,6 +66,7 @@ export const projects: Project[] = [
     href: "https://kelthen.com",
     hrefLabel: { fr: "kelthen.com", en: "kelthen.com" },
     status: { fr: "En ligne", en: "Live" },
+    logo: "/projets/kelthen/logo.svg",
     image: "/projets/kelthen/accueil.webp",
     tags: ["web", "automation", "ai"],
     gallery: [
@@ -93,7 +94,6 @@ export const projects: Project[] = [
     tech: "Next.js, Three.js, Supabase",
     href: "https://take-ur-clothes.com",
     hrefLabel: { fr: "take-ur-clothes.com", en: "take-ur-clothes.com" },
-    demo: { href: "https://take-ur-clothes.com/walk", label: { fr: "Entrer dans le mall 3D", en: "Enter the 3D mall" } },
     status: { fr: "En cours", en: "In progress" },
     aside: { fr: "« La boutique a pris un peu de place. »", en: "“The shop got a little bigger.”" },
     image: "/projets/fraul/walk.webp",

@@ -103,9 +103,10 @@ function Scene({
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     const { top, bottom } = drive.current.band;
-    const frac = Math.max(bottom - top, 0.2) * 0.86;
+    // l'écran (cadre compris) occupe toute la hauteur de la bande
+    const frac = Math.max(bottom - top, 0.2) * 0.93;
     const vfov = SCREEN_ANGLE / frac;
-    cam.fov = THREE.MathUtils.radToDeg(THREE.MathUtils.clamp(vfov, 0.5, 1.6));
+    cam.fov = THREE.MathUtils.radToDeg(THREE.MathUtils.clamp(vfov, 0.3, 1.6));
     cam.updateProjectionMatrix();
     // bande au-dessus du milieu : on baisse le regard pour remonter l'écran
     pitch.current = SCREEN_ELEV - (0.5 - (top + bottom) / 2) * vfov;

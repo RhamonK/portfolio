@@ -1,3 +1,4 @@
+import { ProjectLogo } from "@/components/ProjectLogo";
 import type { Project } from "@/data/projects";
 import { ProjectScreen } from "@/components/ProjectScreen";
 import { ui, type Lang } from "@/i18n";
@@ -67,6 +68,7 @@ export function ProjectCard({
         ))}
       </div>
       <h3 className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[24px] font-bold tracking-tight">
+        <ProjectLogo project={project} size={36} />
         {project.name}
         {project.status && <span className="pc-status">{project.status[lang]}</span>}
       </h3>
@@ -86,14 +88,6 @@ export function ProjectCard({
             <a href={project.href} tabIndex={tab} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               {project.hrefLabel?.[lang] ?? project.href} ↗
             </a>
-          )}
-          {project.demo && (
-            <>
-              {" · "}
-              <a href={project.demo.href} tabIndex={tab} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
-                {project.demo.label[lang]} ↗
-              </a>
-            </>
           )}
         </p>
       )}

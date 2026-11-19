@@ -1,5 +1,6 @@
 "use client";
 
+import { ProjectLogo } from "@/components/ProjectLogo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
@@ -61,7 +62,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   const [webgl, setWebgl] = useState(true);
   // Bande de la scène 3D (fractions de la section) : entre le titre et la
   // légende, pour qu'aucun trait ni cadre ne passe derrière le texte.
-  const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55 });
+  const [canvasBox, setCanvasBox] = useState({ top: 0.2, h: 0.55, fadeTop: 4, fadeBottom: 96 });
   const drive = useRef<RoomDrive>({ a: 0, tunnel: 0, band: { top: 0.2, bottom: 0.7 } });
   const images = projects.map((p) => p.image ?? `/projets/${p.slug}/dessin.svg`);
 
@@ -110,16 +111,21 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
   useEffect(() => {
     const onResize = () => {
       // Bande libre pour l'écran de la salle 3D (fractions de la section).
-      const sec = section.current?.getBoundingClientRect();
-      const st = stage3d.current?.getBoundingClientRect();
-      if (sec && st && sec.height > 0) {
-        const top = (st.top - sec.top) / sec.height;
-        const bottom = (st.bottom - sec.top) / sec.height;
+      // mesures de mise en page (offset*), pas getBoundingClientRect : pendant l'entrée
+      // la salle est mise à l'échelle et la bande mesurée serait trop petite.
+      const sec = section.current;
+      const st = stage3d.current;
+      const inn = inner.current;
+      if (sec && st && inn && sec.offsetHeight > 0) {
+        const y = inn.offsetTop + st.offsetTop;
+        const top = y / sec.offsetHeight;
+        const bottom = (y + st.offsetHeight) / sec.offsetHeight;
         const ctop = Math.max(top - 0.01, 0);
-        const h = Math.min(bottom + 0.015, 1) - ctop;
-        setCanvasBox({ top: ctop, h });
-        // bande de l'écran exprimée en fractions de la scène 3D
-        drive.current.band = { top: (top + 0.02 - ctop) / h, bottom: (bottom - 0.03 - ctop) / h };
+        const h = Math.min(bottom + 0.01, 1) - ctop;
+        // bande de l'écran exprimée en fractions de la scène 3D : toute la place libre
+        const band = { top: (top + 0.008 - ctop) / h, bottom: (bottom - 0.008 - ctop) / h };
+        setCanvasBox({ top: ctop, h, fadeTop: band.top * 100, fadeBottom: band.bottom * 100 });
+        drive.current.band = band;
       }
     };
     onResize();
@@ -467,8 +473,9 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           style={{
             top: `${canvasBox.top * 100}%`,
             height: `${canvasBox.h * 100}%`,
-            maskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 6%, #000 90%, transparent 100%)",
+            // fondu limité aux marges, hors de l'écran
+            maskImage: `linear-gradient(to bottom, transparent 0%, #000 ${canvasBox.fadeTop}%, #000 ${canvasBox.fadeBottom}%, transparent 100%)`,
+            WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, #000 ${canvasBox.fadeTop}%, #000 ${canvasBox.fadeBottom}%, transparent 100%)`,
           }}
         >
           <Room3D images={images} drive={drive} paused={!!open || !onScreen} onPick={(i) => (i === active ? launch(i) : list.includes(i) && goTo(list.indexOf(i)))} />
@@ -485,6 +492,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {filter !== "all" && ` · ${t.tags[filter]}`}
         </span>
         <h3 className="mt-1 flex flex-wrap items-center justify-center gap-x-3 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">
+          <ProjectLogo project={current} size={40} />
           {current.name}
           {current.status && <span className="pc-status">{current.status[lang]}</span>}
         </h3>
@@ -500,11 +508,6 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {current.href && (
             <a href={current.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               · {current.hrefLabel?.[lang] ?? current.href} ↗
-            </a>
-          )}
-          {current.demo && (
-            <a href={current.demo.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
-              · {current.demo.label[lang]} ↗
             </a>
           )}
         </p>
