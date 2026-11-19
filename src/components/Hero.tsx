@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 //   0,0–1,0 s  un point de lumière respire ; la scène, vue de biais, entame un lent quart de tour
 //   1,0–3,6 s  une pointe de lumière écrit la signature RN (étincelles)
 //   1,8–4,0 s  le verre se forme autour du trait
-//   3,2–5,5 s  le nom se révèle, rôles, « Infinite — R.N. », boutons, indice
+//   3,2–5,5 s  le nom se révèle, rôles, « Infinite — R.N. », boutons
 // Défiler, toucher l'écran ou appuyer sur une touche termine l'intro aussitôt.
 
 const INTRO_KEY = "rn-intro-vue";
@@ -133,8 +133,7 @@ export function Hero({ lang }: { lang: Lang }) {
             { y: 18, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.9, stagger: 0.1, immediateRender: true, clearProps: "transform,opacity" },
             4.4,
-          )
-          .fromTo(".h-hint", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.7, immediateRender: true, clearProps: "transform,opacity" }, 4.8);
+          );
         roles.forEach((r, i) => tl.add(scramble(r, 0.8), 3.9 + i * 0.3));
 
         // fin immédiate : défilement, toucher, clavier
@@ -165,8 +164,7 @@ export function Hero({ lang }: { lang: Lang }) {
         gsap
           .timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: 0.5 } })
           .to(".h-core-inner", { scale: 0.86, opacity: 0.2, yPercent: -10, ease: "none" }, 0)
-          .to(".h-text", { yPercent: -12, opacity: 0.4, ease: "none" }, 0)
-          .to(".h-hint", { opacity: 0, duration: 0.15 }, 0);
+          .to(".h-text", { yPercent: -12, opacity: 0.4, ease: "none" }, 0);
       });
     }, root);
 
@@ -244,12 +242,7 @@ export function Hero({ lang }: { lang: Lang }) {
         </div>
       </div>
 
-      <p className="h-hint eyebrow pointer-events-none absolute inset-x-0 bottom-6 flex flex-col items-center gap-3 text-center !text-ink/70">
-        <span aria-hidden className="scroll-mouse hidden md:block" />
-        {/* mobile : pas de molette ni de salle 3D (carrousel plat) */}
-        <span className="md:hidden">{t.hintTouch}</span>
-        <span className="hidden md:inline">{t.hint}</span>
-      </p>
+
 
     </section>
   );

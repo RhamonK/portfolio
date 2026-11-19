@@ -337,7 +337,7 @@
 .core-glass { opacity: 0; }
 .intro .core-glass { opacity: 0.06; filter: blur(14px); transform: scale(1.08); }
 .intro .core-full { opacity: 0; }
-.intro .h-text > *:not(h1), .intro .h-hint { opacity: 0; animation: intro-safety-o 0s 6s forwards; }
+.intro .h-text > *:not(h1) { opacity: 0; animation: intro-safety-o 0s 6s forwards; }
 @keyframes intro-safety-o { to { opacity: 1; } }
 /* la scène du noyau : carte cadrée, coins repérés, comme une vitrine */
 .h-stage {
@@ -568,10 +568,6 @@
   color: var(--lime);
 }
 
-/* Écran de téléphone peu haut : l'indice de défilement laisse la place aux boutons. */
-@media (max-width: 767px) and (max-height: 760px) {
-  .h-hint { display: none !important; }
-}
 .h-letter {
   transition: color 0.25s ease, text-shadow 0.25s ease, transform 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
   will-change: transform;
@@ -582,30 +578,6 @@
     text-shadow: 0 0 40px rgba(212, 255, 58, 0.6);
     transform: translateY(-0.08em) rotate(-4deg);
   }
-}
-.scroll-mouse {
-  position: relative;
-  width: 22px;
-  height: 34px;
-  border: 1.5px solid rgba(242, 243, 238, 0.5);
-  border-radius: 12px;
-}
-.scroll-mouse::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 7px;
-  width: 3px;
-  height: 7px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--lime);
-  animation: wheel 1.6s ease-in-out infinite;
-}
-@keyframes wheel {
-  0% { opacity: 0; transform: translateY(0); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(10px); }
 }
 /* grain de pellicule, très léger, sur toute la page */
 body::after {

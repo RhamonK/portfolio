@@ -5,7 +5,8 @@ export function ProjectLogo({ project, size = 40 }: { project: Project; size?: n
   const style = { width: size, height: size };
   if (project.logo) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={project.logo} alt="" aria-hidden width={size} height={size} className="shrink-0 rounded-[22%]" style={style} />;
+    // hauteur fixe, largeur libre : les logos-mots (TakeUrClothes, NBW) gardent leurs proportions
+    return <img src={project.logo} alt="" aria-hidden height={size} className="w-auto shrink-0 object-contain" style={{ height: size, maxWidth: size * 2.4 }} />;
   }
   const words = project.name.replace(/[^A-Za-zÀ-ÿ ]/g, " ").split(/\s+/).filter(Boolean);
   const first = words[0] ?? "";

@@ -81,6 +81,30 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "nbw",
+    name: "Network of Black Women",
+    pitch: {
+      fr: "Une maison en ligne pour une sororité de femmes noires en Alberta.",
+      en: "A home online for a sisterhood of Black women in Alberta.",
+    },
+    description: {
+      fr: "Site web et plateforme communautaire pour Network of Black Women, une sororité pour les femmes noires de l'Alberta : dons en ligne, inscription aux événements, conférence annuelle, infolettre et contenu facile à mettre à jour, dans une identité chaleureuse (crème, brun, rose).",
+      en: "Website and community platform for Network of Black Women, a sisterhood for Black women in Alberta: online donations, event registration, an annual conference, a newsletter and easy content updates, in a warm identity (cream, brown, pink).",
+    },
+    tech: null,
+    href: "https://networkofblackwomen.ca",
+    hrefLabel: { fr: "networkofblackwomen.ca", en: "networkofblackwomen.ca" },
+    logo: "/projets/nbw/logo.png",
+    image: "/projets/nbw/accueil.webp",
+    tags: ["web"],
+    gallery: [
+      shot("nbw", "slides/home", "Accueil", "Home"),
+      shot("nbw", "slides/donate", "Dons en ligne", "Online donations"),
+      shot("nbw", "slides/programs", "Programmes et initiatives", "Programs and initiatives"),
+      shot("nbw", "slides/conference", "Conférence annuelle", "Annual conference"),
+    ],
+  },
+  {
     slug: "fraul",
     name: "TakeUrClothes",
     pitch: {
@@ -98,6 +122,7 @@ export const projects: Project[] = [
     aside: { fr: "« La boutique a pris un peu de place. »", en: "“The shop got a little bigger.”" },
     image: "/projets/fraul/walk.webp",
     imagePosition: "center",
+    logo: "/projets/fraul/logo.png",
     tags: ["web", "3d"],
     gallery: [
       shot("fraul", "slides/accueil", "Page d'accueil", "Home page"),
@@ -129,6 +154,7 @@ export const projects: Project[] = [
       en: "The website, the database connection and the automations.",
     },
     image: "/projets/studio-nala/reservation.webp",
+    logo: "/projets/studio-nala/logo.svg",
     tags: ["web", "automation", "ai"],
     gallery: [
       shot("studio-nala", "slides/site", "Page d'accueil du salon", "Salon home page"),
@@ -156,6 +182,7 @@ export const projects: Project[] = [
     role: { fr: "Tout, en solo.", en: "All of it, solo." },
     image: "/projets/mamashop/connexion.webp",
     imagePosition: "center",
+    logo: "/projets/mamashop/logo.svg",
     tags: ["mobile"],
     gallery: [shot("mamashop", "connexion", "Écran de connexion", "Sign-in screen")],
   },
@@ -174,6 +201,7 @@ export const projects: Project[] = [
     href: null,
     status: { fr: "En pause", en: "On hold" },
     role: { fr: "Tout, en solo.", en: "All of it, solo." },
+    logo: "/projets/abo/logo.svg",
     tags: ["web"],
     gallery: [],
   },

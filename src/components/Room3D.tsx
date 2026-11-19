@@ -11,7 +11,31 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 // l'écran 0X reçoit la capture du projet X et le cercle tourne de 66°
 // par projet. Chargé seulement sur desktop, à l'approche de la salle.
 
-const STEP = THREE.MathUtils.degToRad(66);
+// La salle Blender a 5 écrans tous les 66° ; on les répartit tous les 60°
+// et on ajoute un 6e écran (copie du 5e) pour faire le tour complet.
+const BLENDER_STEP = 66;
+const STEP_DEG = 60;
+const STEP = THREE.MathUtils.degToRad(STEP_DEG);
+const SETS = ["screen", "glass", "frame", "led_top", "led_bottom"];
+
+function sixScreens(scene: THREE.Object3D) {
+  const byName = new Map<string, THREE.Object3D>();
+  scene.traverse((o) => byName.set(o.name, o));
+  for (const set of SETS) {
+    for (let n = 1; n <= 6; n++) {
+      let obj = byName.get(`${set}_0${n}`);
+      const src = n <= 5 ? n : 5;
+      if (!obj) {
+        const base = byName.get(`${set}_05`);
+        if (!base) continue;
+        obj = base.clone();
+        obj.name = `${set}_0${n}`;
+        base.parent?.add(obj);
+      }
+      obj.rotation.y = THREE.MathUtils.degToRad((n - 1) * STEP_DEG - (src - 1) * BLENDER_STEP);
+    }
+  }
+}
 const EYE = 1.6;
 
 /**
@@ -71,12 +95,14 @@ function Scene({
   // l'anneau du plafond devient la lumière blanc chaud prévue.
   const screens = useMemo(() => {
     const mats: THREE.MeshBasicMaterial[] = [];
+    sixScreens(gltf.scene);
     gltf.scene.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       const m = /^screen_0(\d)$/.exec(mesh.name);
       if (m) {
         const i = Number(m[1]) - 1;
+        if (!images[i]) return;
         const tex = images[i].endsWith(".svg") ? onDark(textures[i]) : textures[i];
         tex.flipY = false;
         tex.colorSpace = THREE.SRGBColorSpace;
