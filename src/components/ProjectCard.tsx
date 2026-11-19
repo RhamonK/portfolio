@@ -74,12 +74,6 @@ export function ProjectCard({
       </h3>
       <p className="mt-1 text-muted">{project.pitch[lang]}</p>
       {project.aside && <p className="mt-1 font-serif text-[18px] italic text-ink/80">{project.aside[lang]}</p>}
-      {project.role && (
-        <p className="mt-2 text-[15px]">
-          <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-muted">{t.myPart} · </span>
-          {project.role[lang]}
-        </p>
-      )}
       {(project.tech || project.href) && (
         <p className="mt-2 font-mono text-[13px] text-muted">
           {project.tech}

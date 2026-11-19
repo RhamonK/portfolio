@@ -37,7 +37,7 @@ export type Project = {
   gallery: Shot[];
   /** Statut réel, seulement s'il est confirmé (En ligne, En cours…). */
   status?: T;
-  /** Ce que Rhamone a fait lui-même, seulement si c'est confirmé. */
+  /** Ce que Rhamone a fait, en quelques mots ; discret, à la fin de la présentation seulement. */
   role?: T;
   /** Vrai logo du projet dans /public/projets/<slug>/ ; sinon ses initiales. */
   logo?: string;
@@ -149,10 +149,7 @@ export const projects: Project[] = [
     tech: "Next.js, Supabase, n8n",
     href: null,
     status: { fr: "Terminé", en: "Done" },
-    role: {
-      fr: "Le site, la connexion à la base de données et les automatisations.",
-      en: "The website, the database connection and the automations.",
-    },
+    role: { fr: "Front-end · base de données · automatisations", en: "Front-end · database · automations" },
     image: "/projets/studio-nala/reservation.webp",
     logo: "/projets/studio-nala/logo.svg",
     tags: ["web", "automation", "ai"],
@@ -179,7 +176,7 @@ export const projects: Project[] = [
     tech: "React Native, Supabase",
     href: "https://github.com/RhamonK/bizup-africa",
     hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
-    role: { fr: "Tout, en solo.", en: "All of it, solo." },
+    role: { fr: "De A à Z", en: "From A to Z" },
     image: "/projets/mamashop/connexion.webp",
     imagePosition: "center",
     logo: "/projets/mamashop/logo.svg",
@@ -200,7 +197,7 @@ export const projects: Project[] = [
     tech: "Next.js, PostgreSQL",
     href: null,
     status: { fr: "En pause", en: "On hold" },
-    role: { fr: "Tout, en solo.", en: "All of it, solo." },
+    role: { fr: "De A à Z", en: "From A to Z" },
     logo: "/projets/abo/logo.svg",
     tags: ["web"],
     gallery: [],

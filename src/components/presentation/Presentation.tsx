@@ -353,6 +353,7 @@ export function Presentation({
                     {t.tech} · {presentation.tech}
                   </span>
                 )}
+                {project.role && <span className="font-mono text-[12px] text-muted/80">{project.role[lang]}</span>}
               </div>
             )}
           </article>
@@ -424,6 +425,7 @@ export function Presentation({
                   {t.tech} · {presentation.tech}
                 </span>
               )}
+              {project.role && <span className="font-mono text-[12px] text-muted/80">{project.role[lang]}</span>}
             </div>
           )}
         </div>
