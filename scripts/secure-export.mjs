@@ -32,7 +32,7 @@ async function secureDirectory(directory) {
       "img-src 'self' data: blob:",
       "font-src 'self'",
       "media-src 'self' blob:",
-      "connect-src 'self' blob: data:",
+      "connect-src 'self' blob: data: https://api.web3forms.com",
       "worker-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'self'",

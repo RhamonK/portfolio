@@ -699,3 +699,36 @@ body::after {
   .xp-cards > li { padding: 18px; }
   .xp-cards h3 { font-size: 22px; }
 }
+
+/* Fil INFINITE, mobile : « où l'on est », visible 1,6 s à chaque changement de section */
+.thread-chip {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .thread-chip {
+    display: block;
+    position: fixed;
+    top: calc(64px + 8px);
+    left: 50%;
+    z-index: 40;
+    transform: translate(-50%, -6px);
+    padding: 5px 12px;
+    border: 1px solid var(--glass-line);
+    border-radius: 999px;
+    background: rgba(10, 11, 10, 0.82);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .thread-chip.is-on {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thread-chip { transition: none; }
+}

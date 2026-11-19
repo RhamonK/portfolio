@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { CvButtons } from "@/components/CvButtons";
+import { ContactForm } from "@/components/ContactForm";
 import { SplitTitle } from "@/components/SplitTitle";
 import { useReveal } from "@/lib/reveal";
 import { SignatureLoop } from "@/components/motion/SignatureLoop";
@@ -55,6 +56,8 @@ export function Contact({ lang }: { lang: Lang }) {
             </div>
           </li>
         </ul>
+
+        <ContactForm lang={lang} />
 
         <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-1 font-mono text-[14px] text-muted" data-reveal>
           <li>
