@@ -66,8 +66,18 @@ export function ProjectCard({
           </span>
         ))}
       </div>
-      <h3 className="mt-2 text-[24px] font-bold tracking-tight">{project.name}</h3>
+      <h3 className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[24px] font-bold tracking-tight">
+        {project.name}
+        {project.status && <span className="pc-status">{project.status[lang]}</span>}
+      </h3>
       <p className="mt-1 text-muted">{project.pitch[lang]}</p>
+      {project.aside && <p className="mt-1 font-serif text-[18px] italic text-ink/80">{project.aside[lang]}</p>}
+      {project.role && (
+        <p className="mt-2 text-[15px]">
+          <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-muted">{t.myPart} · </span>
+          {project.role[lang]}
+        </p>
+      )}
       {(project.tech || project.href) && (
         <p className="mt-2 font-mono text-[13px] text-muted">
           {project.tech}
@@ -76,6 +86,14 @@ export function ProjectCard({
             <a href={project.href} tabIndex={tab} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               {project.hrefLabel?.[lang] ?? project.href} ↗
             </a>
+          )}
+          {project.demo && (
+            <>
+              {" · "}
+              <a href={project.demo.href} tabIndex={tab} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
+                {project.demo.label[lang]} ↗
+              </a>
+            </>
           )}
         </p>
       )}

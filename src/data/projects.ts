@@ -35,6 +35,14 @@ export type Project = {
   tags: Tag[];
   /** Vrais écrans, dans l'ordre d'un parcours ; vide = rien à montrer de plus. */
   gallery: Shot[];
+  /** Statut réel, seulement s'il est confirmé (En ligne, En cours…). */
+  status?: T;
+  /** Ce que Rhamone a fait lui-même, seulement si c'est confirmé. */
+  role?: T;
+  /** Deuxième lien utile (une démo), s'il existe. */
+  demo?: { href: string; label: T };
+  /** Une réplique courte, facultative. */
+  aside?: T;
 };
 
 const shot = (slug: string, file: string, fr: string, en: string): Shot => ({
@@ -57,6 +65,7 @@ export const projects: Project[] = [
     tech: "n8n, Supabase",
     href: "https://kelthen.com",
     hrefLabel: { fr: "kelthen.com", en: "kelthen.com" },
+    status: { fr: "En ligne", en: "Live" },
     image: "/projets/kelthen/accueil.webp",
     tags: ["web", "automation", "ai"],
     gallery: [
@@ -72,24 +81,27 @@ export const projects: Project[] = [
   },
   {
     slug: "fraul",
-    name: "Fraul",
+    name: "TakeUrClothes",
     pitch: {
       fr: "Une boutique de mode qu'on visite comme un centre commercial en 3D.",
       en: "A fashion store you visit like a 3D shopping mall.",
     },
     description: {
-      fr: "Boutique en ligne de vêtements et chaussures, réalisée avec l'équipe Kelthen. Son expérience principale, le Fraul Walk, est un centre commercial en 3D avec une boutique par marque : on touche une vitrine pour entrer. On peut aussi composer une tenue, garder ses envies, demander une pièce introuvable et suivre sa commande. Projet en cours.",
-      en: "An online clothing and shoe store, built with the Kelthen team. Its main experience, the Fraul Walk, is a 3D shopping mall with one shop per brand: tap a window to walk in. Visitors can also build an outfit, save favourites, request a hard-to-find piece and track their order. In progress.",
+      fr: "Boutique en ligne de vêtements et chaussures, réalisée avec l'équipe Kelthen. Son expérience principale est un centre commercial en 3D avec une boutique par marque : on touche une vitrine pour entrer. On peut aussi composer une tenue, garder ses envies, demander une pièce introuvable et suivre sa commande. Projet en cours.",
+      en: "An online clothing and shoe store, built with the Kelthen team. Its main experience is a 3D shopping mall with one shop per brand: tap a window to walk in. Visitors can also build an outfit, save favourites, request a hard-to-find piece and track their order. In progress.",
     },
     tech: "Next.js, Three.js, Supabase",
     href: "https://take-ur-clothes.com",
     hrefLabel: { fr: "take-ur-clothes.com", en: "take-ur-clothes.com" },
+    demo: { href: "https://take-ur-clothes.com/walk", label: { fr: "Entrer dans le mall 3D", en: "Enter the 3D mall" } },
+    status: { fr: "En cours", en: "In progress" },
+    aside: { fr: "« La boutique a pris un peu de place. »", en: "“The shop got a little bigger.”" },
     image: "/projets/fraul/walk.webp",
     imagePosition: "center",
     tags: ["web", "3d"],
     gallery: [
       shot("fraul", "slides/accueil", "Page d'accueil", "Home page"),
-      shot("fraul", "slides/mall", "Le mall (Fraul Walk)", "The mall (Fraul Walk)"),
+      shot("fraul", "slides/mall", "Le mall en 3D", "The 3D mall"),
       shot("fraul", "slides/marques", "Toutes les marques", "All brands"),
       shot("fraul", "slides/boutique", "Boutique d'une marque", "A brand's shop"),
       shot("fraul", "slides/produit", "Fiche produit", "Product page"),

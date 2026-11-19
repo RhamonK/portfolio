@@ -514,15 +514,15 @@ const fraul: Presentation = {
       title: { fr: "Un centre commercial en 3D", en: "A 3D shopping mall" },
       lines: {
         fr: [
-          "Le Fraul Walk : on se promène dans un mall en 3D.",
+          "Le mall 3D : on se promène dans un mall en 3D.",
           "Une boutique par marque ; on touche la vitrine pour entrer.",
         ],
-        en: ["The Fraul Walk: you stroll through a 3D mall.", "One shop per brand; tap the window to walk in."],
+        en: ["The 3D mall: you stroll through a 3D mall.", "One shop per brand; tap the window to walk in."],
       },
-      keywords: { fr: ["Fraul Walk", "3D", "une boutique par marque"], en: ["Fraul Walk", "3D", "one shop per brand"] },
+      keywords: { fr: ["mall 3D", "3D", "une boutique par marque"], en: ["mall 3D", "3D", "one shop per brand"] },
       speech: {
-        fr: "Avec l'équipe Kelthen, on a créé le Fraul Walk : un centre commercial en 3D, avec une boutique par marque.",
-        en: "With the Kelthen team, we built the Fraul Walk: a 3D shopping mall with one shop per brand.",
+        fr: "Avec l'équipe Kelthen, on a créé le mall 3D : un centre commercial en 3D, avec une boutique par marque.",
+        en: "With the Kelthen team, we built the 3D mall: a 3D shopping mall with one shop per brand.",
       },
     },
     {
@@ -587,7 +587,7 @@ const fraul: Presentation = {
         fr: ["Une boutique de mode qu'on visite, au lieu de la faire défiler."],
         en: ["A fashion shop you visit, instead of scrolling through."],
       },
-      keywords: { fr: ["Fraul", "Fraul Walk"], en: ["Fraul", "Fraul Walk"] },
+      keywords: { fr: ["TakeUrClothes", "mall 3D"], en: ["TakeUrClothes", "mall 3D"] },
       speech: {
         fr: "Une boutique de mode qu'on visite, au lieu de la faire défiler. Merci d'avoir regardé.",
         en: "A fashion shop you visit instead of scrolling through. Thanks for watching.",

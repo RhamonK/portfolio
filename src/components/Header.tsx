@@ -17,7 +17,7 @@ export function Header({ lang }: { lang: Lang }) {
   const nav = [
     { label: t.nav.projects, href: `${base[lang]}#projets` },
     { label: t.nav.expertise, href: `${base[lang]}#expertise` },
-    { label: t.nav.path, href: `${base[lang]}#parcours` },
+    { label: t.labNav, href: `${base[lang]}#labo` },
     { label: t.nav.contact, href: `${base[lang]}#contact` },
   ];
 
@@ -57,7 +57,7 @@ export function Header({ lang }: { lang: Lang }) {
   const close = () => setOpen(false);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-glass-line bg-bg/70 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-glass-line bg-bg/90 backdrop-blur-md">
       <div className="wrap flex h-14 items-center justify-between gap-4 md:h-16">
         <Link href={home} aria-label={`R.N. — ${site.name}`} className="font-display text-[17px] font-bold tracking-tight">
           <span aria-hidden className="md:hidden">

@@ -200,9 +200,7 @@ export function Hero({ lang }: { lang: Lang }) {
         {/* ===== texte ===== */}
         <div className="h-text md:order-1">
           <p className="h-eyebrow eyebrow flex items-baseline gap-2">
-            <span className="font-serif text-[22px] italic leading-none text-ink">Infinite</span>
-            <span aria-hidden className="text-lime">—</span>
-            <span>R.N.</span>
+            <span className="font-serif text-[22px] italic leading-none text-ink">{t.heroHello}</span>
           </p>
           <h1
             id="titre-accueil"
@@ -229,11 +227,15 @@ export function Hero({ lang }: { lang: Lang }) {
               {copy.position}
             </span>
           </p>
-          <div className="h-cta mt-7 flex flex-wrap gap-3">
+          <p className="h-lead mt-4 max-w-[520px] text-[clamp(16px,1.5vw,19px)] text-ink/85">{t.heroLead}</p>
+          <div className="h-cta mt-7 flex flex-wrap items-center gap-3">
             <a href="#projets" className="btn btn-lime">
               {t.seeProjects}
             </a>
-            <a href={site.cv[lang]} download className="btn btn-glass">
+            <a href="#contact" className="btn btn-violet">
+              {t.contactMe}
+            </a>
+            <a href={site.cv[lang]} download className="ml-1 text-[15px] font-semibold text-ink/80 underline decoration-ink/30 underline-offset-4 hover:text-ink">
               {t.downloadCv}
             </a>
           </div>

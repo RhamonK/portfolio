@@ -13,6 +13,10 @@ export const palette = {
   olive800: "#10120e",
   olive780: "#0e100c",
   olive750: "#0d0f0b",
+  cream: "#f5f2ea",
+  inkDark: "#24212b",
+  violet: "#4c2b9b",
+  mutedPaper: "#5e5a66",
 } as const;
 
 /** Nom de la variable CSS correspondant à chaque clé. */
@@ -27,4 +31,8 @@ export const cssVar: Record<keyof typeof palette, string> = {
   olive800: "--olive-800",
   olive780: "--olive-780",
   olive750: "--olive-750",
+  cream: "--cream",
+  inkDark: "--ink-dark",
+  violet: "--violet",
+  mutedPaper: "--muted-paper",
 };

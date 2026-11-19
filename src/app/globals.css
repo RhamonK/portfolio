@@ -22,6 +22,14 @@
   --olive-780: #0e100c;
   --olive-750: #0d0f0b;
   --panel: rgba(16, 18, 14, 0.92);
+
+  /* Couleurs claires : le papier crème allège le noir dominant.
+     Crème + encre pour lire, violet pour les accents sur la crème,
+     le lime reste réservé aux fonds sombres. */
+  --cream: #f5f2ea;
+  --ink-dark: #24212b;
+  --violet: #4c2b9b;
+  --muted-paper: #5e5a66;
 }
 
 @theme {
@@ -38,6 +46,9 @@
   --color-olive-780: var(--olive-780);
   --color-olive-750: var(--olive-750);
   --color-panel: var(--panel);
+  --color-cream: var(--cream);
+  --color-ink-dark: var(--ink-dark);
+  --color-violet: var(--violet);
 
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
@@ -732,3 +743,70 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .thread-chip { transition: none; }
 }
+
+/* ===== Papier crème =====
+   Une section .paper inverse les jetons : fond crème, texte encre, et l'accent
+   « lime » devient le violet (lisible sur la crème, contraste 8,8 ; le lime y
+   serait invisible). Tous les composants suivent sans être modifiés. */
+.paper {
+  --bg: var(--cream);
+  --text: var(--ink-dark);
+  --muted: var(--muted-paper);
+  --lime: var(--violet);
+  --on-lime: var(--cream);
+  --glass: rgba(36, 33, 43, 0.04);
+  --glass-strong: rgba(36, 33, 43, 0.06);
+  --glass-line: rgba(36, 33, 43, 0.14);
+  --panel: rgba(36, 33, 43, 0.05);
+  /* Tailwind résout ses couleurs à la racine : on les redéfinit ici aussi */
+  --color-bg: var(--cream);
+  --color-ink: var(--ink-dark);
+  --color-muted: var(--muted-paper);
+  --color-lime: var(--violet);
+  --color-on-lime: var(--cream);
+  --color-glass: rgba(36, 33, 43, 0.04);
+  --color-glass-line: rgba(36, 33, 43, 0.14);
+  --color-panel: rgba(36, 33, 43, 0.05);
+  background: var(--cream);
+  color: var(--ink-dark);
+}
+.paper .glass {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 1px 0 rgba(36, 33, 43, 0.04), 0 18px 40px -28px rgba(36, 33, 43, 0.35);
+}
+.paper ::selection { background: var(--violet); color: var(--cream); }
+/* bouton violet : sur fond sombre comme sur la crème (texte crème, contraste 8,8) */
+.btn-violet {
+  background: var(--violet);
+  color: var(--cream);
+}
+.btn-violet:hover { filter: brightness(1.12); }
+/* statut réel d'un projet (En ligne, En cours…) */
+.pc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  background: var(--glass);
+}
+.pc-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+/* le cercle de l'Expertise sur la crème : traits encre et violet */
+.paper .xp-ring { stroke: rgba(36, 33, 43, 0.16); }
+.paper .xp-tick { stroke: rgba(36, 33, 43, 0.16); }
+.paper .xp-ring-outer { stroke: rgba(76, 43, 155, 0.35); }
+.paper .xp-tick-major { stroke: rgba(76, 43, 155, 0.5); }
+.paper .pc-tag { border-color: rgba(76, 43, 155, 0.35); }

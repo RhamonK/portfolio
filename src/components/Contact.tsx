@@ -41,7 +41,7 @@ export function Contact({ lang }: { lang: Lang }) {
               <a href={`mailto:${site.email}`} className="block break-all text-[18px] font-bold hover:text-lime">
                 {site.email}
               </a>
-              <a href={`mailto:${site.email}`} className="btn btn-lime mt-4">
+              <a href={`mailto:${site.email}`} className="btn btn-violet mt-4">
                 {t.writeMe} →
               </a>
             </div>
@@ -63,9 +63,7 @@ export function Contact({ lang }: { lang: Lang }) {
           <li>
             <a href={site.links.github} className="hover:text-ink">github.com/RhamonK</a>
           </li>
-          <li>
-            {site.location} · {site.languages}
-          </li>
+          <li>{site.languages}</li>
         </ul>
       </div>
     </section>

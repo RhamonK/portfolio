@@ -484,8 +484,12 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {pad(pos + 1)} / {pad(m)}
           {filter !== "all" && ` · ${t.tags[filter]}`}
         </span>
-        <h3 className="mt-1 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">{current.name}</h3>
+        <h3 className="mt-1 flex flex-wrap items-center justify-center gap-x-3 text-[clamp(26px,3vw,38px)] font-bold tracking-tight">
+          {current.name}
+          {current.status && <span className="pc-status">{current.status[lang]}</span>}
+        </h3>
         <p className="mx-auto mt-1 max-w-[760px] text-muted">{current.pitch[lang]}</p>
+        {current.aside && <p className="mt-0.5 font-serif text-[18px] italic text-ink/80">{current.aside[lang]}</p>}
         <p className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-[13px] text-muted">
           {current.tags.map((tag) => (
             <span key={tag} className="pc-tag">
@@ -496,6 +500,11 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {current.href && (
             <a href={current.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
               · {current.hrefLabel?.[lang] ?? current.href} ↗
+            </a>
+          )}
+          {current.demo && (
+            <a href={current.demo.href} className="text-lime underline decoration-lime/40 underline-offset-4 hover:decoration-lime">
+              · {current.demo.label[lang]} ↗
             </a>
           )}
         </p>

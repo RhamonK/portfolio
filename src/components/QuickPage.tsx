@@ -18,7 +18,7 @@ export function QuickPage({ lang }: { lang: Lang }) {
       </Link>
       <h1 className="display mt-6 text-[clamp(40px,7vw,64px)]">{site.name}</h1>
       <p className="mt-3 text-muted">
-        {copy.role} · {copy.position} · {site.location} · {site.languages}
+        {copy.role} · {copy.position} · {site.languages}
       </p>
       <CvButtons lang={lang} className="mt-6" />
 

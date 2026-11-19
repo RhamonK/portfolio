@@ -56,7 +56,7 @@ export function ContactForm({ lang }: { lang: Lang }) {
     "mt-1.5 w-full rounded-xl border border-glass-line bg-white/[0.04] px-4 py-3 text-[16px] text-ink placeholder:text-muted/70 focus:border-lime/60 focus:outline-none";
 
   return (
-    <form onSubmit={onSubmit} className="glass mt-4 rounded-2xl p-6 md:p-7" data-reveal>
+    <form onSubmit={onSubmit} className="paper mt-4 rounded-2xl p-6 md:p-7" data-reveal>
       <h3 className="text-[22px] font-bold tracking-tight">{t.formTitle}</h3>
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         <label className="block text-[14px] text-muted">

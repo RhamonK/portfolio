@@ -1,7 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { ProjectRoom } from "@/components/ProjectRoom";
-import { Parcours } from "@/components/Parcours";
 import { Expertise } from "@/components/Expertise";
 import { Lab } from "@/components/Lab";
 import { Contact } from "@/components/Contact";
@@ -19,7 +18,6 @@ export function HomePage({ lang }: { lang: Lang }) {
         <ProjectRoom lang={lang} />
         <Expertise lang={lang} />
         <Lab lang={lang} />
-        <Parcours lang={lang} />
         <Contact lang={lang} />
       </main>
       <Footer />
