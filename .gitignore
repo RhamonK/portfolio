@@ -29,6 +29,5 @@ yarn-error.log*
 next-env.d.ts
 
 # local tooling / editor
-.claude/
 
 .vercel
