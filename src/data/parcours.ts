@@ -17,7 +17,7 @@ export const parcours: Step[] = [
   {
     period: { fr: "2025 – présent", en: "2025 – present" },
     place: "Gatineau, QC",
-    title: { fr: "Directeur exécutif", en: "Executive Director" },
+    title: { fr: "Directeur", en: "Director" },
     org: "Kelthen Inc.",
     text: {
       fr: "Entreprise de sites web, d'automatisation et d'intégration IA ; référent du développement des sites.",

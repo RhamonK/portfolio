@@ -10,8 +10,8 @@ export const viewport: Viewport = {
 };
 
 const keywords: Record<Lang, string[]> = {
-  fr: ["Rhamone Nyavedji", "développeur full-stack", "automatisation", "intégration IA", "Kelthen Inc.", "Gatineau", "Ottawa", "portfolio"],
-  en: ["Rhamone Nyavedji", "full-stack developer", "automation", "AI integration", "Kelthen Inc.", "Gatineau", "Ottawa", "portfolio"],
+  fr: ["Rhamone Nyavedji", "développeur logiciel", "automatisation IA", "intégration IA", "Kelthen Inc.", "Gatineau", "Ottawa", "portfolio"],
+  en: ["Rhamone Nyavedji", "software developer", "AI automation", "AI integration", "Kelthen Inc.", "Gatineau", "Ottawa", "portfolio"],
 };
 
 /** Métadonnées d'une page : canonique + version dans l'autre langue (hreflang). */

@@ -229,6 +229,7 @@ export function Hero({ lang }: { lang: Lang }) {
               {copy.position}
             </span>
           </p>
+          <p className="h-lead mt-4 max-w-[520px] text-[clamp(17px,1.6vw,20px)] text-ink/85">{t.heroLine}</p>
           <div className="h-cta mt-7 flex flex-wrap items-center gap-3">
             <a href="#projets" className="btn btn-lime">
               {t.seeProjects}

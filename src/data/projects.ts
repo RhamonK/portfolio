@@ -123,6 +123,11 @@ export const projects: Project[] = [
     },
     tech: "Next.js, Supabase, n8n",
     href: null,
+    status: { fr: "Terminé", en: "Done" },
+    role: {
+      fr: "Le site, la connexion à la base de données et les automatisations.",
+      en: "The website, the database connection and the automations.",
+    },
     image: "/projets/studio-nala/reservation.webp",
     tags: ["web", "automation", "ai"],
     gallery: [
@@ -148,6 +153,7 @@ export const projects: Project[] = [
     tech: "React Native, Supabase",
     href: "https://github.com/RhamonK/bizup-africa",
     hrefLabel: { fr: "Code sur GitHub", en: "Code on GitHub" },
+    role: { fr: "Tout, en solo.", en: "All of it, solo." },
     image: "/projets/mamashop/connexion.webp",
     imagePosition: "center",
     tags: ["mobile"],
@@ -166,6 +172,8 @@ export const projects: Project[] = [
     },
     tech: "Next.js, PostgreSQL",
     href: null,
+    status: { fr: "En pause", en: "On hold" },
+    role: { fr: "Tout, en solo.", en: "All of it, solo." },
     tags: ["web"],
     gallery: [],
   },

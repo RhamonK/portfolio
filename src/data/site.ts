@@ -26,19 +26,19 @@ export const siteCopy: Record<
   { title: string; role: string; position: string; description: string; availability: string }
 > = {
   fr: {
-    title: "Rhamone Nyavedji — Développeur full-stack & automatisation",
-    role: "Développeur full-stack & automatisation",
-    position: "Directeur exécutif, Kelthen Inc.",
+    title: "Rhamone Nyavedji — Développeur logiciel & automatisation IA",
+    role: "Développeur logiciel & automatisation IA",
+    position: "Directeur, Kelthen Inc.",
     description:
-      "Rhamone Nyavedji, développeur full-stack et automatisation, directeur exécutif de Kelthen Inc. Applications web et mobiles, automatisations et intégration d'IA. Gatineau / Ottawa, bilingue FR / EN.",
+      "Rhamone Nyavedji, développeur logiciel et automatisation IA, directeur de Kelthen Inc. Applications web et mobiles, automatisations et intégration d'IA. Gatineau / Ottawa, bilingue FR / EN.",
     availability: "ouvert aux opportunités · poste ou mission",
   },
   en: {
-    title: "Rhamone Nyavedji — Full-stack & automation developer",
-    role: "Full-stack & automation developer",
-    position: "Executive Director, Kelthen Inc.",
+    title: "Rhamone Nyavedji — Software developer & AI automation",
+    role: "Software developer & AI automation",
+    position: "Director, Kelthen Inc.",
     description:
-      "Rhamone Nyavedji, full-stack and automation developer, Executive Director of Kelthen Inc. Web and mobile apps, automations and AI integration. Gatineau / Ottawa, bilingual FR / EN.",
+      "Rhamone Nyavedji, software developer and AI automation specialist, Director of Kelthen Inc. Web and mobile apps, automations and AI integration. Gatineau / Ottawa, bilingual FR / EN.",
     availability: "open to opportunities · job or contract",
   },
 };
