@@ -26,6 +26,19 @@ export function InfiniteThread({ lang }: { lang: Lang }) {
   const root = useRef<HTMLDivElement>(null);
   const [marks, setMarks] = useState<{ id: string; at: number; top: number }[]>([]);
   const [active, setActive] = useState(0);
+  // Mobile : petite étiquette « 03 / 06 · Expertise » qui apparaît quand on change
+  // de section, puis s'efface (elle ne capte jamais le doigt).
+  const [chip, setChip] = useState(false);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setChip(true);
+    const id = window.setTimeout(() => setChip(false), 1600);
+    return () => window.clearTimeout(id);
+  }, [active]);
 
   useEffect(() => {
     const el = root.current;
@@ -100,6 +113,10 @@ export function InfiniteThread({ lang }: { lang: Lang }) {
         <div className="thread-fill" />
         <div className="thread-head" />
       </div>
+      {/* où l'on est (mobile) */}
+      <p aria-hidden className={`thread-chip${chip && active > 0 ? " is-on" : ""}`}>
+        <span className="text-lime">0{active + 1}</span> / 0{SECTIONS.length} · {labels[SECTIONS[active]]}
+      </p>
       {/* repères cliquables (desktop) */}
       <nav aria-label={t.threadLabel} className="thread-marks">
         <ol>
