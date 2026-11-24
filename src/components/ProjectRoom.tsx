@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/data/projects";
 import dynamic from "next/dynamic";
 import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectStory } from "@/components/ProjectStory";
 import { ProjectFilter, filtered, type Filter } from "@/components/ProjectFilter";
 import type { RoomDrive } from "@/components/Room3D";
 import { hasPresentation } from "@/data/presented";
@@ -496,7 +497,7 @@ export function ProjectRoom({ lang }: { lang: Lang }) {
           {current.name}
           {current.status && <span className="pc-status">{current.status[lang]}</span>}
         </h3>
-        <p className="mx-auto mt-1 max-w-[760px] text-muted">{current.pitch[lang]}</p>
+        <ProjectStory project={current} lang={lang} variant="caption" />
         {current.aside && <p className="mt-0.5 font-serif text-[18px] italic text-ink/80">{current.aside[lang]}</p>}
         <p className="mt-2 flex flex-wrap items-center justify-center gap-2 font-mono text-[13px] text-muted">
           {current.tags.map((tag) => (

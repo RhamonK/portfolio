@@ -135,6 +135,19 @@ export function Expertise({ lang }: { lang: Lang }) {
                 </li>
               ))}
             </ul>
+            {p.flow && (
+              <figure className="xp-flow mt-5">
+                <ol aria-label={t.flowLabel}>
+                  {p.flow.steps.map((s, k) => (
+                    <li key={k} style={{ "--k": k } as React.CSSProperties}>
+                      <span className="xp-flow-title">{s.title[lang]}</span>
+                      <span className="xp-flow-detail">{s.detail[lang]}</span>
+                    </li>
+                  ))}
+                </ol>
+                <figcaption>{p.flow.caption[lang]}</figcaption>
+              </figure>
+            )}
             <p className="mt-4 text-[14px] text-muted">
               <span className="text-ink/80">{t.proofsLabel}</span> {p.proofs.map(nameOf).join(", ")}
             </p>

@@ -43,6 +43,12 @@ export type Project = {
   logo?: string;
   /** Une réplique courte, facultative. */
   aside?: T;
+  /**
+   * Récit court sous l'écran : le problème, puis ce que le projet change concrètement.
+   * La solution affichée est `pitch`. Absent = seule la phrase `pitch` s'affiche.
+   * Reformulé depuis `description`, sans chiffre ni fait ajouté.
+   */
+  story?: { problem: T; result: T };
 };
 
 const shot = (slug: string, file: string, fr: string, en: string): Shot => ({
@@ -68,6 +74,16 @@ export const projects: Project[] = [
     status: { fr: "En ligne", en: "Live" },
     logo: "/projets/kelthen/logo.svg",
     image: "/projets/kelthen/accueil.webp",
+    story: {
+      problem: {
+        fr: "Attirer des clients, gérer les réservations et rester visible, en plus de son métier.",
+        en: "Attracting clients, handling bookings and staying visible, on top of the actual work.",
+      },
+      result: {
+        fr: "Réservation en ligne, secrétaire IA, rappels SMS et courriel ; en interne, prospection et relances automatisées.",
+        en: "Online booking, an AI receptionist, SMS and email reminders; internally, automated prospecting and follow-ups.",
+      },
+    },
     tags: ["web", "automation", "ai"],
     gallery: [
       shot("kelthen", "slides/accueil", "Page d'accueil", "Home page"),
@@ -123,6 +139,16 @@ export const projects: Project[] = [
     image: "/projets/fraul/walk.webp",
     imagePosition: "center",
     logo: "/projets/fraul/logo.png",
+    story: {
+      problem: {
+        fr: "Faire vivre en ligne l'expérience d'un vrai centre commercial, et pas seulement une grille de produits.",
+        en: "Bring the experience of a real shopping mall online, not just a grid of products.",
+      },
+      result: {
+        fr: "Le Fraul Walk : une boutique par marque, une tenue à composer, une pièce introuvable à demander, une commande à suivre.",
+        en: "The Fraul Walk: one shop per brand, an outfit to build, a hard-to-find piece to request, an order to track.",
+      },
+    },
     tags: ["web", "3d"],
     gallery: [
       shot("fraul", "slides/accueil", "Page d'accueil", "Home page"),
@@ -152,6 +178,16 @@ export const projects: Project[] = [
     role: { fr: "Front-end · base de données · automatisations", en: "Front-end · database · automations" },
     image: "/projets/studio-nala/reservation.webp",
     logo: "/projets/studio-nala/logo.svg",
+    story: {
+      problem: {
+        fr: "Un salon de tresses qui reçoit ses demandes de rendez-vous sur plusieurs canaux à la fois.",
+        en: "A braiding salon receiving appointment requests on several channels at once.",
+      },
+      result: {
+        fr: "La propriétaire valide chaque demande d'un tap sur Telegram ; confirmation par SMS et courriel, agenda à jour, rappels 24 h et 2 h avant.",
+        en: "The owner approves each request with one tap on Telegram; SMS and email confirmation, an up-to-date calendar, reminders 24 h and 2 h before.",
+      },
+    },
     tags: ["web", "automation", "ai"],
     gallery: [
       shot("studio-nala", "slides/site", "Page d'accueil du salon", "Salon home page"),
@@ -180,6 +216,16 @@ export const projects: Project[] = [
     image: "/projets/mamashop/connexion.webp",
     imagePosition: "center",
     logo: "/projets/mamashop/logo.svg",
+    story: {
+      problem: {
+        fr: "Tenir un commerce quand le réseau coupe et que la famille qui le soutient vit loin.",
+        en: "Running a shop when the network drops and the family supporting it lives far away.",
+      },
+      result: {
+        fr: "Les ventes s'enregistrent hors ligne puis se synchronisent ; trois espaces : gérant, agent de terrain, diaspora.",
+        en: "Sales are recorded offline, then sync; three spaces: manager, field agent, diaspora.",
+      },
+    },
     tags: ["mobile"],
     gallery: [shot("mamashop", "connexion", "Écran de connexion", "Sign-in screen")],
   },
@@ -199,6 +245,16 @@ export const projects: Project[] = [
     status: { fr: "En pause", en: "On hold" },
     role: { fr: "Front-end · back-end", en: "Front-end · back-end" },
     logo: "/projets/abo/logo.svg",
+    story: {
+      problem: {
+        fr: "À Lomé, il est difficile de savoir à quel artisan faire confiance.",
+        en: "In Lomé, it is hard to know which tradesperson to trust.",
+      },
+      result: {
+        fr: "Badge « Vérifié ABO » après contrôle d'identité, avis liés à une vraie demande, devis puis échange sur WhatsApp.",
+        en: "A “Vérifié ABO” badge after an identity check, reviews tied to a real request, a quote, then a WhatsApp conversation.",
+      },
+    },
     tags: ["web"],
     gallery: [],
   },

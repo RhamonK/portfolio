@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { Brief } from "@/components/Brief";
 import { ProjectRoom } from "@/components/ProjectRoom";
 import { Expertise } from "@/components/Expertise";
 import { Lab } from "@/components/Lab";
@@ -15,6 +16,7 @@ export function HomePage({ lang }: { lang: Lang }) {
       <Header lang={lang} />
       <main id="contenu">
         <Hero lang={lang} />
+        <Brief lang={lang} />
         <ProjectRoom lang={lang} />
         <Expertise lang={lang} />
         <Lab lang={lang} />

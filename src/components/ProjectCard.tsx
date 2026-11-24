@@ -1,6 +1,7 @@
 import { ProjectLogo } from "@/components/ProjectLogo";
 import type { Project } from "@/data/projects";
 import { ProjectScreen } from "@/components/ProjectScreen";
+import { ProjectStory } from "@/components/ProjectStory";
 import { ui, type Lang } from "@/i18n";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -72,7 +73,7 @@ export function ProjectCard({
         {project.name}
         {project.status && <span className="pc-status">{project.status[lang]}</span>}
       </h3>
-      <p className="mt-1 text-muted">{project.pitch[lang]}</p>
+      <ProjectStory project={project} lang={lang} variant="card" />
       {project.aside && <p className="mt-1 font-serif text-[18px] italic text-ink/80">{project.aside[lang]}</p>}
       {(project.tech || project.href) && (
         <p className="mt-2 font-mono text-[13px] text-muted">

@@ -14,6 +14,11 @@ export type Pillar = {
   tools: string[];
   /** Projets qui le prouvent (slugs) ; « portfolio » = ce site. */
   proofs: string[];
+  /**
+   * Un vrai workflow, étape par étape (affiché dans la fiche du pilier).
+   * Repris tel quel de la description du projet cité dans `caption`.
+   */
+  flow?: { steps: { title: T; detail: T }[]; caption: T };
 };
 
 export const pillars: Pillar[] = [
@@ -46,6 +51,20 @@ export const pillars: Pillar[] = [
     },
     tools: ["n8n", "Make", "Zapier"],
     proofs: ["studio-nala", "kelthen"],
+    // Studio Nala (src/data/projects.ts) : de la demande de la cliente au rappel.
+    flow: {
+      steps: [
+        { title: { fr: "Demande", en: "Request" }, detail: { fr: "5 canaux", en: "5 channels" } },
+        { title: { fr: "Assistante IA", en: "AI assistant" }, detail: { fr: "prend la demande", en: "takes the request" } },
+        { title: { fr: "Validation", en: "Approval" }, detail: { fr: "1 tap Telegram", en: "1 tap on Telegram" } },
+        { title: { fr: "Confirmation", en: "Confirmation" }, detail: { fr: "SMS · courriel · agenda", en: "SMS · email · calendar" } },
+        { title: { fr: "Rappels", en: "Reminders" }, detail: { fr: "24 h et 2 h avant", en: "24 h and 2 h before" } },
+      ],
+      caption: {
+        fr: "Le workflow n8n de Studio Nala : site, Telegram, WhatsApp, Messenger ou Instagram, jusqu'au rappel.",
+        en: "Studio Nala's n8n workflow: website, Telegram, WhatsApp, Messenger or Instagram, all the way to the reminder.",
+      },
+    },
   },
   {
     tag: "ai",
