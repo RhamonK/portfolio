@@ -11,13 +11,14 @@ import { ui, type Lang } from "@/i18n";
 // - Mobile : une ligne fine dans la gouttière, sans repères (rien ne masque le contenu).
 // Calcul quasi nul : une variable CSS mise à jour au défilement (un rAF au plus par image).
 
-const SECTIONS = ["accueil", "projets", "expertise", "contact"] as const;
+const SECTIONS = ["accueil", "projets", "capot", "expertise", "contact"] as const;
 
 export function InfiniteThread({ lang }: { lang: Lang }) {
   const t = ui[lang];
   const labels: Record<(typeof SECTIONS)[number], string> = {
     accueil: t.threadHome,
     projets: t.nav.projects,
+    capot: t.stackNav,
     expertise: t.nav.expertise,
     contact: t.nav.contact,
   };

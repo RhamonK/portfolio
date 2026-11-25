@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site, siteCopy } from "@/data/site";
 import { ui, type Lang } from "@/i18n";
 import { InfinityCore, type InfinityCoreHandle } from "@/components/core/InfinityCore";
+import { CodeField } from "@/components/motion/CodeField";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,6 +55,7 @@ export function Hero({ lang }: { lang: Lang }) {
   const copy = siteCopy[lang];
   const root = useRef<HTMLElement>(null);
   const core = useRef<InfinityCoreHandle>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const finishRef = useRef<() => void>(() => {});
   const [intro, setIntro] = useState(false);
   const [tracing, setTracing] = useState(false);
@@ -182,12 +184,14 @@ export function Hero({ lang }: { lang: Lang }) {
       aria-labelledby="titre-accueil"
       className="hero relative flex min-h-[100svh] items-center overflow-hidden pt-14 md:pt-16"
     >
-      <div className="wrap grid w-full items-center gap-4 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-10 md:py-10">
+      {/* fond : le code qui sort de derrière le noyau (décoratif) */}
+      <CodeField anchor={stage} />
+      <div className="wrap relative z-10 grid w-full items-center gap-4 py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-10 md:py-10">
         {/* ===== noyau ===== */}
         <div className="h-core md:order-2">
           <div className="h-core-inner mx-auto w-full max-w-[calc(34svh*4/3)] [@media(max-height:700px)]:max-w-[calc(27svh*4/3)] md:max-w-none md:[@media(max-height:700px)]:max-w-none">
             {/* la scène : une carte cadrée où l'objet vit */}
-            <div className="h-stage [perspective:1100px]">
+            <div ref={stage} className="h-stage [perspective:1100px]">
               <div className="h-turn">
                 <InfinityCore ref={core} tracing={tracing} defer={intro} />
               </div>
