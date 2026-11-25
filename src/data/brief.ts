@@ -41,12 +41,12 @@ export const skills: Skill[] = [
     tools: ["Agents IA", "LLM", "Prompts", "Outils d'agent", "WhatsApp", "Telegram", "Messenger", "Instagram"],
   },
   {
-    title: { fr: "Automatisation", en: "Automation" },
+    title: { fr: "Automatisation & leads", en: "Automation & leads" },
     pitch: {
-      fr: "Le travail répétitif disparaît : courriels, leads, prospection, relances, réservations, publications.",
-      en: "Repetitive work disappears: emails, leads, prospecting, follow-ups, bookings, social posts.",
+      fr: "Des leads captés, qualifiés et relancés tout seuls ; des courriels, réservations et publications qui partent sans qu'on y touche.",
+      en: "Leads captured, qualified and followed up on their own; emails, bookings and posts that go out without lifting a finger.",
     },
-    tools: ["n8n", "Make", "Zapier", "Courriels auto", "Leads", "Relances", "SMS", "Agenda"],
+    tools: ["n8n", "Make", "Zapier", "Gestion des leads", "Qualification de leads", "Prospection", "CRM", "Courriels automatisés", "Relances", "SMS", "Agenda"],
   },
   {
     title: { fr: "Mobile & 3D", en: "Mobile & 3D" },
