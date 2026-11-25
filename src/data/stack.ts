@@ -109,9 +109,9 @@ agent:  "Yes, 10 am is free. Shall I book it?"`,
 export type Layer = { layer: T; tools: string; proofs: string[] };
 
 export const layers: Layer[] = [
-  { layer: { fr: "Interface", en: "Interface" }, tools: "React · Next.js · React Native · Three.js", proofs: ["fraul", "studio-nala", "mamashop"] },
-  { layer: { fr: "API", en: "API" }, tools: "REST · webhooks · JSON", proofs: ["studio-nala", "kelthen"] },
-  { layer: { fr: "Données", en: "Data" }, tools: "SQL · PostgreSQL · Supabase", proofs: ["abo", "mamashop", "studio-nala"] },
-  { layer: { fr: "Agents IA", en: "AI agents" }, tools: "WhatsApp · Telegram · Messenger · Instagram", proofs: ["studio-nala", "kelthen"] },
+  { layer: { fr: "Interface", en: "Interface" }, tools: "HTML · CSS · React · Next.js · React Native · Three.js", proofs: ["fraul", "studio-nala", "mamashop"] },
+  { layer: { fr: "API", en: "API" }, tools: "Node.js · REST · webhooks · Laravel", proofs: ["studio-nala", "kelthen"] },
+  { layer: { fr: "Données", en: "Data" }, tools: "SQL · PostgreSQL · MySQL · Supabase · Firebase", proofs: ["abo", "mamashop", "studio-nala"] },
+  { layer: { fr: "Agents IA", en: "AI agents" }, tools: "LLM · agents · WhatsApp · Telegram · Messenger · Instagram", proofs: ["studio-nala", "kelthen"] },
   { layer: { fr: "Automatisation", en: "Automation" }, tools: "n8n · Make · Zapier", proofs: ["studio-nala", "kelthen"] },
 ];

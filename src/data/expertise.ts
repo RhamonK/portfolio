@@ -29,7 +29,7 @@ export const pillars: Pillar[] = [
       fr: "Sites et applications web sur mesure, de la maquette à la mise en production.",
       en: "Custom websites and web apps, from mock-up to production.",
     },
-    tools: ["Next.js", "React", "TypeScript", "Laravel", "Vue.js", "Supabase", "PostgreSQL"],
+    tools: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next.js", "Vue.js", "Tailwind CSS", "Node.js", "API REST", "Laravel", "SQL", "PostgreSQL", "MySQL", "Supabase", "Firebase"],
     proofs: ["fraul", "studio-nala", "kelthen", "abo"],
   },
   {
@@ -39,17 +39,17 @@ export const pillars: Pillar[] = [
       fr: "Applications mobiles qui continuent de fonctionner sans réseau et se synchronisent au retour.",
       en: "Mobile apps that keep working offline and sync when the network returns.",
     },
-    tools: ["React Native", "Supabase"],
+    tools: ["React Native", "Supabase", "Firebase"],
     proofs: ["mamashop"],
   },
   {
     tag: "automation",
     title: { fr: "Automatisation", en: "Automation" },
     text: {
-      fr: "Des processus qui tournent seuls : réservations, confirmations, rappels, relances, publication.",
-      en: "Processes that run on their own: bookings, confirmations, reminders, follow-ups, publishing.",
+      fr: "Le travail répétitif disparaît : courriels automatiques, leads, prospection, relances, réservations, rappels, publications.",
+      en: "Repetitive work disappears: automated emails, leads, prospecting, follow-ups, bookings, reminders, social posts.",
     },
-    tools: ["n8n", "Make", "Zapier"],
+    tools: ["n8n", "Make", "Zapier", "Webhooks", "API REST"],
     proofs: ["studio-nala", "kelthen"],
     // Studio Nala (src/data/projects.ts) : de la demande de la cliente au rappel.
     flow: {
@@ -73,7 +73,7 @@ export const pillars: Pillar[] = [
       fr: "Assistants conversationnels branchés sur le site, WhatsApp, Telegram, Messenger ou Instagram.",
       en: "Conversational assistants plugged into the website, WhatsApp, Telegram, Messenger or Instagram.",
     },
-    tools: ["WhatsApp", "Telegram", "Messenger", "Instagram"],
+    tools: ["Agents IA", "LLM", "Prompts", "WhatsApp", "Telegram", "Messenger", "Instagram"],
     proofs: ["studio-nala", "kelthen"],
   },
   {

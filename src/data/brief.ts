@@ -1,33 +1,59 @@
-// « En bref » : quelques repères chiffrés, tous vérifiables ailleurs sur le site.
-// Rien d'estimé : chaque valeur cite sa source. Pour ajouter un chiffre (clients,
-// automatisations en production…), l'ajouter ici seulement quand il est réel.
+// « Ce que je sais faire » : toute la chaîne, du pixel à l'agent IA.
+// Chaque domaine : une phrase qui dit ce que ça apporte, puis les outils.
 
 import type { Lang } from "@/i18n";
-import { projects } from "@/data/projects";
 
 type T = Record<Lang, string>;
 
-export type Fact = { value: string; label: T };
+export type Skill = { title: T; pitch: T; tools: string[] };
 
-export const brief: Fact[] = [
+export const skills: Skill[] = [
   {
-    // src/data/parcours.ts : ODDA Technologies, oct. 2021
-    value: "2021",
-    label: { fr: "premières applications web en production", en: "first web apps in production" },
+    title: { fr: "Front-end", en: "Front-end" },
+    pitch: {
+      fr: "Des interfaces rapides, propres et qui marquent, du site vitrine à l'expérience 3D.",
+      en: "Fast, clean, memorable interfaces, from a landing page to a 3D experience.",
+    },
+    tools: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next.js", "Vue.js", "Tailwind CSS", "GSAP", "Three.js"],
   },
   {
-    // src/data/projects.ts
-    value: String(projects.length),
-    label: { fr: "projets réels, tous présentés ici", en: "real projects, all shown here" },
+    title: { fr: "Back-end & API", en: "Back-end & APIs" },
+    pitch: {
+      fr: "La logique qui fait tourner le produit : API, comptes, paiements, webhooks.",
+      en: "The logic that runs the product: APIs, accounts, payments, webhooks.",
+    },
+    tools: ["Node.js", "API REST", "Webhooks", "Laravel", "PHP", "Stripe", "JSON"],
   },
   {
-    // Studio Nala : site, Telegram, WhatsApp, Messenger, Instagram
-    value: "5",
-    label: { fr: "canaux de réservation reliés par n8n", en: "booking channels connected with n8n" },
+    title: { fr: "Bases de données", en: "Databases" },
+    pitch: {
+      fr: "Des données bien rangées, sécurisées et synchronisées, même hors ligne.",
+      en: "Well-structured, secure data that stays in sync, even offline.",
+    },
+    tools: ["SQL", "PostgreSQL", "MySQL", "Supabase", "Firebase"],
   },
   {
-    // src/data/site.ts : languages
-    value: "FR · EN",
-    label: { fr: "deux langues de travail", en: "two working languages" },
+    title: { fr: "IA & agents", en: "AI & agents" },
+    pitch: {
+      fr: "Des agents IA qui répondent, réservent et agissent sur WhatsApp, Telegram, Messenger, Instagram ou le site.",
+      en: "AI agents that answer, book and take action on WhatsApp, Telegram, Messenger, Instagram or the website.",
+    },
+    tools: ["Agents IA", "LLM", "Prompts", "Outils d'agent", "WhatsApp", "Telegram", "Messenger", "Instagram"],
+  },
+  {
+    title: { fr: "Automatisation", en: "Automation" },
+    pitch: {
+      fr: "Le travail répétitif disparaît : courriels, leads, prospection, relances, réservations, publications.",
+      en: "Repetitive work disappears: emails, leads, prospecting, follow-ups, bookings, social posts.",
+    },
+    tools: ["n8n", "Make", "Zapier", "Courriels auto", "Leads", "Relances", "SMS", "Agenda"],
+  },
+  {
+    title: { fr: "Mobile & 3D", en: "Mobile & 3D" },
+    pitch: {
+      fr: "Des apps mobiles qui tiennent sans réseau, et de la 3D qui reste fluide sur téléphone.",
+      en: "Mobile apps that work without a network, and 3D that stays smooth on phones.",
+    },
+    tools: ["React Native", "Hors ligne", "Three.js", "React Three Fiber", "Blender"],
   },
 ];
