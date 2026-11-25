@@ -17,7 +17,6 @@ export function Header({ lang }: { lang: Lang }) {
   const nav = [
     { label: t.nav.projects, href: `${base[lang]}#projets` },
     { label: t.nav.expertise, href: `${base[lang]}#expertise` },
-    { label: t.labNav, href: `${base[lang]}#labo` },
     { label: t.nav.contact, href: `${base[lang]}#contact` },
   ];
 
